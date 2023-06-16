@@ -41,8 +41,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 11;
+<<<<<<< Updated upstream
   int _counter = 5;
+=======
+
   int _counter = 3;
+
+>>>>>>> Stashed changes
 
   void _incrementCounter() {
     setState(() {
