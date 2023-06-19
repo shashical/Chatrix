@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
-
+  
 
 
   @override
@@ -41,56 +41,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-List<Contact> contacts=[];
-bool isg=false;
-bool isloading=false;
-
+  List<Contact> contacts = [];
+  bool isg = false;
+  bool isloading = false;
+  bool contactsFetched = false; // New state variable
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     getContactPermission();
-
-
   }
-  void getContactPermission()async{
-   if(await Permission.contacts.isGranted){
-     fetchContact();
-    setState(() {
-      isg=true;
-    });
 
-   }
-   else{
-     await Permission.contacts.request();
-     if( await Permission.contacts.isGranted){
-       fetchContact();
+  @override
+  void getContactPermission() async {
+    if (await Permission.contacts.isGranted) {
+      fetchContact();
+      setState(() {
+        isg = true;
+      });
+    } else {
+      await Permission.contacts.request();
+      if (await Permission.contacts.isGranted) {
+        fetchContact();
         setState(() {
-          isg=true;
+          isg = true;
         });
-      debugPrint(isg as String?);
-     }
-
-
-   }
-
+      }
+    }
+    print("${contacts.length}");
   }
-  void fetchContact()async {
-    contacts=await FlutterContacts.getContacts();
+
+  void fetchContact() async {
+    contacts = await FlutterContacts.getContacts();
+    setState(() {
+      contactsFetched = true; // Update the state variable
+    });
   }
 
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
-        title:  Text('people'),
+        title: Text('people'),
       ),
-
-      body:isg==false?Center(child: Text('please restart the app and provide the permission to continue')):isloading?CircularProgressIndicator():ListView.builder(
-          itemCount: contacts.length,
-          itemBuilder:(context,index)=>ListTile(title: Text(contacts[index].displayName!),) )
+      body: isg == false
+          ? Center(child: Text('Please restart the app and provide the permission to continue'))
+          : isloading
+              ? CircularProgressIndicator()
+              : contactsFetched // Display contacts only when fetched
+                  ? ListView.builder(
+                      itemCount: contacts.length,
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(contacts[index].displayName),
+                      ),
+                    )
+                  : Container(), // Placeholder when contacts are not yet fetched
     );
   }
 }
+
