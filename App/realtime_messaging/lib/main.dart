@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 //hey
 void main()async{
-  final ref=FirebaseFirestore.instance;
+ // final ref=FirebaseFirestore.instance;
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -26,13 +26,13 @@ class MyApp extends StatelessWidget {
        
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -43,53 +43,61 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 11;
 
+List<Contact> contacts=[];
+bool isg=false;
+bool isloading=false;
 
-  void _incrementCounter() {
-    setState(() {
-
-      _counter+=3;
-    });
-  }
 
   @override
+  // void initState(){
+  //   super.initState();
+  //   getContactPermission();
+  //
+  //
+  // }
+  // void getContactPermission()async{
+  //  if(await Permission.contacts.isGranted){
+  //    fetchContact();
+  //   setState(() {
+  //     isg=true;
+  //   });
+  //
+  //  }
+  //  else{
+  //    await Permission.contacts.request();
+  //    if( await Permission.contacts.isGranted){
+  //      fetchContact();
+  //       setState(() {
+  //         isg=true;
+  //       });
+  //
+  //    }
+  //
+  //
+  //  }
+  //
+  // }
+  // void fetchContact()async {
+  //   contacts=await ContactsService.getContacts();
+  // }
+
   Widget build(BuildContext context) {
+
 
     return Scaffold(
       appBar: AppBar(
-
-        title: Text(widget.title),
+        title:  Text('people'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
 
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // body:isg?Center(child: Container(child:Text('please restart the app and provide the permission to continue'),)):isloading?CircularProgressIndicator():ListView.builder(
+      //     itemCount: contacts.length,
+      //     itemBuilder:(context,index)=>ListTile(title: Text(contacts[index].displayName!),) )
     );
   }
 }
