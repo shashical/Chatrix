@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 //hey
 void main()async{
@@ -34,14 +34,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -55,37 +48,37 @@ bool isloading=false;
 
 
   @override
-  // void initState(){
-  //   super.initState();
-  //   getContactPermission();
-  //
-  //
-  // }
-  // void getContactPermission()async{
-  //  if(await Permission.contacts.isGranted){
-  //    fetchContact();
-  //   setState(() {
-  //     isg=true;
-  //   });
-  //
-  //  }
-  //  else{
-  //    await Permission.contacts.request();
-  //    if( await Permission.contacts.isGranted){
-  //      fetchContact();
-  //       setState(() {
-  //         isg=true;
-  //       });
-  //
-  //    }
-  //
-  //
-  //  }
-  //
-  // }
-  // void fetchContact()async {
-  //   contacts=await ContactsService.getContacts();
-  // }
+  void initState(){
+    super.initState();
+    getContactPermission();
+
+
+  }
+  void getContactPermission()async{
+   if(await Permission.contacts.isGranted){
+     fetchContact();
+    setState(() {
+      isg=true;
+    });
+
+   }
+   else{
+     await Permission.contacts.request();
+     if( await Permission.contacts.isGranted){
+       fetchContact();
+        setState(() {
+          isg=true;
+        });
+      debugPrint(isg as String?);
+     }
+
+
+   }
+
+  }
+  void fetchContact()async {
+    contacts=await FlutterContacts.getContacts();
+  }
 
   Widget build(BuildContext context) {
 
@@ -95,9 +88,9 @@ bool isloading=false;
         title:  Text('people'),
       ),
 
-      // body:isg?Center(child: Container(child:Text('please restart the app and provide the permission to continue'),)):isloading?CircularProgressIndicator():ListView.builder(
-      //     itemCount: contacts.length,
-      //     itemBuilder:(context,index)=>ListTile(title: Text(contacts[index].displayName!),) )
+      body:isg==false?Center(child: Text('please restart the app and provide the permission to continue')):isloading?CircularProgressIndicator():ListView.builder(
+          itemCount: contacts.length,
+          itemBuilder:(context,index)=>ListTile(title: Text(contacts[index].displayName!),) )
     );
   }
 }
