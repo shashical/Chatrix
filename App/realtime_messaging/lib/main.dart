@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:realtime_messaging/screens/login_page.dart';
+import 'package:realtime_messaging/screens/verify_otp_page.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -26,7 +28,8 @@ class MyApp extends StatelessWidget {
        
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      debugShowCheckedModeBanner: false,
+      home:VerifyOtpPage( phoneNo: '9811286230', verificationId: 'dbddb', token: 123456,),
     );
   }
 }
@@ -43,8 +46,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Contact> contacts = [];
   bool isg = false;
-  bool isloading = false;
-  bool contactsFetched = false; // New state variable
+  bool contactsFetched = false;
 
   @override
   void initState() {
@@ -52,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     getContactPermission();
   }
 
-  @override
+
   void getContactPermission() async {
     if (await Permission.contacts.isGranted) {
       fetchContact();
@@ -74,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void fetchContact() async {
     contacts = await FlutterContacts.getContacts();
     setState(() {
-      contactsFetched = true; // Update the state variable
+      contactsFetched = true;
     });
   }
 
@@ -85,16 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: isg == false
           ? Center(child: Text('Please restart the app and provide the permission to continue'))
-          : isloading
-              ? CircularProgressIndicator()
-              : contactsFetched // Display contacts only when fetched
+              : contactsFetched
                   ? ListView.builder(
                       itemCount: contacts.length,
                       itemBuilder: (context, index) => ListTile(
                         title: Text(contacts[index].displayName),
                       ),
                     )
-                  : Container(), // Placeholder when contacts are not yet fetched
+                  :  CircularProgressIndicator() // Placeholder when contacts are not yet fetched
     );
   }
 }
