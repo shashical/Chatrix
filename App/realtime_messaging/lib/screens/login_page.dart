@@ -12,9 +12,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextEditingController phoneNoController=TextEditingController();
+  bool isloading=false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -22,30 +24,39 @@ class _LoginPageState extends State<LoginPage> {
         child: Stack(
           children:
           [
+            Column(
+              children: [
+                Spacer(),
+                Image(
+                  image: AssetImage('assets/login_bgnd.png'),
+                  width: 500,
+
+                ),
+              ],
+            ),
             ClipPath(
             clipper:BottomWaveClipper(),
               child: Container(
-                color: const Color.fromARGB(255, 210, 131, 225),
+                color: const Color.fromARGB(255, 20, 78, 225),
                 width: double.infinity,
-                height: 420,
+                height: 650,
               ),
             ),
             ClipPath(
               clipper:BottomWaveClipper(),
-              child: Container(
-                color: const Color.fromARGB(255, 187, 12, 215),
-                width: double.infinity,
-                height: 400,
-              ),
+              child: Image(
+                image: AssetImage('assets/login_bgnd.png'),
+                width: 395,
+              )
             ),
             Positioned(
-              top: 180,
+              top: 235,
                 left: 20,
                 child: BlurryContainer(
                   color: Colors.white.withOpacity(0.4),
                   blur: 2,
                   elevation: 6,
-                  height: 500,
+                  height:400,
                   width: 350,
                   padding: EdgeInsets.all(25),
                   child: Column(
@@ -72,11 +83,16 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       TextField(
                         controller: phoneNoController,
-
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500
+                        ),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          prefixIcon: Text(' +91',
+
+                          prefixIcon: Text(' +91 ',
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.black,
@@ -94,109 +110,132 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       SizedBox(height: 20,),
-                      ElevatedButton(
+                      SizedBox(
+                        width: 400,
+                        child: ElevatedButton(
 
-                        onPressed: ()async{
-                          String phoneNo=phoneNoController.text;
-                          try{
-                            final credential = await FirebaseAuth.instance.verifyPhoneNumber(
-                                verificationCompleted: (_){},
-                                verificationFailed:(e){
-                                  showDialog(context: (context),
-                                      builder:(context){
-                                        return AlertDialog(
-
-                                          content: Text('${e.message}'),
-                                          actions: [
-                                            Builder(
-                                                builder: (context) {
-                                                  return ElevatedButton(
-                                                      onPressed: (){
-                                                        Navigator.of(context,rootNavigator: true).pop();
-                                                      },
-                                                      child: const Text('OK'));
-                                                }
-                                            )
-                                          ],
-                                        );});
-                                },
-                                codeSent: ( String verificationId,int? token ){
-                                  Navigator.push((context),
-                                      MaterialPageRoute(builder: (context)=>VerifyOtpPage(phoneNo: phoneNo, verificationId: verificationId, token: token!,))).then((value){
-                                    phoneNoController.clear;
-
-                                  });
-                                },
-                                codeAutoRetrievalTimeout: (e){
-                                  showDialog(context: (context),
-                                      builder:(context){
-                                        return AlertDialog(
-
-                                          content: Text('${e}'),
-                                          actions: [
-                                            Builder(
-                                                builder: (context) {
-                                                  return ElevatedButton(
-                                                      onPressed: (){
-                                                        Navigator.of(context,rootNavigator: true).pop();
-                                                      },
-                                                      child: const Text('OK'));
-                                                }
-                                            )
-                                          ],
-                                        );});
-                                }
-                            );
-
-
-                          }on FirebaseException catch(e){
-                            showDialog(context: (context),
-                                builder:(context){
-                                  return AlertDialog(
-
-                                    content: Text('${e.message}'),
-                                    actions: [
-                                      Builder(
-                                          builder: (context) {
-                                            return ElevatedButton(
-                                                onPressed: (){
-                                                  Navigator.of(context,rootNavigator: true).pop();
-                                                },
-                                                child: const Text('OK'));
-                                          }
-                                      )
-                                    ],
-                                  );});
-
-
-                          }
-                          catch(e){
-                            showDialog(context: (context), builder:(context) {
-                              return AlertDialog(
-
-                                content: Text('${e}'),
-                                actions: [
-                                  Builder(
-                                      builder: (context) {
-                                        return ElevatedButton(
-                                            onPressed: (){
-                                              Navigator.of(context,rootNavigator: true).pop();
-                                            },
-                                            child: const Text('OK'));
-                                      }
-                                  )
-                                ],
-                              );
+                          onPressed: ()async{
+                            setState(() {
+                              isloading=true;
                             });
-                          }
+                            String phoneNo=phoneNoController.text;
+                            try{
+                               FirebaseAuth.instance.verifyPhoneNumber(
+                                 phoneNumber: "91"+phoneNo,
+                                  verificationCompleted: (_){},
+                                  verificationFailed:(e){
+                                   isloading =false;
+                                   setState(() {
+                                     
+                                   });
+                                    showDialog(context: (context),
+                                        builder:(context){
+                                          return AlertDialog(
 
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Login',
-                            style: TextStyle(
-                                fontSize: 25
-                            ),),
+                                            content: Text('${e.message}'),
+                                            actions: [
+                                              Builder(
+                                                  builder: (context) {
+                                                    return ElevatedButton(
+                                                        onPressed: (){
+                                                          Navigator.of(context,rootNavigator: true).pop();
+                                                        },
+                                                        child: const Text('OK'));
+                                                  }
+                                              )
+                                            ],
+                                          );});
+                                  },
+                                  codeSent: ( String verificationId,int? token ){
+                                   setState(() {
+                                     isloading=false;
+                                   });
+                                    Navigator.push((context),
+                                        MaterialPageRoute(builder: (context)=>VerifyOtpPage(phoneNo: phoneNo, verificationId: verificationId, token: token!,))).then((value){
+                                      phoneNoController.clear;
+
+                                    });
+                                  },
+                                  codeAutoRetrievalTimeout: (e){
+                                    showDialog(context: (context),
+                                        builder:(context){
+                                          return AlertDialog(
+
+                                            content: Text('${e}'),
+                                            actions: [
+                                              Builder(
+                                                  builder: (context) {
+                                                    return ElevatedButton(
+                                                        onPressed: (){
+                                                          Navigator.of(context,rootNavigator: true).pop();
+                                                        },
+                                                        child: const Text('OK'));
+                                                  }
+                                              )
+                                            ],
+                                          );});
+                                  }
+                              );
+
+
+                            }on FirebaseException catch(e){
+                              setState(() {
+                                isloading=false;
+                              });
+                              showDialog(context: (context),
+                                  builder:(context){
+                                    return AlertDialog(
+
+                                      content: Text('${e.message}'),
+                                      actions: [
+                                        Builder(
+                                            builder: (context) {
+                                              return ElevatedButton(
+                                                  onPressed: (){
+                                                    Navigator.of(context,rootNavigator: true).pop();
+                                                  },
+                                                  child: const Text('OK'));
+                                            }
+                                        )
+                                      ],
+                                    );});
+
+
+                            }
+                            catch(e){
+                              setState(() {
+                                isloading=false;
+                              });
+                              showDialog(context: (context), builder:(context) {
+                                return AlertDialog(
+
+                                  content: Text('${e}'),
+                                  actions: [
+                                    Builder(
+                                        builder: (context) {
+                                          return ElevatedButton(
+                                              onPressed: (){
+                                                Navigator.of(context,rootNavigator: true).pop();
+                                              },
+                                              child: const Text('OK'));
+                                        }
+                                    )
+                                  ],
+                                );
+                              });
+                            }
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
+                          ),
+                          child:(isloading)? CircularProgressIndicator():  Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:Text('Send OTP',
+                              style: TextStyle(
+                                  fontSize: 25
+                              ),),
+                          ),
                         ),
                       ),
 

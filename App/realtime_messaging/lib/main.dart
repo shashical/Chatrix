@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashPage(),
+      debugShowCheckedModeBanner: false,
+      home:VerifyOtpPage(phoneNo: '9811286230',token: 123456,verificationId: "12345ggl",),
     );
   }
 }
