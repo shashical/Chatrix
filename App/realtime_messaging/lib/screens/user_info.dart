@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:realtime_messaging/screens/my_chats.dart';
+
+import '../Models/users.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -155,7 +160,36 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async{
+                        try{
+                        final auth=await FirebaseAuth.instance.currentUser!.uid;
+                        final ref=await FirebaseFirestore.instance.collection('users').doc(auth);
+                       await  ref.update({"name":_usernameController.text,
+                                      "photoUrl":_image,
+                                      "about":_aboutController.text
+
+                        }).catchError((e)=>{
+                          throw Exception('$e')
+                       });
+                        Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context)=>MyChatsPage()));
+                        }on FirebaseAuthException catch(e){
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(SnackBar(content: Text('${e.message}')));
+                        } on FirebaseException catch(e){
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(SnackBar(content: Text('${e.message}')));
+                        }
+
+                        catch(e)
+                             { ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(SnackBar(content: Text('$e')));}
+
+                        ;
+
                         
                       },
                       child: Text(
@@ -175,7 +209,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        
+                        Navigator.pushReplacement((context),
+                            MaterialPageRoute(builder: (context)=>MyChatsPage()));
                       },
                       child: Text(
                         'Skip',

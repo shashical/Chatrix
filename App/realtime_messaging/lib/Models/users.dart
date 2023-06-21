@@ -1,23 +1,23 @@
 
 import 'dart:convert';
 
-User userFromjson(String str)=>User.Fromjson(json.decode(str));
-String userTojson( User data)=>json.encode(data.Tojson());
-class User{
+Users userFromjson(String str)=>Users.Fromjson(json.decode(str));
+String userTojson( Users data)=>json.encode(data.Tojson());
+class Users{
   String id;
   String? name;
   String? photoUrl;
   bool? isOnline;
   String mobileNo;
   String? about;
-  User({required this.id,
+  Users({required this.id,
       this.name,
       this.photoUrl='https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1',
       this.isOnline,
       required this.mobileNo,
       this.about
   });
-  factory User.Fromjson( Map<String,dynamic> json)=>User(
+  factory Users.Fromjson( Map<String,dynamic> json)=>Users(
     id: json["id"],
     name: json["name"],
     photoUrl: json["photoUrl"],
@@ -36,7 +36,7 @@ class User{
 
 
  };
- User updateUser(User user,String? name,String? photoUrl,String? mobileNo,String? about,bool? isOnline,)=>User(
+ Users updateUser(Users user,String? name,String? photoUrl,String? mobileNo,String? about,bool? isOnline,)=>Users(
    id:user.id,
    name: (name==null)?user.name:name,
    photoUrl: (photoUrl==null)?user.photoUrl:photoUrl,

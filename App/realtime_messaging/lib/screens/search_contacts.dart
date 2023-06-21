@@ -14,7 +14,6 @@ class SearchContactPage extends StatefulWidget {
 class _SearchContactPageState extends State<SearchContactPage> {
   List<Contact> contacts = [];
   bool isg = false;
-  bool isloading = false;
   bool contactsFetched = false; 
 
   @override
@@ -23,7 +22,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
     getContactPermission();
   }
 
-  @override
+
   void getContactPermission() async {
     if (await Permission.contacts.isGranted) {
       fetchContact();
@@ -47,7 +46,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
       contactsFetched = true; 
     });
   }
-
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -55,8 +54,6 @@ class _SearchContactPageState extends State<SearchContactPage> {
       ),
       body: isg == false
           ? Center(child: Text('Please restart the app and provide the permission to continue'))
-          : isloading
-              ? CircularProgressIndicator()
               : contactsFetched 
                   ? ListView.builder(
                       itemCount: contacts.length,
@@ -64,7 +61,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                         title: Text(contacts[index].displayName),
                       ),
                     )
-                  : Container(), 
+                  : CircularProgressIndicator(),
     );
   }
 }

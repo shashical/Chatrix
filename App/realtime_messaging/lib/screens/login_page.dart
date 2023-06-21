@@ -229,7 +229,8 @@ class _LoginPageState extends State<LoginPage> {
                           style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
                           ),
-                          child:(isloading)? CircularProgressIndicator():  Padding(
+                          child:(isloading)? CircularProgressIndicator(strokeWidth: 2,
+                          color: Colors.white,):  Padding(
                             padding: EdgeInsets.all(8.0),
                             child:Text('Send OTP',
                               style: TextStyle(
