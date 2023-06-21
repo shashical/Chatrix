@@ -55,6 +55,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         signingConfig signingConfigs.debug
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -71,5 +72,7 @@ flutter {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation platform('com.google.firebase:firebase-bom:32.1.1')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

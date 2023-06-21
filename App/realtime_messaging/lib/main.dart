@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'screens/splash.dart';
+import 'screens/user_info.dart';
 
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:VerifyOtpPage(phoneNo: '9811286230',token: 123456,verificationId: "12345ggl",),
+      home:UserInfoPage(),
     );
   }
 }

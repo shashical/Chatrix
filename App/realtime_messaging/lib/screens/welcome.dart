@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'splash.dart';
 import 'login_page.dart';
-import 'verify_otp_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
