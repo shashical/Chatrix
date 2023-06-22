@@ -153,10 +153,10 @@ class _SearchContactPageState extends State<SearchContactPage> {
                     if(_searchController.text.isEmpty) {
                       return ListView(
                         children: users.map((user) =>
-                        (savedUsers.contains(user.mobileNo))?
+                        (savedUsers.contains(user.phoneNo))?
                             ListTile(
                               leading: CircleAvatar(child: Image(image:NetworkImage('${user.photoUrl}')),),
-                              title: Text(savedUsers[savedNumber.indexOf(user.mobileNo)]),
+                              title: Text(savedUsers[savedNumber.indexOf(user.phoneNo)]),
                               subtitle: Text('${user.about}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -168,9 +168,9 @@ class _SearchContactPageState extends State<SearchContactPage> {
                     }
                     else{
                       return ListView(
-                        children: users.map((user) => (searchedNumber.contains(user.mobileNo))?
+                        children: users.map((user) => (searchedNumber.contains(user.phoneNo))?
                         ListTile(
-                          title: Text(searchedUser[searchedNumber.indexOf(user.mobileNo)]),
+                          title: Text(searchedUser[searchedNumber.indexOf(user.phoneNo)]),
                         ):const SizedBox(height: 0,width: 0,)
                         ).toList(),
                       );
