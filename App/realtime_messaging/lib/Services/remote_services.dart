@@ -36,5 +36,10 @@ class RemoteServices{
     }
   }
 
+  Future<bool> doesDocumentExist(String documentPath) async {
+    final DocumentSnapshot documentSnapshot =
+        await FirebaseFirestore.instance.doc(documentPath).get();
 
+    return documentSnapshot.exists;
+  }
 }
