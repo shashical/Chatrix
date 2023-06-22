@@ -14,7 +14,7 @@ class RemoteServices{
   }
   Future<void>setUsers(Users user) async{
     try{
-      reference.collection('user').doc(user.id).set(user.Tojson()).catchError((e)=>
+      reference.collection('user').doc(user.id).update(user.Tojson()).catchError((e)=>
       throw Exception('$e'));
     }on FirebaseException catch(e){
       throw Exception('$e');

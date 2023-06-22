@@ -122,6 +122,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
                                   }
+
                                 },
                                 style:Theme.of(context).textTheme.titleLarge,
                                 keyboardType: TextInputType.number,
@@ -148,6 +149,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 onChanged: (value){
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
+                                  }
+                                  else if(value.length==0){
+                                    FocusScope.of(context).previousFocus();
                                   }
                                 },
                                 style:Theme.of(context).textTheme.titleLarge,
@@ -176,6 +180,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
                                   }
+                                  else if(value.length==0){
+                                    FocusScope.of(context).previousFocus();
+                                  }
                                 },
                                 style:Theme.of(context).textTheme.titleLarge,
                                 keyboardType: TextInputType.number,
@@ -202,6 +209,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 onChanged: (value){
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
+                                  }
+                                  else if(value.length==0){
+                                    FocusScope.of(context).previousFocus();
                                   }
                                 },
 
@@ -231,6 +241,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
                                   }
+                                  else if(value.length==0){
+                                    FocusScope.of(context).previousFocus();
+                                  }
                                 },
                                 style:Theme.of(context).textTheme.titleLarge,
                                 keyboardType: TextInputType.number,
@@ -258,6 +271,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 onChanged: (value){
                                   if(value.length==1){
                                     FocusScope.of(context).nextFocus();
+                                  }
+                                  else if(value.length==0){
+                                    FocusScope.of(context).previousFocus();
                                   }
                                 },
                                 style:Theme.of(context).textTheme.titleLarge,
@@ -445,9 +461,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 final id=FirebaseAuth.instance.currentUser!.uid;
                                 RemoteServices().setUsers(Users(id:id,
                                     phoneNo:"+91${widget.phoneNo}",
-                                    name:"",
+
                                     isOnline:true,
-                                    about: "",
+
 
 
                                 ));
