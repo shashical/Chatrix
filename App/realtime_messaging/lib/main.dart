@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:SplashPage(),
+      home:SearchContactPage()//SplashPage(),
     );
   }
 }
