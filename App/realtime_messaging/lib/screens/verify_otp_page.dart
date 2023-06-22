@@ -1,8 +1,13 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:realtime_messaging/screens/login_page.dart';
+import 'package:realtime_messaging/Models/users.dart';
+import 'package:realtime_messaging/Services/remote_services.dart';
+import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:timer_count_down/timer_controller.dart';
+import 'package:timer_count_down/timer_count_down.dart';
 
 import '../Widgets/BottomWaveClipper.dart';
 class VerifyOtpPage extends StatefulWidget {
@@ -10,7 +15,7 @@ class VerifyOtpPage extends StatefulWidget {
   final String verificationId;
   final int token;
 
-   VerifyOtpPage({Key? key , required this.phoneNo, required this.verificationId, required this.token}) : super(key: key);
+   const VerifyOtpPage({Key? key , required this.phoneNo, required this.verificationId, required this.token}) : super(key: key);
 
   @override
   State<VerifyOtpPage> createState() => _VerifyOtpPageState();
@@ -24,8 +29,15 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   TextEditingController pin5cont=TextEditingController();
   TextEditingController pin6cont=TextEditingController();
   bool isloading=false;
+  CountdownController _controller=new CountdownController(autoStart: true);
+  bool canresend=false;
+  String? veryid="";
+
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      veryid=widget.verificationId;
+    });
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -267,24 +279,149 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             ),
                           ],
                         ),
-                          
+
                         ),
                         SizedBox(height: 20,),
                         Row(
                           children: [
+                            Countdown(
+                               controller: _controller,
+                              seconds: 30,
+                              build: (_, double time) => Text(
+                                time.toString(),
+                                style: TextStyle(
+                                  fontSize: 35,
+                                ),
+                              ),
+                              interval: Duration(milliseconds: 10),
+                              onFinished: () {
+                               setState(() {
+                                 canresend=true;
+                               });
 
+                              },
+                            ),
+                            Spacer(),
+                            TextButton(
+                              onPressed: (){
+                              if(canresend){
+                              setState(() {
+                              canresend=false;
+                              });
+                              _controller.restart();
+                              try{
+                                FirebaseAuth.instance.verifyPhoneNumber(
+                                    phoneNumber: "91${widget.phoneNo}",
+                                    verificationCompleted: (_){},
+                                    verificationFailed:(e){
+                                     canresend=true;
+                                      setState(() {
+
+                                      });
+                                      showDialog(context: (context),
+                                          builder:(context){
+                                            return AlertDialog(
+
+                                              content: Text('${e.message}'),
+                                              actions: [
+                                                Builder(
+                                                    builder: (context) {
+                                                      return ElevatedButton(
+                                                          onPressed: (){
+                                                            Navigator.of(context,rootNavigator: true).pop();
+                                                          },
+                                                          child: const Text('OK'));
+                                                    }
+                                                )
+                                              ],
+                                            );});
+                                    },
+                                    codeSent: ( String verificationId,int? token ){
+                                        veryid=verificationId;
+                                        setState(() {
+
+                                        });
+
+                                    },
+                                    codeAutoRetrievalTimeout: (e){
+                                      showDialog(context: (context),
+                                          builder:(context){
+                                            return AlertDialog(
+
+                                              content: Text('${e}'),
+                                              actions: [
+                                                Builder(
+                                                    builder: (context) {
+                                                      return ElevatedButton(
+                                                          onPressed: (){
+                                                            Navigator.of(context,rootNavigator: true).pop();
+                                                          },
+                                                          child: const Text('OK'));
+                                                    }
+                                                )
+                                              ],
+                                            );});
+                                    }
+                                );
+
+
+                              }on FirebaseException catch(e){
+                                setState(() {
+                                  isloading=false;
+                                });
+                                showDialog(context: (context),
+                                    builder:(context){
+                                      return AlertDialog(
+
+                                        content: Text('${e.message}'),
+                                        actions: [
+                                          Builder(
+                                              builder: (context) {
+                                                return ElevatedButton(
+                                                    onPressed: (){
+                                                      Navigator.of(context,rootNavigator: true).pop();
+                                                    },
+                                                    child: const Text('OK'));
+                                              }
+                                          )
+                                        ],
+                                      );});
+
+
+                              }
+                              catch(e){
+
+                                showDialog(context: (context), builder:(context) {
+                                  return AlertDialog(
+
+                                    content: Text('${e}'),
+                                    actions: [
+                                      Builder(
+                                          builder: (context) {
+                                            return ElevatedButton(
+                                                onPressed: (){
+                                                  Navigator.of(context,rootNavigator: true).pop();
+                                                },
+                                                child: const Text('OK'));
+                                          }
+                                      )
+                                    ],
+                                  );
+                                });
+                              }
+                              }
+                              },
+                             child: Text('Resend OTP',
+                                      style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w300,
+                              color:(canresend)? Colors.deepPurpleAccent:Colors.red,
+                              ),
+                            )
+                            )
                           ],
                         ),
-                        SizedBox(
-                          height: 18,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
 
-
-                          ],
-                        ),
                         SizedBox(height: 20,),
                         Center(
                           child: SizedBox(
@@ -297,14 +434,26 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               String p=pin1cont.text+pin2cont.text+pin3cont.text+pin4cont.text+pin5cont.text+pin6cont.text;
                               try{
                                 final credential=PhoneAuthProvider.credential(
-                                    verificationId: widget.verificationId,
+                                    verificationId: veryid!,
                                     smsCode: p);
                                 await FirebaseAuth.instance.signInWithCredential(credential);
                                 setState(() {
                                   isloading =false;
                                 });
+
+
+                                final id=FirebaseAuth.instance.currentUser!.uid;
+                                RemoteServices().setUsers(Users(id:id,
+                                    mobileNo:"+91${widget.phoneNo}",
+                                    name:"",
+                                    isOnline:true,
+                                    about: "",
+
+
+                                ));
+
                                 Navigator.pushReplacement(context,MaterialPageRoute(
-                                    builder: (context)=>LoginPage()));
+                                    builder: (context)=>UserInfoPage()));
 
 
 
@@ -362,7 +511,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                     builder:(context){
                                       return AlertDialog(
 
-                                        content: Text('${e}'),
+                                        content: Text('$e'),
                                         actions: [
                                           Builder(
                                               builder: (context) {
@@ -394,7 +543,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 )),
                           ),
                         )
-                        
+
 
 
 
