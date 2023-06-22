@@ -36,15 +36,7 @@ class Users{
 
 
  };
- Users updateUser(Users user,String? name,String? photoUrl,String? mobileNo,String? about,bool? isOnline,)=>Users(
-   id:user.id,
-   name: (name==null)?user.name:name,
-   photoUrl: (photoUrl==null)?user.photoUrl:photoUrl,
-   isOnline: (isOnline==null)? user.isOnline:isOnline,
-   mobileNo: (mobileNo==null)? user.mobileNo:mobileNo,
-   about: (about==null)? user.about:about,
 
- );
 
 
 

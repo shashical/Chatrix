@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:realtime_messaging/Models/users.dart';
-import 'package:realtime_messaging/screens/login_page.dart';
+import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
@@ -441,18 +441,16 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   isloading =false;
                                 });
 
-                                final colref= FirebaseFirestore.instance.collection('users');
-                                final auth=FirebaseAuth.instance.currentUser!.uid;
-                                colref.doc(auth).set(Users(id:auth,
-                                    mobileNo:widget.phoneNo,
+
+                                final id=FirebaseAuth.instance.currentUser!.uid;
+                                RemoteServices().setUsers(Users(id:id,
+                                    mobileNo:"+91${widget.phoneNo}",
                                     name:"",
                                     isOnline:true,
                                     about: "",
 
 
-                                ).Tojson()).catchError((e)=>{
-                                  throw Exception('$e')}
-                                );
+                                ));
 
                                 Navigator.pushReplacement(context,MaterialPageRoute(
                                     builder: (context)=>UserInfoPage()));
