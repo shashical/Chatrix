@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                             String phoneNo=phoneNoController.text;
                             try{
                                FirebaseAuth.instance.verifyPhoneNumber(
-                                 phoneNumber: "91"+phoneNo,
+                                 phoneNumber: "+91"+phoneNo,
                                   verificationCompleted: (_){},
                                   verificationFailed:(e){
                                    isloading =false;
