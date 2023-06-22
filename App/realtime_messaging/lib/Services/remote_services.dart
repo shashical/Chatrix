@@ -13,14 +13,20 @@ class RemoteServices{
     );
   }
   Future<void>setUsers(Users user) async{
-    try{
-      reference.collection('user').doc(user.id).update(user.Tojson()).catchError((e)=>
-      throw Exception('$e'));
-    }on FirebaseException catch(e){
-      throw Exception('$e');
-    }catch(e){
-      rethrow;
-    }
+    final DocumentSnapshot docsnap=await reference.collection('user').doc(user.id).get();
+    if(!docsnap.exists)
+      {
+        try{
+
+          reference.collection('user').doc(user.id).set(user.Tojson()).catchError((e)=>
+          throw Exception('$e'));
+          }on FirebaseException catch(e){
+          throw Exception('$e');
+        }catch(e){
+          rethrow;
+        }
+      }
+
 
   }
   Future<void> updateUser(String id,Map<String,dynamic> upd)async{

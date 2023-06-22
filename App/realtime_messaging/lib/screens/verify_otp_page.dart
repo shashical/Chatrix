@@ -460,8 +460,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
                                 final id=FirebaseAuth.instance.currentUser!.uid;
                                 RemoteServices().setUsers(Users(id:id,
+                                    name:'',
                                     phoneNo:"+91${widget.phoneNo}",
-
+                                    about: '',
                                     isOnline:true,
 
 
