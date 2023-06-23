@@ -1,27 +1,27 @@
 import 'dart:convert';
 
-GroupChat groupChatFromJson(String str) => GroupChat.fromJson(json.decode(str));
-String groupChatToJson(GroupChat data) => json.encode(data.toJson());
+UserGroup userGroupFromJson(String str) => UserGroup.fromJson(json.decode(str));
+String userGroupToJson(UserGroup data) => json.encode(data.toJson());
 
-class GroupChat {
+class UserGroup {
   String id;
-  String chatId;
+  String groupId;
   bool exited;
   String? backgroundImage;
   bool pinned;
 
-  GroupChat({
+  UserGroup({
     required this.id,
-    required this.chatId,
+    required this.groupId,
     required this.exited,
     this.backgroundImage,
     required this.pinned,
   });
 
-  factory GroupChat.fromJson(Map<String, dynamic> json) {
-    return GroupChat(
+  factory UserGroup.fromJson(Map<String, dynamic> json) {
+    return UserGroup(
       id: json['id'],
-      chatId: json['chatId'],
+      groupId: json['groupId'],
       exited: json['exited'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
@@ -31,7 +31,7 @@ class GroupChat {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'chatId': chatId,
+      'groupId': groupId,
       'exited': exited,
       'backgroundImage': backgroundImage,
       'pinned': pinned,

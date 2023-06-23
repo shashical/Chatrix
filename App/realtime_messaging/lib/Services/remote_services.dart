@@ -8,17 +8,17 @@ import '../Models/users.dart';
 class RemoteServices{
   final reference=FirebaseFirestore.instance;
   Stream<List<Users>>getUsers(){
-    return reference.collection('user').snapshots().map((snapshot) => snapshot
+    return reference.collection('users').snapshots().map((snapshot) => snapshot
         .docs.map((doc) => Users.fromJson(doc.data())).toList()
     );
   }
   Future<void>setUsers(Users user) async{
-    final DocumentSnapshot docsnap=await reference.collection('user').doc(user.id).get();
+    final DocumentSnapshot docsnap=await reference.collection('users').doc(user.id).get();
     if(!docsnap.exists)
       {
         try{
 
-          reference.collection('user').doc(user.id).set(user.toJson()).catchError((e)=>
+          reference.collection('users').doc(user.id).set(user.toJson()).catchError((e)=>
           throw Exception('$e'));
           }on FirebaseException catch(e){
           throw Exception('$e');
