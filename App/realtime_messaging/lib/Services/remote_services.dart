@@ -16,7 +16,7 @@ class RemoteServices{
      final docsnap=await reference.collection('user').doc(id).get();
 
      if( docsnap.exists){
-       return Users.Fromjson(docsnap.data()!);
+       return Users.fromJson(docsnap.data()!);
      }
      return null;
 
