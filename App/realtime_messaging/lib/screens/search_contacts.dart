@@ -53,10 +53,13 @@ class _SearchContactPageState extends State<SearchContactPage> {
   void fetchContact() async {
     contacts = await FlutterContacts.getContacts(withProperties: true);
     setState(() {
+
       contactsFetched = true;
+
+      debugPrint("${contactsFetched}");
       savedNumber=contacts.map((contact) => contact.phones[0].normalizedNumber).toList();
       savedUsers=contacts.map((contact)=>contact.displayName).toList();
-
+      debugPrint("${savedNumber}");
     });
   }
   TextEditingController _searchController=TextEditingController();
@@ -119,7 +122,8 @@ class _SearchContactPageState extends State<SearchContactPage> {
                         Icon(Icons.arrow_back),
                         Text('Go back')
                       ],
-                    ))
+                    ),
+                    onTap: (){},)
 
                   ],),
                 border: OutlineInputBorder(
@@ -150,10 +154,14 @@ class _SearchContactPageState extends State<SearchContactPage> {
                   }
                   else {
                     final users = snapshot.data!;
+                    debugPrint("you have to find ${savedUsers[savedNumber.indexOf(users[3].phoneNo)]}");
                     if(_searchController.text.isEmpty) {
                       return ListView(
-                        children: users.map((user) =>
-                        (savedUsers.contains(user.phoneNo))?
+                        children: users.map((user){
+                          debugPrint('${savedUsers.contains(user.phoneNo)}');
+                          return
+
+                        (savedNumber.contains(user.phoneNo) && user.id!=FirebaseAuth.instance.currentUser!.uid)?
                             ListTile(
                               leading: CircleAvatar(child: Image(image:NetworkImage('${user.photoUrl}')),),
                               title: Text(savedUsers[savedNumber.indexOf(user.phoneNo)]),
@@ -161,16 +169,24 @@ class _SearchContactPageState extends State<SearchContactPage> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               ),
-                            ):const SizedBox(height: 0,width: 0,)
-                        ).toList(),
+                            ):const SizedBox(height: 0,width: 0,);
+                        }).toList(),
+
 
                       );
-                    }
+                  }
+
                     else{
                       return ListView(
-                        children: users.map((user) => (searchedNumber.contains(user.phoneNo))?
+                        children: users.map((user) => (searchedNumber.contains(user.phoneNo) &&   user!=FirebaseAuth.instance.currentUser!.uid)?
                         ListTile(
+                          leading: CircleAvatar(child:
+                            Image(
+                              image:NetworkImage(user.photoUrl!),
+                            ),),
                           title: Text(searchedUser[searchedNumber.indexOf(user.phoneNo)]),
+                          subtitle: Text(user.about!),
+
                         ):const SizedBox(height: 0,width: 0,)
                         ).toList(),
                       );
