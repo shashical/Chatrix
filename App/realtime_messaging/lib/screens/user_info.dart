@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/my_chats.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../Models/users.dart';
 
 class UserInfoPage extends StatefulWidget {
@@ -18,9 +18,30 @@ class UserInfoPage extends StatefulWidget {
 
 class _UserInfoPageState extends State<UserInfoPage> {
   File? _image;
+  String? imageUrl;
+  Users? currentUser;
+  bool currentUserLoaded=false;
+
+  void initState(){
+    getCurrentUser();
+    super.initState();
+
+
+  }
+
+  getCurrentUser()async {
+    currentUser=await RemoteServices().getSinleUser(FirebaseAuth.instance.currentUser!.uid);
+    setState(() {
+      currentUserLoaded=true;
+
+      debugPrint('${currentUser}');
+    });
+
+  }
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
 
+  firebase_storage.FirebaseStorage storage =firebase_storage.FirebaseStorage.instance;
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
     if (image == null) {
@@ -35,6 +56,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -164,13 +186,25 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ElevatedButton(
                       onPressed: () async{
                         try{
+
                         final id=await FirebaseAuth.instance.currentUser!.uid;
+                        if(_image!=null) {
+                          firebase_storage.Reference ref = firebase_storage
+                              .FirebaseStorage.instance.ref(
+                              '/Profile_images$id');
+                          firebase_storage.UploadTask uploadTask = ref.putFile(
+                              _image!.absolute);
+                          await Future.value(uploadTask);
+                           imageUrl=await ref.getDownloadURL();
+                        }
+
                         RemoteServices().updateUser(id,{
                           "name":_usernameController.text,
-                          "photoUrl":_image.toString(),
+                          "photoUrl":(imageUrl==null)? 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1':imageUrl,
                           "about":_aboutController.text
 
                         });
+
                         Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context)=>MyChatsPage()));
                         }on FirebaseAuthException catch(e){
@@ -241,6 +275,7 @@ class TextFormInput extends StatelessWidget {
   final String? hintText;
   final int maxLines;
   final TextEditingController controller;
+
 
   const TextFormInput({
     Key? key,
