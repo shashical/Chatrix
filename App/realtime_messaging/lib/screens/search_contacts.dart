@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,7 +9,8 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
 
 import '../Models/users.dart';
-
+List<String> savedNumber=[];
+List<String> savedUsers=[];
 class SearchContactPage extends StatefulWidget {
   const SearchContactPage({super.key});
   @override
@@ -18,10 +21,10 @@ class _SearchContactPageState extends State<SearchContactPage> {
   List<Contact> contacts = [];
   bool isg = false;
   bool contactsFetched = false;
-  List<String> savedNumber=[];
-  List<String> savedUsers=[];
+
   List<String> searchedUser=[];
   List<String> searchedNumber=[];
+  List<String> appUserNumber=[];
 
 
   @override
@@ -56,10 +59,11 @@ class _SearchContactPageState extends State<SearchContactPage> {
 
       contactsFetched = true;
 
-      debugPrint("${contactsFetched}");
-      savedNumber=contacts.map((contact) => contact.phones[0].normalizedNumber).toList();
+      //debugPrint("${contactsFetched}");
+
+      savedNumber=contacts.map((contact) =>(contact.phones.isNotEmpty)? contact.phones[0].normalizedNumber:'').toList();
       savedUsers=contacts.map((contact)=>contact.displayName).toList();
-      debugPrint("${savedNumber}");
+      //debugPrint("${savedNumber}");
     });
   }
   TextEditingController _searchController=TextEditingController();
@@ -154,48 +158,30 @@ class _SearchContactPageState extends State<SearchContactPage> {
                   }
                   else {
                     final users = snapshot.data!;
-                    debugPrint("you have to find ${savedUsers[savedNumber.indexOf(users[3].phoneNo)]}");
+
+                      appUserNumber=users.map((user) =>user.phoneNo).toList();
+
+
                     if(_searchController.text.isEmpty) {
                       return ListView(
-                        children: users.map((user){
-                          debugPrint('${savedUsers.contains(user.phoneNo)}');
-                          return
-
-                        (savedNumber.contains(user.phoneNo) && user.id!=FirebaseAuth.instance.currentUser!.uid)?
-                            ListTile(
-                              leading: CircleAvatar(child: Image(image:NetworkImage('${user.photoUrl}')),),
-                              title: Text(savedUsers[savedNumber.indexOf(user.phoneNo)]),
-                              subtitle: Text('${user.about}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              ),
-                            ):const SizedBox(height: 0,width: 0,);
-                        }).toList(),
-
-
+                        children: MergeAppUserAndSendInvite(users, appUserNumber),
                       );
-                  }
+                      }
 
                     else{
-                      return ListView(
-                        children: users.map((user) => (searchedNumber.contains(user.phoneNo) &&   user.id!=FirebaseAuth.instance.currentUser!.uid)?
-                        ListTile(
-                          leading: CircleAvatar(child:
-                            Image(
-                              image:NetworkImage(user.photoUrl!),
-                            ),),
-                          title: Text(searchedUser[searchedNumber.indexOf(user.phoneNo)]),
-                          subtitle: Text(user.about!),
 
-                        ):const SizedBox(height: 0,width: 0,)
-                        ).toList(),
+                      return ListView(
+                        children: SearchMerge(users, appUserNumber, searchedNumber, searchedUser)
+
                       );
+
                     }
                   }
 
                     },
             )
-            )
+            ),
+
           ],
           ):
       Center(
@@ -204,3 +190,98 @@ class _SearchContactPageState extends State<SearchContactPage> {
     );
     }
   }
+List<Widget>MergeAppUserAndSendInvite(List<Users> users ,List<String> appUserNumber,){
+  List<Widget> returnablelist=[];
+  List<Widget> inviteToApp=[];
+  for(int i=0;i<savedNumber.length;i++) {
+    int index = appUserNumber.indexOf(savedNumber[i]);
+    if (index != -1) {
+      returnablelist.add(
+          ListTile(
+
+            leading: CircleAvatar(
+              foregroundImage: NetworkImage('${users[index].photoUrl}'
+              ),
+
+            ),
+            title: Text(savedUsers[i]),
+            subtitle: Text('${users[index].about}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+      );
+    }
+    else {
+      inviteToApp.add(
+          ListTile(
+            leading: CircleAvatar(foregroundImage: NetworkImage('https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'),),
+            title: Text('${savedUsers[i]}'),
+            trailing: TextButton(
+              onPressed: () {},
+              child: Text('invite',
+                style: TextStyle(color: Colors.purple, fontSize: 20),),
+            ),
+          )
+      );
+    }
+  }
+    if(inviteToApp.isNotEmpty){
+      returnablelist.add(SizedBox(child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Text('Invite to Chatrix',
+        style: TextStyle(fontSize: 22,fontWeight: FontWeight.w500,color: Colors.grey),),
+      ),));
+      returnablelist.addAll(inviteToApp);
+    }
+    return returnablelist;
+
+
+}
+
+List<Widget> SearchMerge(List<Users>users,List<String>appUserNumber,List<String>searchedNumber,List<String>searchedUsers){
+  List<Widget> returnablelist=[];
+  List<Widget> inviteToApp=[];
+  for(int i=0;i<searchedNumber.length;i++) {
+    int index = appUserNumber.indexOf(searchedNumber[i]);
+    if (index != -1) {
+      returnablelist.add(
+          ListTile(
+
+            leading: CircleAvatar(
+              foregroundImage: NetworkImage('${users[index].photoUrl}'
+              ),
+
+            ),
+            title: Text(searchedUsers[i]),
+            subtitle: Text('${users[index].about}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+      );
+    }
+    else {
+      inviteToApp.add(
+          ListTile(
+            leading: CircleAvatar(foregroundImage: NetworkImage('https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'),),
+            title: Text(searchedUsers[i]),
+            trailing: TextButton(
+              onPressed: () {},
+              child: Text('invite',
+                style: TextStyle(color: Colors.purple, fontSize: 20),),
+            ),
+          )
+      );
+    }
+  }
+  if(inviteToApp.isNotEmpty){
+    returnablelist.add(SizedBox(child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text('Invite to Chatrix',
+        style: TextStyle(fontSize: 22,fontWeight: FontWeight.w500,color: Colors.grey),),
+    ),));
+    returnablelist.addAll(inviteToApp);
+  }
+  return returnablelist;
+}

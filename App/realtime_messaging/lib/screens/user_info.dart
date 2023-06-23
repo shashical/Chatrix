@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
 
 class UserInfoPage extends StatefulWidget {
@@ -21,6 +22,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   String? imageUrl;
   Users? currentUser;
   bool currentUserLoaded=false;
+  bool fileUploading=false;
 
   void initState(){
     getCurrentUser();
@@ -30,7 +32,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   getCurrentUser()async {
-    currentUser=await RemoteServices().getSinleUser(FirebaseAuth.instance.currentUser!.uid);
+    currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid);
     setState(() {
       currentUserLoaded=true;
 
@@ -185,17 +187,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   children: [
                     ElevatedButton(
                       onPressed: () async{
+                        setState(() {
+                          fileUploading=true;
+                        });
                         try{
 
                         final id=await FirebaseAuth.instance.currentUser!.uid;
                         if(_image!=null) {
                           firebase_storage.Reference ref = firebase_storage
                               .FirebaseStorage.instance.ref(
-                              '/Profile_images$id');
+                              '/Profile_images/$id');
                           firebase_storage.UploadTask uploadTask = ref.putFile(
                               _image!.absolute);
-                          await Future.value(uploadTask);
-                           imageUrl=await ref.getDownloadURL();
+                          await Future.value(uploadTask).catchError((e)=>throw Exception('$e'));
+                           imageUrl=await ref.getDownloadURL().catchError((e)=>throw Exception('$e'));
                         }
 
                         RemoteServices().updateUser(id,{
@@ -204,21 +209,33 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           "about":_aboutController.text
 
                         });
-
+                        setState(() {
+                          fileUploading=false;
+                        });
                         Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context)=>MyChatsPage()));
+                        MaterialPageRoute(builder: (context)=>SearchContactPage()));
                         }on FirebaseAuthException catch(e){
+                          setState(() {
+                            fileUploading=false;
+                          });
                           ScaffoldMessenger.of(context)
                             ..removeCurrentSnackBar()
                             ..showSnackBar(SnackBar(content: Text('${e.message}')));
                         } on FirebaseException catch(e){
+                          setState(() {
+                            fileUploading=false;
+                          });
                           ScaffoldMessenger.of(context)
                             ..removeCurrentSnackBar()
                             ..showSnackBar(SnackBar(content: Text('${e.message}')));
                         }
 
                         catch(e)
-                             { ScaffoldMessenger.of(context)
+                             {
+                               setState(() {
+                                 fileUploading=false;
+                               });
+                               ScaffoldMessenger.of(context)
                                 ..removeCurrentSnackBar()
                                 ..showSnackBar(SnackBar(content: Text('$e')));}
 
@@ -226,7 +243,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
                         
                       },
-                      child: Text(
+                      child:(fileUploading)?CircularProgressIndicator(strokeWidth: 3,color: Colors.white,): Text(
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -244,7 +261,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement((context),
-                            MaterialPageRoute(builder: (context)=>MyChatsPage()));
+                            MaterialPageRoute(builder: (context)=>SearchContactPage()));
                       },
                       child: Text(
                         'Skip',

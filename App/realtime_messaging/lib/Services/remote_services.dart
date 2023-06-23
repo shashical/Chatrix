@@ -12,8 +12,8 @@ class RemoteServices{
         .docs.map((doc) => Users.fromJson(doc.data())).toList()
     );
   }
-  Future<Users?> getSinleUser(String id)async{
-     final docsnap=await reference.collection('user').doc(id).get();
+  Future<Users?> getSingleUser(String id)async{
+     final docsnap=await reference.collection('users').doc(id).get();
 
      if( docsnap.exists){
        return Users.fromJson(docsnap.data()!);
@@ -40,7 +40,7 @@ class RemoteServices{
   }
   Future<void> updateUser(String id,Map<String,dynamic> upd)async{
     try{
-        reference.collection('user').doc(id).update(upd).catchError((e)=>
+        reference.collection('users').doc(id).update(upd).catchError((e)=>
         throw Exception('$e'));
     }
     on FirebaseException catch(e){

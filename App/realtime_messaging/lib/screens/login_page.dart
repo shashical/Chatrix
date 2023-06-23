@@ -156,29 +156,10 @@ class _LoginPageState extends State<LoginPage> {
 
                                     });
                                   },
-                                  codeAutoRetrievalTimeout: (e){
-                                    showDialog(context: (context),
-                                        builder:(context){
-                                          return AlertDialog(
-
-                                            content: Text('${e}'),
-                                            actions: [
-                                              Builder(
-                                                  builder: (context) {
-                                                    return ElevatedButton(
-                                                        onPressed: (){
-                                                          Navigator.of(context,rootNavigator: true).pop();
-                                                        },
-                                                        child: const Text('OK'));
-                                                  }
-                                              )
-                                            ],
-                                          );});
-                                  }
-                              );
+                                  codeAutoRetrievalTimeout: (_){}
 
 
-                            }on FirebaseException catch(e){
+                               ); }on FirebaseException catch(e){
                               setState(() {
                                 isloading=false;
                               });
@@ -209,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                               showDialog(context: (context), builder:(context) {
                                 return AlertDialog(
 
-                                  content: Text('${e}'),
+                                  content: Text('$e'),
                                   actions: [
                                     Builder(
                                         builder: (context) {
