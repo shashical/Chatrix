@@ -43,6 +43,7 @@ dependencies:
   blurrycontainer: ^1.0.2
   image_picker: ^0.8.9
   timer_count_down: ^2.2.2
+  firebase_storage: ^11.2.3
 
 dev_dependencies:
   flutter_test:

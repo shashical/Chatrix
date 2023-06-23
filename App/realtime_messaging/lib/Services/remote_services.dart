@@ -12,6 +12,15 @@ class RemoteServices{
         .docs.map((doc) => Users.fromJson(doc.data())).toList()
     );
   }
+  Future<Users?> getSinleUser(String id)async{
+     final docsnap=await reference.collection('user').doc(id).get();
+
+     if( docsnap.exists){
+       return Users.Fromjson(docsnap.data()!);
+     }
+     return null;
+
+  }
   Future<void>setUsers(Users user) async{
     final DocumentSnapshot docsnap=await reference.collection('users').doc(user.id).get();
     if(!docsnap.exists)
