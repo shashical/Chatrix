@@ -7,7 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
+
+final cid=FirebaseAuth.instance.currentUser!.uid;
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -30,7 +33,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   getCurrentUser()async {
-    currentUser=await RemoteServices().getSinleUser(FirebaseAuth.instance.currentUser!.uid);
+    currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid);
     setState(() {
       currentUserLoaded=true;
 

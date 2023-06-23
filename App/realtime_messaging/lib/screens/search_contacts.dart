@@ -154,11 +154,9 @@ class _SearchContactPageState extends State<SearchContactPage> {
                   }
                   else {
                     final users = snapshot.data!;
-                    debugPrint("you have to find ${savedUsers[savedNumber.indexOf(users[3].phoneNo)]}");
                     if(_searchController.text.isEmpty) {
                       return ListView(
                         children: users.map((user){
-                          debugPrint('${savedUsers.contains(user.phoneNo)}');
                           return
 
                         (savedNumber.contains(user.phoneNo) && user.id!=FirebaseAuth.instance.currentUser!.uid)?
@@ -192,7 +190,6 @@ class _SearchContactPageState extends State<SearchContactPage> {
                       );
                     }
                   }
-
                     },
             )
             )
