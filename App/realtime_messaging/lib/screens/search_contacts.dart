@@ -178,7 +178,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
 
                     else{
                       return ListView(
-                        children: users.map((user) => (searchedNumber.contains(user.phoneNo) &&   user!=FirebaseAuth.instance.currentUser!.uid)?
+                        children: users.map((user) => (searchedNumber.contains(user.phoneNo) &&   user.id!=FirebaseAuth.instance.currentUser!.uid)?
                         ListTile(
                           leading: CircleAvatar(child:
                             Image(
