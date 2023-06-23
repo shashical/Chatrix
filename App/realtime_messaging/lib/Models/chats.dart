@@ -10,6 +10,8 @@ class Chat {
   String? lastMessage;
   String? lastMessageType;
   DateTime? lastMessageTime;
+  List<String>? blockedList;
+  List<String>? mutedBy;
 
   Chat({
     required this.id,
@@ -18,6 +20,8 @@ class Chat {
     this.lastMessage,
     this.lastMessageType,
     this.lastMessageTime,
+    this.blockedList,
+    this.mutedBy,
   });
 
   factory Chat.fromJson(Map<String, dynamic> json) {
@@ -28,6 +32,8 @@ class Chat {
       lastMessage: json['lastMessage'],
       lastMessageType: json['lastMessageType'],
       lastMessageTime: DateTime.parse(json['lastMessageTime']),
+      blockedList: List<String>.from(json['blockedList'] ?? []),
+      mutedBy: List<String>.from(json['mutedBy'] ?? []),
     );
   }
 
@@ -39,6 +45,8 @@ class Chat {
       'lastMessage': lastMessage,
       'lastMessageType': lastMessageType,
       'lastMessageTime': lastMessageTime?.toIso8601String(),
+      'blockedList': blockedList,
+      'mutedBy': mutedBy,
     };
   }
 }

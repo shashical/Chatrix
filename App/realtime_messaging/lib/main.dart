@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'screens/my_chats.dart';
 import 'screens/splash.dart';
 import 'screens/user_info.dart';
 
