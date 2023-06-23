@@ -15,6 +15,8 @@ class Group {
   DateTime? lastMessageTime;
   String? lastMessageType;
   String? description;
+  List<String>? admins;
+  List<String>? mutedBy;
 
   Group({
     required this.id,
@@ -28,6 +30,8 @@ class Group {
     this.lastMessageTime,
     this.lastMessageType,
     this.description,
+    this.admins,
+    this.mutedBy,
   });
 
   factory Group.fromJson(Map<String, dynamic> json) {
@@ -43,6 +47,8 @@ class Group {
       lastMessageTime: DateTime.parse(json['lastMessageTime']),
       lastMessageType: json['lastMessageType'],
       description: json['description'],
+      admins: List<String>.from(json['admins'] ?? []),
+      mutedBy: List<String>.from(json['mutedBy'] ?? []),
     );
   }
 
@@ -59,6 +65,8 @@ class Group {
       'lastMessageTime': lastMessageTime?.toIso8601String(),
       'lastMessageType': lastMessageType,
       'description': description,
+      'admins': admins,
+      'mutedBy': mutedBy,
     };
   }
 }

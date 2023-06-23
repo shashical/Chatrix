@@ -9,7 +9,7 @@ class RemoteServices{
   final reference=FirebaseFirestore.instance;
   Stream<List<Users>>getUsers(){
     return reference.collection('user').snapshots().map((snapshot) => snapshot
-        .docs.map((doc) => Users.Fromjson(doc.data())).toList()
+        .docs.map((doc) => Users.fromJson(doc.data())).toList()
     );
   }
   Future<void>setUsers(Users user) async{
@@ -18,7 +18,7 @@ class RemoteServices{
       {
         try{
 
-          reference.collection('user').doc(user.id).set(user.Tojson()).catchError((e)=>
+          reference.collection('user').doc(user.id).set(user.toJson()).catchError((e)=>
           throw Exception('$e'));
           }on FirebaseException catch(e){
           throw Exception('$e');
