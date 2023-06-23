@@ -10,6 +10,8 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
 
+final cid=FirebaseAuth.instance.currentUser!.uid;
+
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
 
