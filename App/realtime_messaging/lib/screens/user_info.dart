@@ -30,12 +30,37 @@ class _UserInfoPageState extends State<UserInfoPage> {
   bool fileUploading=false;
 
   void initState(){
-    getCurrentUser();
+    try
+    {getCurrentUser();}
+    on FirebaseAuthException catch(e){
+      setState(() {
+        fileUploading=false;
+      });
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('${e.message}')));
+    } on FirebaseException catch(e){
+      setState(() {
+        fileUploading=false;
+      });
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('${e.message}')));
+    }
+
+    catch(e)
+    {
+      setState(() {
+        fileUploading=false;
+      });
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$e')));}
     super.initState();
   }
 
   getCurrentUser()async {
-    currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid);
+    currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid).catchError((e)=>throw Exception('$e'));
     setState(() {
       _usernameController.text=currentUser!.name ?? "";
       _aboutController.text=currentUser!.about ?? "";

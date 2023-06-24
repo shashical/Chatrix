@@ -17,7 +17,7 @@ class RemoteServices{
     );
   }
   Future<Users?> getSingleUser(String id)async{
-     final docsnap=await reference.collection('users').doc(id).get();
+     final docsnap=await reference.collection('users').doc(id).get().catchError((e)=>throw Exception('$e'));
 
      if( docsnap.exists){
        return Users.fromJson(docsnap.data()!);
