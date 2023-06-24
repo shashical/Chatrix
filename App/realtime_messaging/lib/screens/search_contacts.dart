@@ -17,18 +17,22 @@ class SearchContactPage extends StatefulWidget {
 
 class _SearchContactPageState extends State<SearchContactPage> {
   List<Contact> contacts = [];
+
   bool isg = false;
   bool contactsFetched = false;
 
   List<String> searchedUser=[];
   List<String> searchedNumber=[];
   List<String> appUserNumber=[];
+  Set<String> helper={};
 
 
   @override
   void initState() {
     super.initState();
+    FlutterContacts.config.returnUnifiedContacts=true;
     getContactPermission();
+
 
   }
 
@@ -59,8 +63,17 @@ class _SearchContactPageState extends State<SearchContactPage> {
 
       //debugPrint("${contactsFetched}");
 
-      savedNumber=contacts.map((contact) =>(contact.phones.isNotEmpty)? contact.phones[0].normalizedNumber:'').toList();
-      savedUsers=contacts.map((contact)=>contact.displayName).toList();
+
+      for(int i=0;i<contacts.length;i++){
+        int a=helper.length;
+        if(contacts[i].phones.isNotEmpty){
+          helper.add(contacts[i].phones[0].normalizedNumber);
+          if(helper.length>a){
+            savedNumber.add(contacts[i].phones[0].normalizedNumber);
+            savedUsers.add(contacts[i].displayName);
+          }
+        }
+      }
       //debugPrint("${savedNumber}");
     });
   }
