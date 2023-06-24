@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
+import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'welcome.dart';
 
 class SplashPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _SplashPageState extends State<SplashPage> {
             StreamBuilder(
                 stream:FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
-                  return  (snapshot.hasData)?WelcomePage():CurrentUserProfilePage();
+                  return  /*(snapshot.hasData)?*/WelcomePage()/*:SearchContactPage()*/;
                 }
             )),
       );
