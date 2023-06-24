@@ -10,6 +10,9 @@ import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
 
 final cid=FirebaseAuth.instance.currentUser!.uid;
 
@@ -24,25 +27,43 @@ class _UserInfoPageState extends State<UserInfoPage> {
   File? _image;
   String? imageUrl;
   Users? currentUser;
-  bool currentUserLoaded=false;
   bool fileUploading=false;
 
   void initState(){
     getCurrentUser();
     super.initState();
-
-
   }
 
   getCurrentUser()async {
     currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid);
     setState(() {
-      currentUserLoaded=true;
-
-      debugPrint('${currentUser}');
+      _usernameController.text=currentUser!.name ?? "";
+      _aboutController.text=currentUser!.about ?? "";
+      if (currentUser!.photoUrl != null) {
+          Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
+          _downloadImage(imageUrl).then((imageFile) {
+          setState(() {
+            _image = imageFile;
+          });
+      });
+      }
     });
-
   }
+
+  Future<File?> _downloadImage(Uri imageUrl) async {
+    try {
+      http.Response response = await http.get(imageUrl);
+      String fileName = imageUrl.pathSegments.last;
+      Directory tempDir = await getTemporaryDirectory();
+      File file = File('${tempDir.path}/$fileName');
+      await file.writeAsBytes(response.bodyBytes);
+      return file;
+    } catch (e) {
+      debugPrint('Error downloading image: $e');
+      return null;
+    }
+  }
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
 
@@ -195,7 +216,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         });
                         try{
 
-                        final id=await FirebaseAuth.instance.currentUser!.uid;
+                        final id=FirebaseAuth.instance.currentUser!.uid;
                         if(_image!=null) {
                          imageUrl=await RemoteServices().uploadNewImage(_image!, id);
 
