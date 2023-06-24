@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:realtime_messaging/screens/current_user_profile_page.dart';
 import 'welcome.dart';
 
 class SplashPage extends StatefulWidget {
@@ -13,7 +15,13 @@ class _SplashPageState extends State<SplashPage> {
     Future.delayed(Duration(seconds: 1,milliseconds: 500), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => WelcomePage()),
+        MaterialPageRoute(builder: (context) =>
+            StreamBuilder(
+                stream:FirebaseAuth.instance.authStateChanges(),
+                builder: (context, snapshot) {
+                  return  (snapshot.hasData)?WelcomePage():CurrentUserProfilePage();
+                }
+            )),
       );
     });
   }

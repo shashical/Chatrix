@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Models/users.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'dart:io';
 
 class RemoteServices{
   final reference=FirebaseFirestore.instance;
@@ -67,6 +69,20 @@ class RemoteServices{
     }
     else{
       throw Exception("Document does not exist.");
+    }
+  }
+  Future<String> uploadNewImage(File _image,String id)async{
+    try {
+      firebase_storage.Reference ref = firebase_storage
+          .FirebaseStorage.instance.ref(
+          '/Profile_images/$id');
+      firebase_storage.UploadTask uploadTask = ref.putFile(
+          _image.absolute);
+      await Future.value(uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    }catch(e){
+      rethrow;
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
+import 'package:realtime_messaging/screens/current_user_profile_page.dart';
 import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:realtime_messaging/screens/search_contacts.dart';
@@ -196,13 +197,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
                         final id=await FirebaseAuth.instance.currentUser!.uid;
                         if(_image!=null) {
-                          firebase_storage.Reference ref = firebase_storage
-                              .FirebaseStorage.instance.ref(
-                              '/Profile_images/$id');
-                          firebase_storage.UploadTask uploadTask = ref.putFile(
-                              _image!.absolute);
-                          await Future.value(uploadTask).catchError((e)=>throw Exception('$e'));
-                           imageUrl=await ref.getDownloadURL().catchError((e)=>throw Exception('$e'));
+                         imageUrl=await RemoteServices().uploadNewImage(_image!, id);
+
                         }
 
                         RemoteServices().updateUser(id,{
@@ -263,7 +259,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement((context),
-                            MaterialPageRoute(builder: (context)=>SearchContactPage()));
+                            MaterialPageRoute(builder: (context)=>CurrentUserProfilePage()));
                       },
                       child: Text(
                         'Skip',
