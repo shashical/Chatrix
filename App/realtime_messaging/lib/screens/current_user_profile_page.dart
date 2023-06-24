@@ -233,7 +233,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
                                   onPressed: (){
-                                     // try{RemoteServices().updateUser(id, upd)}
+                                      try{RemoteServices().updateUser(cid, {"name":_nameController.text})}
                                   },
                                   icon: Icon(Icons.done),
                                 ),
