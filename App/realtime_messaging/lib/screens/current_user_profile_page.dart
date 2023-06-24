@@ -233,7 +233,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
                                   onPressed: (){
-                                    
+
                                   },
                                   icon: Icon(Icons.done),
                                 ),
