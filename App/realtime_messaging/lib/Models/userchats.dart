@@ -7,19 +7,19 @@ class UserChat {
   String id;
   String chatId;
   String recipientPhoto;
-  String recipientName;
   bool deleted;
   String? backgroundImage;
   bool pinned;
+  String recipientPhoneNo;
 
   UserChat({
     required this.id,
     required this.chatId,
     required this.recipientPhoto,
-    required this.recipientName,
     required this.deleted,
     this.backgroundImage,
     required this.pinned,
+    required this.recipientPhoneNo,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {
@@ -27,10 +27,10 @@ class UserChat {
       id: json['id'],
       chatId: json['chatId'],
       recipientPhoto: json['recipientPhoto'],
-      recipientName: json['recipientName'],
       deleted: json['deleted'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
+      recipientPhoneNo: json['recipientPhoneNo']
     );
   }
 
@@ -39,10 +39,10 @@ class UserChat {
       'id': id,
       'chatId': chatId,
       'recipientPhoto': recipientPhoto,
-      'recipientName': recipientName,
       'deleted': deleted,
       'backgroundImage': backgroundImage,
       'pinned': pinned,
+      'recipientPhoneNo': recipientPhoneNo,
     };
   }
 }

@@ -2,6 +2,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:realtime_messaging/Models/chats.dart';
+import 'package:realtime_messaging/Models/userChats.dart';
 
 import '../Models/users.dart';
 
@@ -21,6 +23,13 @@ class RemoteServices{
      return null;
 
   }
+
+  Stream<List<UserChat>>getUserChats(String id){
+    return reference.collection('users/$id/userChats').snapshots().map((event) => 
+    event.docs.map((doc) => UserChat.fromJson(doc.data())).toList()
+    );
+  }
+
   Future<void>setUsers(Users user) async{
     final DocumentSnapshot docsnap=await reference.collection('users').doc(user.id).get();
     if(!docsnap.exists)
