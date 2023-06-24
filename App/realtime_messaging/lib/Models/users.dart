@@ -18,7 +18,7 @@ class Users {
     required this.id,
     this.name,
     this.photoUrl = 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1',
-    this.isOnline,
+    this.isOnline=true,
     required this.phoneNo,
     this.about,
     this.lastOnline,

@@ -359,24 +359,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                         });
 
                                     },
-                                    codeAutoRetrievalTimeout: (e){
-                                      showDialog(context: (context),
-                                          builder:(context){
-                                            return AlertDialog(
-
-                                              content: Text('${e}'),
-                                              actions: [
-                                                Builder(
-                                                    builder: (context) {
-                                                      return ElevatedButton(
-                                                          onPressed: (){
-                                                            Navigator.of(context,rootNavigator: true).pop();
-                                                          },
-                                                          child: const Text('OK'));
-                                                    }
-                                                )
-                                              ],
-                                            );});
+                                    codeAutoRetrievalTimeout: (_){
                                     }
                                 );
 
