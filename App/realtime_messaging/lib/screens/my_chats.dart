@@ -38,17 +38,23 @@ class _ChatsPageState extends State<ChatsPage> {
               itemBuilder: (context, index) {
                 final UserChat userchat = userchats[index];
 
-                return ListTile(
+                return FutureBuilder<Chat>(
+                  future: _remoteServices.getSingleChat(userchat.chatId),
+                  builder: (context, snapshot) {
+                    final chat = snapshot.data!;
+                    return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(userchat.backgroundImage ?? "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"),
+                    backgroundImage: NetworkImage(userchat.recipientPhoto),
                   ),
                   title: Text(userchat.recipientPhoneNo),
-                  subtitle: Text(""),
-                  trailing: Text(""),
+                  subtitle: Text(chat.lastMessage ?? ""),
+                  trailing: Text((chat.lastMessageTime==null?"":"${chat.lastMessageTime!.hour}"+":"+"${chat.lastMessageTime!.minute}")),
                   onTap: () {
 
                   },
                 );
+                  },
+                  );
               },
             );
           } else if (snapshot.hasError) {

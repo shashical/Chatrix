@@ -17,7 +17,7 @@ class UserChat {
     required this.chatId,
     required this.recipientPhoto,
     required this.deleted,
-    this.backgroundImage,
+    this.backgroundImage = "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
     required this.pinned,
     required this.recipientPhoneNo,
   });

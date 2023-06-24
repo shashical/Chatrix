@@ -32,6 +32,11 @@ class RemoteServices{
     );
   }
 
+  Future<Chat> getSingleChat(String id)async{
+    final docsnap = await reference.collection('chats').doc(id).get().catchError((e)=>throw Exception('$e'));
+    return Chat.fromJson(docsnap.data()!);
+  }
+
   Future<void>setUsers(Users user) async{
     final DocumentSnapshot docsnap=await reference.collection('users').doc(user.id).get();
     if(!docsnap.exists)
