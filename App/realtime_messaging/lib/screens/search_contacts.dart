@@ -1,17 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-//import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
+import '../main.dart';
 
-List<String> savedNumber = [];
-List<String> savedUsers = [];
+
 
 class SearchContactPage extends StatefulWidget {
   const SearchContactPage({super.key});
@@ -28,74 +23,14 @@ class _SearchContactPageState extends State<SearchContactPage> {
   List<String> searchedUser = [];
   List<String> searchedNumber = [];
   List<String> appUserNumber = [];
-  Set<String> helper = {};
-
-  @override
-  void initState() {
-    super.initState();
-    FlutterContacts.config.returnUnifiedContacts = true;
-    getContactPermission();
-  }
-
-  void getContactPermission() async {
-    if (await Permission.contacts.isGranted) {
-      fetchContact();
-      setState(() {
-        isg = true;
-      });
-    } else {
-      await Permission.contacts.request();
-      if (await Permission.contacts.isGranted) {
-        fetchContact();
-
-        setState(() {
-          isg = true;
-        });
-      }
-    }
-  }
-
-  void fetchContact() async {
-    contacts = await FlutterContacts.getContacts(withProperties: true);
-    setState(() {
-      contactsFetched = true;
-
-      //debugPrint("${contactsFetched}");
-
-      for (int i = 0; i < contacts.length; i++) {
-        int a = helper.length;
-        if (contacts[i].phones.isNotEmpty) {
-          helper.add(contacts[i].phones[0].normalizedNumber);
-          if (helper.length > a) {
-            savedNumber.add(contacts[i].phones[0].normalizedNumber);
-            savedUsers.add(contacts[i].displayName);
-          }
-        }
-      }
-      //debugPrint("${savedNumber}");
-    });
-  }
-
   TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: (isg == false)
-            ? Center(
-                child: Text(
-                  'Please Restart the App and provide required permission!',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 32,
-                  ),
-                ),
-              )
-            : (contactsFetched)
-                ? Column(
+        body: Column(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       SizedBox(
@@ -121,7 +56,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                               filled: true,
                               hintText: 'Search Contacts',
                               fillColor: Colors.blue[100],
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.search,
                                 size: 25,
                                 color: Colors.black,
@@ -129,7 +64,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                               suffixIcon: PopupMenuButton(
                                 itemBuilder: (context) => [
                                   PopupMenuItem(
-                                    child: Row(
+                                    child: const Row(
                                       children: [
                                         Icon(Icons.group),
                                         Text(
@@ -140,7 +75,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                                     onTap: () {},
                                   ),
                                   PopupMenuItem(
-                                    child: Row(
+                                    child: const Row(
                                       children: [
                                         Icon(Icons.arrow_back),
                                         Text('Go back')
@@ -170,8 +105,8 @@ class _SearchContactPageState extends State<SearchContactPage> {
                           } else if (snapshot.data == null) {
                             return Center(
                                 child: Container(
-                              padding: EdgeInsets.all(15),
-                              child: Text(
+                                  padding: EdgeInsets.all(15),
+                                  child: const Text(
                                   'App Users from Your contact will appear here'),
                             ));
                           } else {
@@ -195,11 +130,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                       )),
                     ],
                   )
-                : Center(
-                    child: CircularProgressIndicator(
-                    strokeWidth: 4,
-                    color: Colors.deepPurple,
-                  )));
+                );
   }
 }
 
@@ -235,14 +166,14 @@ List<Widget> MergeAppUserAndSendInvite(
       }
     } else {
       inviteToApp.add(ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           foregroundImage: NetworkImage(
               'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'),
         ),
-        title: Text('${savedUsers[i]}'),
+        title: Text(savedUsers[i]),
         trailing: TextButton(
           onPressed: () {},
-          child: Text(
+          child: const Text(
             'invite',
             style: TextStyle(color: Colors.purple, fontSize: 20),
           ),
@@ -251,9 +182,9 @@ List<Widget> MergeAppUserAndSendInvite(
     }
   }
   if (inviteToApp.isNotEmpty) {
-    returnablelist.add(SizedBox(
+    returnablelist.add(const SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Text(
           'Invite to Chatrix',
           style: TextStyle(
@@ -302,14 +233,14 @@ List<Widget> SearchMerge(
       }
     } else {
       inviteToApp.add(ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           foregroundImage: NetworkImage(
               'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'),
         ),
         title: Text(searchedUsers[i]),
         trailing: TextButton(
           onPressed: () {},
-          child: Text(
+          child: const Text(
             'invite',
             style: TextStyle(color: Colors.purple, fontSize: 20),
           ),
@@ -318,9 +249,9 @@ List<Widget> SearchMerge(
     }
   }
   if (inviteToApp.isNotEmpty) {
-    returnablelist.add(SizedBox(
+    returnablelist.add(const SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Text(
           'Invite to Chatrix',
           style: TextStyle(

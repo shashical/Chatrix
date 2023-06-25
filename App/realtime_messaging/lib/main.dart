@@ -12,10 +12,12 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'screens/my_chats.dart';
 import 'screens/splash.dart';
 import 'screens/user_info.dart';
-
+List<String> savedNumber = [];
+List<String> savedUsers = [];
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 

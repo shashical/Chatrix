@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/userGroups.dart';
+import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/groups.dart';
@@ -41,8 +42,13 @@ class _GroupsPageState extends State<GroupsPage> {
                   builder: (context, snapshot) {
                     final group = snapshot.data!;
                     return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(group.imageUrl!),
+                      leading: InkWell(
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(group.imageUrl!),
+                        ),
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,)));
+                        },
                       ),
                       title: Text(group.name),
                       subtitle: Text(group.lastMessage ?? ""),
@@ -73,7 +79,7 @@ class _GroupsPageState extends State<GroupsPage> {
           showModalBottomSheet(
             context: context,
             builder: (context) => SearchContactPage(),
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(40),
               ),

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/screens/current_user_profile_page.dart';
-import 'package:realtime_messaging/screens/search_contacts.dart';
+import 'package:realtime_messaging/Services/contact_services.dart';
+import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'welcome.dart';
 
 class SplashPage extends StatefulWidget {
@@ -13,17 +14,22 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
+    savedUsers=[];
+    savedNumber=[];
+    ContactServices().getContactPermission(context);
+
+    Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => StreamBuilder(
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
-                  return /*(snapshot.hasData)?*/ WelcomePage() /*:SearchContactPage()*/;
+                  return (snapshot.hasData)? const WelcomePage() :HomePage();
                 })),
       );
     });
+
   }
 
   @override
@@ -34,7 +40,7 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Feel Connected',
               style: TextStyle(
                 fontSize: 50,
@@ -42,13 +48,13 @@ class _SplashPageState extends State<SplashPage> {
                 //fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             ClipOval(
               clipper: CustomCircularClipper(80),
               child: Container(
                 width: 180,
                 height: 180,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: AssetImage('assets/chatrix_logo.png'),
@@ -57,7 +63,7 @@ class _SplashPageState extends State<SplashPage> {
                 ),
               ),
             ),
-            Text(
+            const Text(
               'Chatrix',
               style: TextStyle(
                 fontSize: 30,

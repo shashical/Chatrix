@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
+import 'package:realtime_messaging/Services/chats_remote_services.dart';
+import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-import '../Services/chats_remote_services.dart';
 import '../Services/users_remote_services.dart';
 
 class ChatsPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class ChatsPage extends StatefulWidget {
 class _ChatsPageState extends State<ChatsPage> {
   final RemoteServices _usersremoteServices = RemoteServices();
   final ChatsRemoteServices _chatsremoteServices = ChatsRemoteServices();
+  int index=-1;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class _ChatsPageState extends State<ChatsPage> {
           if (snapshot.hasData) {
             final List<UserChat> userchats = snapshot.data!;
             if (userchats.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No chats to display.'),
               );
             }
@@ -37,23 +39,22 @@ class _ChatsPageState extends State<ChatsPage> {
               itemBuilder: (context, index) {
                 final UserChat userchat = sorteduserchats[index];
                 if (userchat.deleted) {
-                  return SizedBox();
+                  return const SizedBox();
                 }
                 return FutureBuilder<Chat>(
                   future: _chatsremoteServices.getSingleChat(userchat.chatId),
                   builder: (context, snapshot) {
                     final chat = snapshot.data!;
+                    index=savedNumber.indexOf(userchat.recipientPhoneNo);
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(userchat.recipientPhoto),
                       ),
-                      title: Text(userchat.recipientPhoneNo),
+                      title: Text((index!=-1)?savedUsers[index]:userchat.recipientPhoneNo),
                       subtitle: Text(chat.lastMessage ?? ""),
                       trailing: Text((chat.lastMessageTime == null
                           ? ""
-                          : "${chat.lastMessageTime!.hour}" +
-                              ":" +
-                              "${chat.lastMessageTime!.minute}")),
+                          : "${chat.lastMessageTime!.hour}:${chat.lastMessageTime!.minute/10}${chat.lastMessageTime!.minute%10}")),
                       onTap: () {},
                     );
                   },
@@ -65,7 +66,7 @@ class _ChatsPageState extends State<ChatsPage> {
               child: Text('Error: ${snapshot.error}'),
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -73,12 +74,12 @@ class _ChatsPageState extends State<ChatsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.cyan.shade800,
-        child: Icon(Icons.search),
+        child: const Icon(Icons.search),
         onPressed: () {
           showModalBottomSheet(
             context: context,
-            builder: (context) => SearchContactPage(),
-            shape: RoundedRectangleBorder(
+            builder: (context) => const SearchContactPage(),
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(40),
               ),
