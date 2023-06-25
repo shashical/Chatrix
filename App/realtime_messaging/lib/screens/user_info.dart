@@ -308,7 +308,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement((context),
-                            MaterialPageRoute(builder: (context)=>ChatWindow()));
+                            MaterialPageRoute(builder: (context)=>CurrentUserProfilePage()));
                       },
                       child: Text(
                         'Skip',
