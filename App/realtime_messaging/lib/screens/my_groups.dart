@@ -27,28 +27,32 @@ class _GroupsPageState extends State<GroupsPage> {
                 child: Text('No groups to display.'),
               );
             }
-            final List<UserGroup> sortedusergroups =[... usergroups.where((element) => element.pinned), ... usergroups.where((element) => !element.pinned)];
+            final List<UserGroup> sortedusergroups = [
+              ...usergroups.where((element) => element.pinned),
+              ...usergroups.where((element) => !element.pinned)
+            ];
             return ListView.builder(
               itemCount: usergroups.length,
               itemBuilder: (context, index) {
                 final UserGroup usergroup = sortedusergroups[index];
                 return FutureBuilder<Group>(
-                  future: GroupsRemoteServices().getSingleGroup(usergroup.groupId),
+                  future:
+                      GroupsRemoteServices().getSingleGroup(usergroup.groupId),
                   builder: (context, snapshot) {
                     final group = snapshot.data!;
                     return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(group.imageUrl!),
-                  ),
-                  title: Text(group.name),
-                  subtitle: Text(group.lastMessage ?? ""),
-                  trailing: Text((group.lastMessageTime==null?"":"${group.lastMessageTime!.hour}:${group.lastMessageTime!.minute}")),
-                  onTap: () {
-
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(group.imageUrl!),
+                      ),
+                      title: Text(group.name),
+                      subtitle: Text(group.lastMessage ?? ""),
+                      trailing: Text((group.lastMessageTime == null
+                          ? ""
+                          : "${group.lastMessageTime!.hour}:${group.lastMessageTime!.minute}")),
+                      onTap: () {},
+                    );
                   },
                 );
-                  },
-                  );
               },
             );
           } else if (snapshot.hasError) {

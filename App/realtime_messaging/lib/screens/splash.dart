@@ -13,16 +13,15 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1,milliseconds: 500), () {
+    Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) =>
-            StreamBuilder(
-                stream:FirebaseAuth.instance.authStateChanges(),
+        MaterialPageRoute(
+            builder: (context) => StreamBuilder(
+                stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
-                  return  /*(snapshot.hasData)?*/WelcomePage()/*:SearchContactPage()*/;
-                }
-            )),
+                  return /*(snapshot.hasData)?*/ WelcomePage() /*:SearchContactPage()*/;
+                })),
       );
     });
   }
