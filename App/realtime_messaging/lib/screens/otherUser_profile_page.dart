@@ -6,6 +6,7 @@ import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
+import '../main.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
   final String? chatId;

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/screens/search_contacts.dart';
+import 'package:realtime_messaging/Services/users_remote_services.dart';
+import 'package:realtime_messaging/screens/current_user_profile_page.dart';
+import 'package:realtime_messaging/screens/user_info.dart';
 
+import '../Models/users.dart';
 import 'my_chats.dart';
 import 'my_groups.dart';
 
@@ -12,12 +15,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  Users? curUser;
+  bool isLoaded=false;
 
   final List<Widget> _pages = [
     ChatsPage(),
     GroupsPage(),
   ];
-
+  void getCurUser()async{
+    curUser=await RemoteServices().getSingleUser(cid);
+    setState(() {
+      isLoaded=true;
+    });
+  }
   @override
   void dispose() {
     _pageController.dispose();
@@ -28,11 +38,29 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Chatrix",
           style: TextStyle(fontFamily: "Caveat", fontSize: 40),
         ),
         automaticallyImplyLeading: false,
+        actions: [
+          PopupMenuButton(itemBuilder: (context)=>[
+             PopupMenuItem(child: Row(
+              children: [
+                CircleAvatar(
+                  foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
+                      "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
+
+                  ),
+                ),
+                const Text('Account',style: TextStyle(fontSize: 20),)
+              ],
+            ),
+             onTap: (){
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>CurrentUserProfilePage()));
+             },)
+          ])
+        ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -62,12 +90,12 @@ class _HomePageState extends State<HomePage> {
             _currentIndex = index;
             _pageController.animateToPage(
               index,
-              duration: Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
             );
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chats',

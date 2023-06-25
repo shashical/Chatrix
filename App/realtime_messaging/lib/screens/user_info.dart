@@ -1,19 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
-import 'package:realtime_messaging/screens/current_user_profile_page.dart';
-import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-
-import 'chat_window.dart';
 import 'home_page.dart';
 
 final cid = FirebaseAuth.instance.currentUser!.uid;
@@ -30,7 +22,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
   String? imageUrl;
   Users? currentUser;
   bool fileUploading = false;
+  bool currentUserLoaded=false;
 
+  @override
   void initState() {
     try {
       getCurrentUser();
@@ -64,6 +58,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         .getSingleUser(FirebaseAuth.instance.currentUser!.uid)
         .catchError((e) => throw Exception('$e'));
     setState(() {
+      currentUserLoaded=true;
       _usernameController.text = currentUser!.name ?? "";
       _aboutController.text = currentUser!.about ?? "";
       // if (currentUser!.photoUrl != null) {
@@ -112,7 +107,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Stack(
+      body:(currentUserLoaded)? Stack(
         children: [
           Container(
             decoration: BoxDecoration(
@@ -120,22 +115,22 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromARGB(255, 232, 194, 165),
+                  const Color.fromARGB(255, 232, 194, 165),
                   Colors.pink.shade200
                 ],
               ),
             ),
           ),
           Container(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Align(
                   alignment: Alignment.topCenter,
                   child: Container(
-                    margin: EdgeInsets.only(top: 40.0),
-                    child: Text(
+                    margin: const EdgeInsets.only(top: 40.0),
+                    child: const Text(
                       'Enter Your Profile',
                       style: TextStyle(
                           fontSize: 38.0,
@@ -148,13 +143,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 GestureDetector(
                   onTap: () {
                     SimpleDialog alert = SimpleDialog(
-                      title: Text("Choose an action"),
+                      title: const Text("Choose an action"),
                       children: [
                         SimpleDialogOption(
                           onPressed: () {
                             getImage(ImageSource.gallery);
                           },
-                          child: Row(
+                          child: const Row(
                             children: [
                               Icon(
                                 CupertinoIcons.photo,
@@ -175,7 +170,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           onPressed: () {
                             getImage(ImageSource.camera);
                           },
-                          child: Row(
+                          child: const Row(
                             children: [
                               Icon(
                                 Icons.camera_alt,
@@ -223,20 +218,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     //     : null,
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 TextFormInput(
                   label: 'Username',
                   hintText: 'Enter your desired username',
                   controller: _usernameController,
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 TextFormInput(
                   label: 'About',
                   hintText: 'Tell us about yourself',
                   maxLines: 3,
                   controller: _aboutController,
                 ),
-                Spacer(),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -262,10 +257,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           setState(() {
                             fileUploading = false;
                           });
-                          Navigator.pushReplacement(
+                          Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ChatWindow()));
+                                  builder: (context) => HomePage()),
+                                ModalRoute.withName('/')
+                          );
                         } on FirebaseAuthException catch (e) {
                           setState(() {
                             fileUploading = false;
@@ -293,54 +290,55 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
                         ;
                       },
-                      child: (fileUploading)
-                          ? CircularProgressIndicator(
-                              strokeWidth: 3,
-                              color: Colors.white,
-                            )
-                          : Text(
-                              'Done',
-                              style: TextStyle(color: Colors.white),
-                            ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        padding: EdgeInsets.symmetric(horizontal: 30.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
+                      child: (fileUploading)
+                          ? const CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              'Done',
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 30,
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.pushAndRemoveUntil(
                             (context),
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    CurrentUserProfilePage()));
+                                    HomePage()),
+                        ModalRoute.withName('/'));
                       },
-                      child: Text(
-                        'Skip',
-                        style: TextStyle(color: Colors.white),
-                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,
-                        padding: EdgeInsets.symmetric(horizontal: 30.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
+                      child: const Text(
+                        'Skip',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
               ],
             ),
           ),
         ],
-      ),
+      ):const CircularProgressIndicator(color: Colors.deepPurpleAccent,),
     );
   }
 }
@@ -366,9 +364,9 @@ class TextFormInput extends StatelessWidget {
       children: [
         Text(
           label!,
-          style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 5.0),
+        const SizedBox(height: 5.0),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
@@ -379,7 +377,7 @@ class TextFormInput extends StatelessWidget {
             ),
             filled: true,
             fillColor: Colors.grey[200],
-            contentPadding: EdgeInsets.symmetric(
+            contentPadding: const EdgeInsets.symmetric(
               vertical: 10.0,
               horizontal: 15.0,
             ),
