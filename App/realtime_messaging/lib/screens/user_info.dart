@@ -67,30 +67,30 @@ class _UserInfoPageState extends State<UserInfoPage> {
     setState(() {
       _usernameController.text=currentUser!.name ?? "";
       _aboutController.text=currentUser!.about ?? "";
-      if (currentUser!.photoUrl != null) {
-          Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
-          _downloadImage(imageUrl).then((imageFile) {
-          setState(() {
-            _image = imageFile;
-          });
-      });
-      }
+      // if (currentUser!.photoUrl != null) {
+      //     Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
+      //     _downloadImage(imageUrl).then((imageFile) {
+      //     setState(() {
+      //       _image = imageFile;
+      //     });
+      // });
+      // }
     });
   }
 
-  Future<File?> _downloadImage(Uri imageUrl) async {
-    try {
-      http.Response response = await http.get(imageUrl);
-      String fileName = imageUrl.pathSegments.last;
-      Directory tempDir = await getTemporaryDirectory();
-      File file = File('${tempDir.path}/$fileName');
-      await file.writeAsBytes(response.bodyBytes);
-      return file;
-    } catch (e) {
-      debugPrint('Error downloading image: $e');
-      return null;
-    }
-  }
+  // Future<File?> _downloadImage(Uri imageUrl) async {
+  //   try {
+  //     http.Response response = await http.get(imageUrl);
+  //     String fileName = imageUrl.pathSegments.last;
+  //     Directory tempDir = await getTemporaryDirectory();
+  //     File file = File('${tempDir.path}/$fileName');
+  //     await file.writeAsBytes(response.bodyBytes);
+  //     return file;
+  //   } catch (e) {
+  //     debugPrint('Error downloading image: $e');
+  //     return null;
+  //   }
+  // }
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
@@ -209,15 +209,15 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               image: FileImage(_image!),
                               fit: BoxFit.cover,
                             )
-                          : null,
+                          : DecorationImage(image: NetworkImage(currentUser!.photoUrl!)),
                     ),
-                    child: _image == null
-                        ? Icon(
-                            Icons.camera_alt,
-                            size: 40.0,
-                            color: Colors.grey[500],
-                          )
-                        : null,
+                    // child: _image == null
+                    //     ? Icon(
+                    //         Icons.camera_alt,
+                    //         size: 40.0,
+                    //         color: Colors.grey[500],
+                    //       )
+                    //     : null,
                   ),
                 ),
                 SizedBox(height: 20.0),
