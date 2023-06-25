@@ -20,7 +20,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
+
     );
   }
 }

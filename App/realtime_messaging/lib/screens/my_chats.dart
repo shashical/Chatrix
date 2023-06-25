@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
+import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
@@ -36,14 +37,13 @@ class _ChatsPageState extends State<ChatsPage> {
                   return SizedBox();
                 }
                 return FutureBuilder<Chat>(
-                  future: _remoteServices.getSingleChat(userchat.chatId),
+                  future: ChatsRemoteServices().getSingleChat(userchat.chatId),
                   builder: (context, snapshot) {
                     final chat = snapshot.data!;
                     return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(userchat.recipientPhoto),
-                  ),
-                  title: Text(userchat.recipientPhoneNo),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(userchat.recipientPhoto),
+                      ), title: Text(userchat.recipientPhoneNo),
                   subtitle: Text(chat.lastMessage ?? ""),
                   trailing: Text((chat.lastMessageTime==null?"":"${chat.lastMessageTime!.hour}"+":"+"${chat.lastMessageTime!.minute}")),
                   onTap: () {
