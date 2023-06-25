@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:io';
 import '../Models/users.dart';
-import '../Services/remote_services.dart';
+import '../Services/users_remote_services.dart';
 
 class CurrentUserProfilePage extends StatefulWidget {
   const CurrentUserProfilePage({Key? key}) : super(key: key);

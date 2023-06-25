@@ -3,9 +3,8 @@ import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-
 import '../Models/users.dart';
-import '../Services/remote_services.dart';
+import '../Services/users_remote_services.dart';
 
 class ChatsPage extends StatefulWidget {
   @override
@@ -18,26 +17,24 @@ class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chats'),
-      ),
       body: StreamBuilder<List<UserChat>>(
         stream: _remoteServices.getUserChats(cid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final List<UserChat> userchats = snapshot.data!;
-
             if (userchats.isEmpty) {
               return Center(
                 child: Text('No chats to display.'),
               );
             }
-
+            final List<UserChat> sorteduserchats =[... userchats.where((element) => element.pinned), ... userchats.where((element) => !element.pinned)];
             return ListView.builder(
               itemCount: userchats.length,
               itemBuilder: (context, index) {
-                final UserChat userchat = userchats[index];
-
+                final UserChat userchat = sorteduserchats[index];
+                if(userchat.deleted){
+                  return SizedBox();
+                }
                 return FutureBuilder<Chat>(
                   future: _remoteServices.getSingleChat(userchat.chatId),
                   builder: (context, snapshot) {
@@ -66,6 +63,22 @@ class _ChatsPageState extends State<ChatsPage> {
               child: CircularProgressIndicator(),
             );
           }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.cyan.shade800,
+        child: Icon(Icons.search),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => SearchContactPage(),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(40),
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+          );
         },
       ),
     );

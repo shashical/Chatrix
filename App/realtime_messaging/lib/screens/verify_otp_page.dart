@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:realtime_messaging/Models/users.dart';
-import 'package:realtime_messaging/Services/remote_services.dart';
+import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';

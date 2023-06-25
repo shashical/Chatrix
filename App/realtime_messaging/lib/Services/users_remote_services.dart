@@ -4,7 +4,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
+import 'package:realtime_messaging/Models/userGroups.dart';
 
+import '../Models/groups.dart';
 import '../Models/users.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'dart:io';
@@ -32,9 +34,12 @@ class RemoteServices{
     );
   }
 
-  Future<Chat> getSingleChat(String id)async{
-    final docsnap = await reference.collection('chats').doc(id).get().catchError((e)=>throw Exception('$e'));
-    return Chat.fromJson(docsnap.data()!);
+  Stream<List<UserGroup>>getUserGroups(String id){
+    return reference.collection('users/$id/userGroups')
+    .snapshots().map((event) => event.docs.map((doc) => UserGroup
+    .fromJson(doc.data()))
+    .toList()
+    );
   }
 
   Future<void>setUsers(Users user) async{
