@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:bubble/bubble.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 
 class MyBubble extends StatelessWidget {
-  MyBubble({required this.message,required this.time, this.delivered, this.isMe});
+  MyBubble(
+      {required this.message, required this.time, this.delivered, this.isMe});
 
   final String message, time;
   final delivered, isMe;
@@ -28,7 +28,8 @@ class MyBubble extends StatelessWidget {
       crossAxisAlignment: align,
       children: [
         Container(
-          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.8),
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
           margin: const EdgeInsets.all(3.0),
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
@@ -44,16 +45,26 @@ class MyBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(message,style: TextStyle(fontSize: 16)),
-              SizedBox(height: 1,),
+              Text(message, style: TextStyle(fontSize: 16)),
+              SizedBox(
+                height: 1,
+              ),
               ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: 55.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text("12:00",style: TextStyle(fontSize: 13),),
-                    SizedBox(width: 5,),
-                    Icon(Icons.done_all,size: 16,)
+                    Text(
+                      "12:00",
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Icon(
+                      Icons.done_all,
+                      size: 16,
+                    )
                   ],
                 ),
               ),
@@ -68,7 +79,12 @@ class MyBubble extends StatelessWidget {
 class ChatWindow extends StatefulWidget {
   final String backgroundImage;
   final String? chatId;
-  const ChatWindow({this.backgroundImage = "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",this.chatId,Key? key}) : super(key: key);
+  const ChatWindow(
+      {this.backgroundImage =
+          "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+      this.chatId,
+      Key? key})
+      : super(key: key);
 
   @override
   State<ChatWindow> createState() => _ChatWindowState();
@@ -88,9 +104,7 @@ class _ChatWindowState extends State<ChatWindow> {
             icon: Icon(
               Icons.more_vert,
             ),
-            onPressed: () {
-
-            },
+            onPressed: () {},
           )
         ],
       ),

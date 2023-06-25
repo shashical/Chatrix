@@ -4,7 +4,7 @@ import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-import '../Models/users.dart';
+import '../Services/chats_remote_services.dart';
 import '../Services/users_remote_services.dart';
 
 class ChatsPage extends StatefulWidget {
@@ -13,13 +13,14 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
-  final RemoteServices _remoteServices = RemoteServices();
+  final RemoteServices _usersremoteServices = RemoteServices();
+  final ChatsRemoteServices _chatsremoteServices = ChatsRemoteServices();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<List<UserChat>>(
-        stream: _remoteServices.getUserChats(cid),
+        stream: _usersremoteServices.getUserChats(cid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final List<UserChat> userchats = snapshot.data!;
@@ -28,30 +29,36 @@ class _ChatsPageState extends State<ChatsPage> {
                 child: Text('No chats to display.'),
               );
             }
-            final List<UserChat> sorteduserchats =[... userchats.where((element) => element.pinned), ... userchats.where((element) => !element.pinned)];
+            final List<UserChat> sorteduserchats = [
+              ...userchats.where((element) => element.pinned),
+              ...userchats.where((element) => !element.pinned)
+            ];
             return ListView.builder(
               itemCount: userchats.length,
               itemBuilder: (context, index) {
                 final UserChat userchat = sorteduserchats[index];
-                if(userchat.deleted){
+                if (userchat.deleted) {
                   return SizedBox();
                 }
                 return FutureBuilder<Chat>(
-                  future: ChatsRemoteServices().getSingleChat(userchat.chatId),
+                  future: _chatsremoteServices.getSingleChat(userchat.chatId),
                   builder: (context, snapshot) {
                     final chat = snapshot.data!;
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(userchat.recipientPhoto),
-                      ), title: Text(userchat.recipientPhoneNo),
-                  subtitle: Text(chat.lastMessage ?? ""),
-                  trailing: Text((chat.lastMessageTime==null?"":"${chat.lastMessageTime!.hour}"+":"+"${chat.lastMessageTime!.minute}")),
-                  onTap: () {
-
+                      ),
+                      title: Text(userchat.recipientPhoneNo),
+                      subtitle: Text(chat.lastMessage ?? ""),
+                      trailing: Text((chat.lastMessageTime == null
+                          ? ""
+                          : "${chat.lastMessageTime!.hour}" +
+                              ":" +
+                              "${chat.lastMessageTime!.minute}")),
+                      onTap: () {},
+                    );
                   },
                 );
-                  },
-                  );
               },
             );
           } else if (snapshot.hasError) {

@@ -16,8 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'chat_window.dart';
 import 'home_page.dart';
 
-
-final cid=FirebaseAuth.instance.currentUser!.uid;
+final cid = FirebaseAuth.instance.currentUser!.uid;
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -30,72 +29,73 @@ class _UserInfoPageState extends State<UserInfoPage> {
   File? _image;
   String? imageUrl;
   Users? currentUser;
-  bool fileUploading=false;
+  bool fileUploading = false;
 
-  void initState(){
-    try
-    {getCurrentUser();}
-    on FirebaseAuthException catch(e){
+  void initState() {
+    try {
+      getCurrentUser();
+    } on FirebaseAuthException catch (e) {
       setState(() {
-        fileUploading=false;
+        fileUploading = false;
       });
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('${e.message}')));
-    } on FirebaseException catch(e){
+    } on FirebaseException catch (e) {
       setState(() {
-        fileUploading=false;
+        fileUploading = false;
       });
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('${e.message}')));
+    } catch (e) {
+      setState(() {
+        fileUploading = false;
+      });
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$e')));
     }
-
-    catch(e)
-    {
-      setState(() {
-        fileUploading=false;
-      });
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('$e')));}
     super.initState();
   }
 
-  getCurrentUser()async {
-    currentUser=await RemoteServices().getSingleUser(FirebaseAuth.instance.currentUser!.uid).catchError((e)=>throw Exception('$e'));
+  getCurrentUser() async {
+    currentUser = await RemoteServices()
+        .getSingleUser(FirebaseAuth.instance.currentUser!.uid)
+        .catchError((e) => throw Exception('$e'));
     setState(() {
-      _usernameController.text=currentUser!.name ?? "";
-      _aboutController.text=currentUser!.about ?? "";
-      if (currentUser!.photoUrl != null) {
-          Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
-          _downloadImage(imageUrl).then((imageFile) {
-          setState(() {
-            _image = imageFile;
-          });
-      });
-      }
+      _usernameController.text = currentUser!.name ?? "";
+      _aboutController.text = currentUser!.about ?? "";
+      // if (currentUser!.photoUrl != null) {
+      //     Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
+      //     _downloadImage(imageUrl).then((imageFile) {
+      //     setState(() {
+      //       _image = imageFile;
+      //     });
+      // });
+      // }
     });
   }
 
-  Future<File?> _downloadImage(Uri imageUrl) async {
-    try {
-      http.Response response = await http.get(imageUrl);
-      String fileName = imageUrl.pathSegments.last;
-      Directory tempDir = await getTemporaryDirectory();
-      File file = File('${tempDir.path}/$fileName');
-      await file.writeAsBytes(response.bodyBytes);
-      return file;
-    } catch (e) {
-      debugPrint('Error downloading image: $e');
-      return null;
-    }
-  }
+  // Future<File?> _downloadImage(Uri imageUrl) async {
+  //   try {
+  //     http.Response response = await http.get(imageUrl);
+  //     String fileName = imageUrl.pathSegments.last;
+  //     Directory tempDir = await getTemporaryDirectory();
+  //     File file = File('${tempDir.path}/$fileName');
+  //     await file.writeAsBytes(response.bodyBytes);
+  //     return file;
+  //   } catch (e) {
+  //     debugPrint('Error downloading image: $e');
+  //     return null;
+  //   }
+  // }
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
 
-  firebase_storage.FirebaseStorage storage =firebase_storage.FirebaseStorage.instance;
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
     if (image == null) {
@@ -110,7 +110,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -133,15 +132,18 @@ class _UserInfoPageState extends State<UserInfoPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                margin: EdgeInsets.only(top: 40.0),
-                child: Text(
-                  'Enter Your Profile',
-                  style: TextStyle(fontSize: 38.0, fontWeight: FontWeight.bold,fontFamily: 'Caveat'),
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 40.0),
+                    child: Text(
+                      'Enter Your Profile',
+                      style: TextStyle(
+                          fontSize: 38.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Caveat'),
+                    ),
+                  ),
                 ),
-              ),
-            ),
                 SizedBox(height: 20.0),
                 GestureDetector(
                   onTap: () {
@@ -209,15 +211,16 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               image: FileImage(_image!),
                               fit: BoxFit.cover,
                             )
-                          : null,
+                          : DecorationImage(
+                              image: NetworkImage(currentUser!.photoUrl!)),
                     ),
-                    child: _image == null
-                        ? Icon(
-                            Icons.camera_alt,
-                            size: 40.0,
-                            color: Colors.grey[500],
-                          )
-                        : null,
+                    // child: _image == null
+                    //     ? Icon(
+                    //         Icons.camera_alt,
+                    //         size: 40.0,
+                    //         color: Colors.grey[500],
+                    //       )
+                    //     : null,
                   ),
                 ),
                 SizedBox(height: 20.0),
@@ -238,62 +241,67 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         setState(() {
-                          fileUploading=true;
+                          fileUploading = true;
                         });
-                        try{
+                        try {
+                          final id = FirebaseAuth.instance.currentUser!.uid;
+                          if (_image != null) {
+                            imageUrl = await RemoteServices()
+                                .uploadNewImage(_image!, id);
+                          }
 
-                        final id=FirebaseAuth.instance.currentUser!.uid;
-                        if(_image!=null) {
-                         imageUrl=await RemoteServices().uploadNewImage(_image!, id);
-
-                        }
-
-                        RemoteServices().updateUser(id,{
-                          "name":_usernameController.text,
-                          "photoUrl":(imageUrl==null)? 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1':imageUrl,
-                          "about":_aboutController.text
-
-                        });
-                        setState(() {
-                          fileUploading=false;
-                        });
-                        Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context)=>ChatWindow()));
-                        }on FirebaseAuthException catch(e){
+                          RemoteServices().updateUser(id, {
+                            "name": _usernameController.text,
+                            "photoUrl": (imageUrl == null)
+                                ? 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'
+                                : imageUrl,
+                            "about": _aboutController.text
+                          });
                           setState(() {
-                            fileUploading=false;
+                            fileUploading = false;
+                          });
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChatWindow()));
+                        } on FirebaseAuthException catch (e) {
+                          setState(() {
+                            fileUploading = false;
                           });
                           ScaffoldMessenger.of(context)
                             ..removeCurrentSnackBar()
-                            ..showSnackBar(SnackBar(content: Text('${e.message}')));
-                        } on FirebaseException catch(e){
+                            ..showSnackBar(
+                                SnackBar(content: Text('${e.message}')));
+                        } on FirebaseException catch (e) {
                           setState(() {
-                            fileUploading=false;
+                            fileUploading = false;
                           });
                           ScaffoldMessenger.of(context)
                             ..removeCurrentSnackBar()
-                            ..showSnackBar(SnackBar(content: Text('${e.message}')));
+                            ..showSnackBar(
+                                SnackBar(content: Text('${e.message}')));
+                        } catch (e) {
+                          setState(() {
+                            fileUploading = false;
+                          });
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(SnackBar(content: Text('$e')));
                         }
-
-                        catch(e)
-                             {
-                               setState(() {
-                                 fileUploading=false;
-                               });
-                               ScaffoldMessenger.of(context)
-                                ..removeCurrentSnackBar()
-                                ..showSnackBar(SnackBar(content: Text('$e')));}
 
                         ;
-
-                        
                       },
-                      child:(fileUploading)?CircularProgressIndicator(strokeWidth: 3,color: Colors.white,): Text(
-                        'Done',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: (fileUploading)
+                          ? CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: Colors.white,
+                            )
+                          : Text(
+                              'Done',
+                              style: TextStyle(color: Colors.white),
+                            ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: EdgeInsets.symmetric(horizontal: 30.0),
@@ -307,8 +315,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement((context),
-                            MaterialPageRoute(builder: (context)=>CurrentUserProfilePage()));
+                        Navigator.pushReplacement(
+                            (context),
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    CurrentUserProfilePage()));
                       },
                       child: Text(
                         'Skip',
@@ -339,7 +350,6 @@ class TextFormInput extends StatelessWidget {
   final String? hintText;
   final int maxLines;
   final TextEditingController controller;
-
 
   const TextFormInput({
     Key? key,

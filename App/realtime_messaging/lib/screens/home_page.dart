@@ -27,9 +27,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chatrix",style: TextStyle(fontFamily: "Caveat",fontSize: 40),),
-      automaticallyImplyLeading: false,
-      flexibleSpace: Container(
+      appBar: AppBar(
+        title: Text(
+          "Chatrix",
+          style: TextStyle(fontFamily: "Caveat", fontSize: 40),
+        ),
+        automaticallyImplyLeading: false,
+        flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
