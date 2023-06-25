@@ -43,8 +43,8 @@ class RemoteServices{
   }
 
   Future<void>setUsers(Users user) async{
-    final DocumentSnapshot docsnap=await reference.collection('users').doc(user.id).get();
-    if(!docsnap.exists)
+    final DocumentSnapshot docSnap=await reference.collection('users').doc(user.id).get();
+    if(!docSnap.exists)
       {
         try{
 

@@ -1,11 +1,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/Services/remote_services.dart';
+//import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Models/users.dart';
+import '../Services/users_remote_services.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
  final  String? chatId;
