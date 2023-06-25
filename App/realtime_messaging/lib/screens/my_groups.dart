@@ -4,6 +4,7 @@ import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/groups.dart';
 import '../Services/groups_remote_services.dart';
+import '../Services/users_remote_services.dart';
 
 class GroupsPage extends StatefulWidget {
   @override
@@ -22,7 +23,7 @@ class _GroupsPageState extends State<GroupsPage> {
           if (snapshot.hasData) {
             final List<UserGroup> usergroups = snapshot.data!;
             if (usergroups.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No groups to display.'),
               );
             }
@@ -32,7 +33,7 @@ class _GroupsPageState extends State<GroupsPage> {
               itemBuilder: (context, index) {
                 final UserGroup usergroup = sortedusergroups[index];
                 return FutureBuilder<Group>(
-                  future: _remoteServices.getSingleGroup(usergroup.groupId),
+                  future: GroupsRemoteServices().getSingleGroup(usergroup.groupId),
                   builder: (context, snapshot) {
                     final group = snapshot.data!;
                     return ListTile(
@@ -41,7 +42,7 @@ class _GroupsPageState extends State<GroupsPage> {
                   ),
                   title: Text(group.name),
                   subtitle: Text(group.lastMessage ?? ""),
-                  trailing: Text((group.lastMessageTime==null?"":"${group.lastMessageTime!.hour}"+":"+"${group.lastMessageTime!.minute}")),
+                  trailing: Text((group.lastMessageTime==null?"":"${group.lastMessageTime!.hour}:${group.lastMessageTime!.minute}")),
                   onTap: () {
 
                   },
@@ -55,7 +56,7 @@ class _GroupsPageState extends State<GroupsPage> {
               child: Text('Error: ${snapshot.error}'),
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -63,7 +64,7 @@ class _GroupsPageState extends State<GroupsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.cyan.shade800,
-        child: Icon(Icons.search),
+        child: const Icon(Icons.search),
         onPressed: () {
           showModalBottomSheet(
             context: context,

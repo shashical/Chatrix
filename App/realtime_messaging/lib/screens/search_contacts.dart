@@ -5,10 +5,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:realtime_messaging/Services/remote_services.dart';
+//import 'package:realtime_messaging/Services/remote_services.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
+import '../Services/users_remote_services.dart';
 List<String> savedNumber=[];
 List<String> savedUsers=[];
 class SearchContactPage extends StatefulWidget {
