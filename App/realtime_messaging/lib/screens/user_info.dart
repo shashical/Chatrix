@@ -12,7 +12,6 @@ import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-
 import 'chat_window.dart';
 import 'home_page.dart';
 
@@ -29,6 +28,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   File? _image;
   String? imageUrl;
   Users? currentUser;
+  bool isUserLoaded = false;
   bool fileUploading = false;
 
   void initState() {
@@ -66,6 +66,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     setState(() {
       _usernameController.text = currentUser!.name ?? "";
       _aboutController.text = currentUser!.about ?? "";
+      isUserLoaded = true;
       // if (currentUser!.photoUrl != null) {
       //     Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
       //     _downloadImage(imageUrl).then((imageFile) {
@@ -211,8 +212,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               image: FileImage(_image!),
                               fit: BoxFit.cover,
                             )
-                          : DecorationImage(
-                              image: NetworkImage(currentUser!.photoUrl!)),
+                          : (isUserLoaded?
+                          DecorationImage(
+                              image: NetworkImage(currentUser!.photoUrl!),fit: BoxFit.cover)
+                              :DecorationImage(
+                              image: NetworkImage("https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"),fit: BoxFit.cover)
+                          ),
                     ),
                     // child: _image == null
                     //     ? Icon(
@@ -265,7 +270,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ChatWindow()));
+                                  builder: (context) => HomePage()));
                         } on FirebaseAuthException catch (e) {
                           setState(() {
                             fileUploading = false;
@@ -319,7 +324,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             (context),
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    CurrentUserProfilePage()));
+                                    ChatWindow()));
                       },
                       child: Text(
                         'Skip',
