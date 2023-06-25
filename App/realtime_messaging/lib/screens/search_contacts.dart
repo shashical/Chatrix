@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:realtime_messaging/Services/remote_services.dart';
+import 'package:realtime_messaging/Services/users_remote_services.dart';
 
 import '../Models/users.dart';
 List<String> savedNumber=[];

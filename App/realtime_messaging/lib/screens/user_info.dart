@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:realtime_messaging/Services/remote_services.dart';
+import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
 import 'package:realtime_messaging/screens/my_chats.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -12,6 +12,9 @@ import 'package:realtime_messaging/screens/search_contacts.dart';
 import '../Models/users.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+import 'chat_window.dart';
+import 'home_page.dart';
 
 
 final cid=FirebaseAuth.instance.currentUser!.uid;
@@ -257,7 +260,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           fileUploading=false;
                         });
                         Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context)=>SearchContactPage()));
+                        MaterialPageRoute(builder: (context)=>ChatWindow()));
                         }on FirebaseAuthException catch(e){
                           setState(() {
                             fileUploading=false;
@@ -305,7 +308,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement((context),
-                            MaterialPageRoute(builder: (context)=>SearchContactPage()));
+                            MaterialPageRoute(builder: (context)=>ChatWindow()));
                       },
                       child: Text(
                         'Skip',
