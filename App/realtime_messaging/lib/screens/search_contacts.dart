@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,7 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:realtime_messaging/Services/remote_services.dart';
-
+import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
+import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
 List<String> savedNumber=[];
 List<String> savedUsers=[];
@@ -175,14 +177,14 @@ class _SearchContactPageState extends State<SearchContactPage> {
 
                     if(_searchController.text.isEmpty) {
                       return ListView(
-                        children: MergeAppUserAndSendInvite(users, appUserNumber),
+                        children: MergeAppUserAndSendInvite(users, appUserNumber,context),
                       );
                       }
 
                     else{
 
                       return ListView(
-                        children: SearchMerge(users, appUserNumber, searchedNumber, searchedUser)
+                        children: SearchMerge(users, appUserNumber, searchedNumber, searchedUser,context)
 
                       );
 
@@ -201,19 +203,25 @@ class _SearchContactPageState extends State<SearchContactPage> {
     );
     }
   }
-List<Widget>MergeAppUserAndSendInvite(List<Users> users ,List<String> appUserNumber,){
+List<Widget>MergeAppUserAndSendInvite(List<Users> users ,List<String> appUserNumber,BuildContext context){
   List<Widget> returnablelist=[];
   List<Widget> inviteToApp=[];
   for(int i=0;i<savedNumber.length;i++) {
     int index = appUserNumber.indexOf(savedNumber[i]);
-    if (index != -1) {
-      returnablelist.add(
+    if (index != -1 ) {
+      if(users[index].id!=cid)
+      {returnablelist.add(
           ListTile(
 
-            leading: CircleAvatar(
-              foregroundImage: NetworkImage('${users[index].photoUrl}'
-              ),
+            leading: InkWell(
+              child: CircleAvatar(
+                foregroundImage: NetworkImage('${users[index].photoUrl}'
+                ),
 
+              ),
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(userId: users[index].id,)));
+              },
             ),
             title: Text(savedUsers[i]),
             subtitle: Text('${users[index].about}',
@@ -221,9 +229,9 @@ List<Widget>MergeAppUserAndSendInvite(List<Users> users ,List<String> appUserNum
               overflow: TextOverflow.ellipsis,
             ),
           )
-      );
+      );}
     }
-    else {
+    else  {
       inviteToApp.add(
           ListTile(
             leading: CircleAvatar(foregroundImage: NetworkImage('https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'),),
@@ -250,27 +258,36 @@ List<Widget>MergeAppUserAndSendInvite(List<Users> users ,List<String> appUserNum
 
 }
 
-List<Widget> SearchMerge(List<Users>users,List<String>appUserNumber,List<String>searchedNumber,List<String>searchedUsers){
+List<Widget> SearchMerge(List<Users>users,List<String>appUserNumber,List<String>searchedNumber,List<String>searchedUsers,BuildContext context){
   List<Widget> returnablelist=[];
   List<Widget> inviteToApp=[];
   for(int i=0;i<searchedNumber.length;i++) {
     int index = appUserNumber.indexOf(searchedNumber[i]);
     if (index != -1) {
-      returnablelist.add(
-          ListTile(
+      if(users[index].id!=cid) {
+        returnablelist.add(
+            ListTile(
 
-            leading: CircleAvatar(
-              foregroundImage: NetworkImage('${users[index].photoUrl}'
+              leading: InkWell(
+                child: CircleAvatar(
+                  foregroundImage: NetworkImage('${users[index].photoUrl}'
+                  ),
+
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) =>
+                          OtherUserProfilePage(userId: users[index].id,)));
+                },
               ),
-
-            ),
-            title: Text(searchedUsers[i]),
-            subtitle: Text('${users[index].about}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          )
-      );
+              title: Text(searchedUsers[i]),
+              subtitle: Text('${users[index].about}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+        );
+      }
     }
     else {
       inviteToApp.add(
