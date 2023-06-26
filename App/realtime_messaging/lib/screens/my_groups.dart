@@ -198,8 +198,14 @@ class _GroupsPageState extends State<GroupsPage> {
                     ),
                     PopupMenuButton(
                         itemBuilder: (context)=>[
-                          const PopupMenuItem(
-                              child: Text('Select All'))
+                           PopupMenuItem(
+                              child: const Text('Select All'),
+                            onTap: (){
+                                setState(() {
+
+                                });
+                            },
+                          )
                         ])
                   ],
                 ):const SizedBox(width: 0,),
@@ -263,34 +269,34 @@ class _GroupsPageState extends State<GroupsPage> {
                             }
                           },
                           onLongPress: (){
-                              if(isSelected[index]){
-                                setState(() {
-                                  if(!usergroups[index].muted){
-                                    unMutedSelected.remove(index);
+                                if(isSelected[index]){
+                                  setState(() {
+                                    if(!usergroups[index].muted){
+                                      unMutedSelected.remove(index);
 
-                                  }
-                                  if(!usergroups[index].pinned){
-                                    unPinnedSelected.remove(index);
-                                  }
-                                  isSelected[index]=false;
-                                  trueCount--;
-                                });
-                                
-                              }
-                              else{
-                                setState(() {
-                                  if(!usergroups[index].muted){
-                                    unMutedSelected.add(index);
+                                    }
+                                    if(!usergroups[index].pinned){
+                                      unPinnedSelected.remove(index);
+                                    }
+                                    isSelected[index]=false;
+                                    trueCount--;
+                                  });
 
-                                  }
-                                  if(!usergroups[index].pinned){
-                                    unPinnedSelected.add(index);
-                                  }
-                                  isSelected[index]=true;
-                                  trueCount++;
-                                });
-                                
-                              }
+                                }
+                                else{
+                                  setState(() {
+                                    if(!usergroups[index].muted){
+                                      unMutedSelected.add(index);
+
+                                    }
+                                    if(!usergroups[index].pinned){
+                                      unPinnedSelected.add(index);
+                                    }
+                                    isSelected[index]=true;
+                                    trueCount++;
+                                  });
+
+                                }
                           },
                         );
                       },

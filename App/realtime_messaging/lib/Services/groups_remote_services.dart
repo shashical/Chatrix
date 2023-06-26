@@ -6,7 +6,23 @@ import '../Models/groups.dart';
 
 class GroupsRemoteServices{
   final reference= FirebaseFirestore.instance;
-
+  Future<void> setGroups(Group group) async {
+    final DocumentSnapshot docSnap =
+    await reference.collection('groups').doc(group.id).get();
+    if (!docSnap.exists) {
+      try {
+        reference
+            .collection('groups')
+            .doc(group.id)
+            .set(group.toJson())
+            .catchError((e) => throw Exception('$e'));
+      } on FirebaseException catch (e) {
+        throw Exception('$e');
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
   Future<Group>getSingleGroup(String id)async{
     final docsnap= await reference.collection('groups')
     .doc(id).get()

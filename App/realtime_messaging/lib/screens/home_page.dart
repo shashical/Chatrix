@@ -61,6 +61,9 @@ class _HomePageState extends State<HomePage> {
              onTap: (){
                Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
              },),
+            PopupMenuItem(child: Text('New Group'),
+
+            ),
             PopupMenuItem(child: const Row(
               children: [
                 Icon(Icons.logout),
