@@ -13,6 +13,7 @@ class Users {
   DateTime? lastOnline;
   bool isOnlineVisibility;
   bool lastOnlineVisibility;
+  List<String>? blockedBy;
 
   Users({
     required this.id,
@@ -24,6 +25,7 @@ class Users {
     this.lastOnline,
     this.isOnlineVisibility = true,
     this.lastOnlineVisibility = true,
+    this.blockedBy = const [],
   });
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
@@ -36,6 +38,7 @@ class Users {
         lastOnline: json["lastOnline"] != null ? DateTime.parse(json["lastOnline"]) : null,
         isOnlineVisibility: json["isOnlineVisibility"],
         lastOnlineVisibility: json["lastOnlineVisibility"],
+        blockedBy: List<String>.from(json['blockedBy'] ?? []),
       );
 
   Map<String, dynamic> toJson() => {
@@ -48,5 +51,6 @@ class Users {
         "lastOnline": lastOnline?.toIso8601String(),
         "isOnlineVisibility": isOnlineVisibility,
         "lastOnlineVisibility": lastOnlineVisibility,
+        "blockedBy": blockedBy,
       };
 }
