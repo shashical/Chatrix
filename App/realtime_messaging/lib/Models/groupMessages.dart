@@ -17,7 +17,6 @@ class GroupMessage {
   String? repliedTo;
   Map<String, bool>? deliveredTo;
   Map<String, bool>? readBy;
-  List<String>? starredBy;
   bool edited;
 
   GroupMessage({
@@ -34,7 +33,6 @@ class GroupMessage {
     this.repliedTo,
     this.deliveredTo,
     this.readBy,
-    this.starredBy,
     this.edited = false,
   });
 
@@ -53,7 +51,6 @@ class GroupMessage {
       repliedTo: json['repliedTo'],
       deliveredTo: Map<String, bool>.from(json['deliveredTo'] ?? {}),
       readBy: Map<String, bool>.from(json['readBy'] ?? {}),
-      starredBy: List<String>.from(json['starredBy'] ?? []),
       edited: json['edited'] ?? false,
     );
   }
@@ -73,7 +70,6 @@ class GroupMessage {
       'repliedTo': repliedTo,
       'deliveredTo': deliveredTo,
       'readBy': readBy,
-      'starredBy': starredBy,
       'edited': edited,
     };
   }

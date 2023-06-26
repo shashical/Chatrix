@@ -44,7 +44,6 @@ dependencies:
   image_picker: ^0.8.9
   timer_count_down: ^2.2.2
   firebase_storage: ^11.2.3
-  path_provider: ^2.0.15
   restart_app: ^1.2.1
 
 dev_dependencies:

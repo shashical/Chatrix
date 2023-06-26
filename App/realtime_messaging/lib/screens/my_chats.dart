@@ -63,7 +63,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           const SizedBox(height: 0,width: 0,)
                         ]
                       ),
-                      title: Text((index!=-1)?savedUsers[ind]:userchat.recipientPhoneNo),
+                      title: Text((ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo),
                       subtitle: Text(chat.lastMessage ?? ""),
                       trailing: Text((chat.lastMessageTime == null
                           ? ""

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../Models/users.dart';
+import 'chat_window.dart';
 import 'home_page.dart';
 
 final cid = FirebaseAuth.instance.currentUser!.uid;
@@ -21,6 +22,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   File? _image;
   String? imageUrl;
   Users? currentUser;
+  bool isUserLoaded = false;
   bool fileUploading = false;
   bool currentUserLoaded=false;
 
@@ -61,6 +63,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       currentUserLoaded=true;
       _usernameController.text = currentUser!.name ?? "";
       _aboutController.text = currentUser!.about ?? "";
+      isUserLoaded = true;
       // if (currentUser!.photoUrl != null) {
       //     Uri imageUrl = Uri.parse(currentUser!.photoUrl!);
       //     _downloadImage(imageUrl).then((imageFile) {
@@ -206,8 +209,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               image: FileImage(_image!),
                               fit: BoxFit.cover,
                             )
-                          : DecorationImage(
-                              image: NetworkImage(currentUser!.photoUrl!)),
+                          : (isUserLoaded?
+                          DecorationImage(
+                              image: NetworkImage(currentUser!.photoUrl!),fit: BoxFit.cover)
+                              :DecorationImage(
+                              image: NetworkImage("https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"),fit: BoxFit.cover)
+                          ),
                     ),
                     // child: _image == null
                     //     ? Icon(
