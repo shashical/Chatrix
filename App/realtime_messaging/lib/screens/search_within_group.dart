@@ -47,6 +47,20 @@ class _SearchWithinGroupState extends State<SearchWithinGroup> {
                     size: 25,
                     color: Colors.black,
                   ),
+                  suffixIcon: IconButton(
+                    onPressed: (){
+                      if(_searchController.text.isEmpty){
+                        Navigator.pop(context);
+                      }
+                      else{
+                        setState(() {
+                          _searchController.text='';
+                        });
+
+                      }
+                    },
+                    icon: Icon(Icons.cancel_outlined),
+                  ),
 
                   border: OutlineInputBorder(
                       borderSide: BorderSide.none,
