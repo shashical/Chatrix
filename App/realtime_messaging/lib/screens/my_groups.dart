@@ -5,8 +5,6 @@ import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-import '../Models/groups.dart';
-import '../Services/groups_remote_services.dart';
 import '../Services/users_remote_services.dart';
 
 class GroupsPage extends StatefulWidget {
@@ -203,17 +201,12 @@ class _GroupsPageState extends State<GroupsPage> {
                   itemCount: usergroups.length,
                   itemBuilder: (context, index) {
                     final UserGroup usergroup = sortedusergroups[index];
-                    return FutureBuilder<Group>(
-                      future:
-                          GroupsRemoteServices().getSingleGroup(usergroup.groupId),
-                      builder: (context, snapshot) {
-                        final group = snapshot.data!;
-                        return ListTile(
+                    return ListTile(
                           leading: InkWell(
                             child: Stack(
                               children: [
                               CircleAvatar(
-                                backgroundImage: NetworkImage(group.imageUrl!),
+                                backgroundImage: NetworkImage(usergroup.imageUrl),
                               ),
                                 (isSelected[index])?
                                 const Positioned(
@@ -224,14 +217,14 @@ class _GroupsPageState extends State<GroupsPage> {
                             ]
                             ),
                             onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,)));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,userGroupId: usergroup.id,)));
                             },
                           ),
-                          title: Text(group.name),
-                          subtitle: Text(group.lastMessage ?? ""),
-                          trailing: Text((group.lastMessageTime == null
+                          title: Text(usergroup.name),
+                          subtitle: Text(usergroup.lastMessage ?? ""),
+                          trailing: Text((usergroup.lastMessageTime == null
                               ? ""
-                              : "${group.lastMessageTime!.hour}:${group.lastMessageTime!.minute/10}${group.lastMessageTime!.minute%10}")),
+                              : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute/10}${usergroup.lastMessageTime!.minute%10}")),
                           onTap: () {
                             if(trueCount!=0) {
                               if (isSelected[index]) {
@@ -295,16 +288,17 @@ class _GroupsPageState extends State<GroupsPage> {
                           },
                         );
                       },
-                    );
-                  },
+
                 ),
               ],
             );
-          } else if (snapshot.hasError) {
+        }
+          else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
             );
-          } else {
+          }
+          else {
             return const Center(
               child: CircularProgressIndicator(),
             );

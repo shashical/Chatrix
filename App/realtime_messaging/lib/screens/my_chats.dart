@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
-import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
@@ -14,7 +12,6 @@ class ChatsPage extends StatefulWidget {
 
 class _ChatsPageState extends State<ChatsPage> {
   final RemoteServices _usersremoteServices = RemoteServices();
-  final ChatsRemoteServices _chatsremoteServices = ChatsRemoteServices();
   int index=-1;
   List<bool> isSelected=[];
 
@@ -31,7 +28,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 child: Text('No chats to display.'),
               );
             }
-            isSelected=List.filled(userchats.length,false);
+            isSelected = List.filled(userchats.length, false);
             final List<UserChat> sorteduserchats = [
               ...userchats.where((element) => element.pinned),
               ...userchats.where((element) => !element.pinned)
@@ -44,63 +41,68 @@ class _ChatsPageState extends State<ChatsPage> {
                 if (userchat.deleted) {
                   return const SizedBox();
                 }
-                return FutureBuilder<Chat>(
-                  future: _chatsremoteServices.getSingleChat(userchat.chatId),
-                  builder: (context, snapshot) {
-                    final chat = snapshot.data!;
-                    final ind=savedNumber.indexOf(userchat.recipientPhoneNo);
-                    return ListTile(
-                      leading:Stack(
-                        children:[
+                else {
+                  final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
+                  return ListTile(
+                    leading: Stack(
+                        children: [
                           CircleAvatar(
-                          backgroundImage: NetworkImage(userchat.recipientPhoto),
-                        ),
-                          (isSelected[index])?
+                            backgroundImage: NetworkImage(
+                                userchat.recipientPhoto),
+                          ),
+                          (isSelected[index]) ?
                           const Positioned(
-                            bottom: 1,
+                              bottom: 1,
                               right: 5,
-                              child: Icon(Icons.check_circle,size: 16,color: Colors.cyan,)):
-                          const SizedBox(height: 0,width: 0,)
+                              child: Icon(Icons.check_circle, size: 16,
+                                color: Colors.cyan,)) :
+                          const SizedBox(height: 0, width: 0,)
                         ]
-                      ),
-                      title: Text((ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo),
-                      subtitle: Text(chat.lastMessage ?? ""),
-                      trailing: Text((chat.lastMessageTime == null
-                          ? ""
-                          : "${chat.lastMessageTime!.hour}:${chat.lastMessageTime!.minute/10}${chat.lastMessageTime!.minute%10}")),
-                      onTap: () {
-                        if(isSelected[index]){
-                          setState(() {
-                            isSelected[index]=false;
-                          });
-                        }
-                      },
-                      onLongPress: (){
-                        if(isSelected[index]){
-                          setState(() {
-                            isSelected[index]=false;
-                          });
-
-                        }
-                        else{
-                          setState(() {
-                            isSelected[index]=true;
-                          });
-                        }
-                      },
-                    );
-                  },
-                );
+                    ),
+                    title: Text((ind != -1) ? savedUsers[ind] : userchat
+                        .recipientPhoneNo),
+                    subtitle: Text(userchat.lastMessage ?? ""),
+                    trailing: Text((userchat.lastMessageTime == null
+                        ? ""
+                        : "${userchat.lastMessageTime!.hour}:${userchat
+                        .lastMessageTime!.minute / 10}${userchat
+                        .lastMessageTime!.minute % 10}")),
+                    onTap: () {
+                      if (isSelected[index]) {
+                        setState(() {
+                          isSelected[index] = false;
+                        });
+                      }
+                    },
+                    onLongPress: () {
+                      if (isSelected[index]) {
+                        setState(() {
+                          isSelected[index] = false;
+                        });
+                      }
+                      else {
+                        setState(() {
+                          isSelected[index] = true;
+                        });
+                      }
+                    },
+                  );
+                }
               },
             );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
+          }
+          else if(snapshot.connectionState==ConnectionState.waiting){
             return const Center(
               child: CircularProgressIndicator(),
             );
+          }
+          else if(snapshot.hasError){
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          else{
+            return const SizedBox();
           }
         },
       ),

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
@@ -20,7 +21,8 @@ import '../Services/users_remote_services.dart';
 List<Widget> participant=[];
 class GroupInfoPage extends StatefulWidget {
   final String groupId;
-  const GroupInfoPage({Key? key, required this.groupId}) : super(key: key);
+  final String userGroupId;
+  const GroupInfoPage({Key? key, required this.groupId, required this.userGroupId}) : super(key: key);
 
   @override
   State<GroupInfoPage> createState() => _GroupInfoPageState();
@@ -35,15 +37,24 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   File ?_image;
   List<String> appUsersIds=[];
   List<String> appUserNumber=[];
+  UserGroup ?currentUserGroup;
+  bool currentuserchatloading=true;
   @override
   void initState() {
     super.initState();
     getCurrentGroup();
+    getUserCurrentGroup();
   }
-  getCurrentGroup()async{
+  void getCurrentGroup()async{
     currentGroup=await GroupsRemoteServices().getSingleGroup(widget.groupId);
     setState(() {
       isloaded=true;
+    });
+  }
+  void getUserCurrentGroup()async{
+    currentUserGroup=await RemoteServices().getSingleUserGroup(cid,widget.userGroupId);
+    setState(() {
+      currentuserchatloading=false;
     });
   }
   Future getImage(ImageSource source) async {
@@ -61,7 +72,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:(isloaded)?
+      body:(isloaded && !currentuserchatloading)?
           ListView(
             children: [
               const SizedBox(
@@ -98,7 +109,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                       ),
                     )
                         : Image(
-                      image: NetworkImage(currentGroup!.imageUrl!),
+                      image: NetworkImage(currentUserGroup!.imageUrl),
                       fit: BoxFit.cover,
                       width: 200,
                       height: 200,
@@ -141,7 +152,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                           }).catchError(
                                                   (e) => throw Exception('$e'));
                                           setState(() {
-                                            currentGroup!.imageUrl =
+                                            currentUserGroup!.imageUrl =
                                                 photoUrl;
                                             photoUploading = false;
                                           });
@@ -242,7 +253,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                       ],
                                     ),
                                   ),
-                                  (currentGroup!.imageUrl !=
+                                  (currentUserGroup!.imageUrl !=
                                       "https://geodash.gov.bd/uploaded/people_group/default_group.png")
                                       ? SimpleDialogOption(
                                     onPressed: () async {
@@ -258,7 +269,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                         }).catchError((e) =>
                                         throw Exception('$e'));
                                         setState(() {
-                                          currentGroup!.imageUrl =
+                                          currentUserGroup!.imageUrl =
                                           "https://geodash.gov.bd/uploaded/people_group/default_group.png";
                                           photoUploading = false;
                                         });
@@ -323,7 +334,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               const SizedBox(
                 height: 10,
               ),
-              Text((currentGroup!.name),
+              Text((currentUserGroup!.name),
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
@@ -381,7 +392,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                           children: [
                             Text(currentGroup!.participantIds.length as String,
                               style: const TextStyle(color: Colors.grey,fontSize: 15),),
-                            Spacer(),
+                            const Spacer(),
                             IconButton(onPressed: (){
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchWithinGroup(ListItem: participant, ListContent:contentList)));
                             }, icon: const Icon(Icons.search))
