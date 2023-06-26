@@ -81,7 +81,7 @@ class RemoteServices {
 
   Future<void> setUserChat(String userid, UserChat userchat) async {
     final DocumentSnapshot docSnap =
-        await reference.collection("users").doc(userchat.id).get();
+        await reference.collection("users").doc(userid).collection('userChats').doc(userchat.id).get();
     if (!docSnap.exists) {
       try {
         reference
@@ -126,6 +126,23 @@ class RemoteServices {
   }
 
 //UserGroups
+  Future<void> setUserGroup(String userid, UserGroup usergroup,) async {
+    final DocumentSnapshot docSnap =
+    await reference.collection("users").doc(userid).collection('userGroups').doc(usergroup.id).get();
+    if (!docSnap.exists) {
+      try {
+        reference
+            .collection("users")
+            .doc(userid).collection('userGroups').doc(usergroup.id)
+            .set(usergroup.toJson())
+            .catchError((e) => throw Exception('$e'));
+      } on FirebaseException catch (e) {
+        throw Exception('$e');
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
   Stream<List<UserGroup>> getUserGroups(String id) {
     return reference.collection('users/$id/userGroups').snapshots().map(
         (event) =>

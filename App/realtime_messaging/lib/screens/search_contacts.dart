@@ -15,15 +15,10 @@ class SearchContactPage extends StatefulWidget {
 }
 
 class _SearchContactPageState extends State<SearchContactPage> {
-  List<Contact> contacts = [];
-
-  bool isg = false;
-  bool contactsFetched = false;
-
   List<String> searchedUser = [];
   List<String> searchedNumber = [];
   List<String> appUserNumber = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +100,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
                           } else if (snapshot.data == null) {
                             return Center(
                                 child: Container(
-                                  padding: EdgeInsets.all(15),
+                                  padding: const EdgeInsets.all(15),
                                   child: const Text(
                                   'App Users from Your contact will appear here'),
                             ));
