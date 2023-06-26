@@ -236,13 +236,26 @@ class _ChatWindowState extends State<ChatWindow> {
                                 id: "$cid${widget.otherUserId}",
                                 participantIds: [cid, widget.otherUserId],
                               ));
-                              await RemoteServices().setUserChat(cid,
-                                UserChat(id: "$cid${widget.otherUserId}", chatId: "$cid${widget.otherUserId}", recipientPhoto: otheruser.photoUrl!, deleted: false, pinned: false, recipientPhoneNo: otheruser.phoneNo)
-                              );
-                              final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
-                              await RemoteServices().setUserChat(otheruser.id,
-                                UserChat(id: "${widget.otherUserId}$cid", chatId: "$cid${widget.otherUserId}", recipientPhoto: currentuser.photoUrl!, deleted: false, pinned: false, recipientPhoneNo: currentuser.phoneNo)
-                              );
+                              await RemoteServices().setUserChat(
+                                  cid,
+                                  UserChat(
+                                      id: "$cid${widget.otherUserId}",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: otheruser.photoUrl!,
+                                      deleted: false,
+                                      pinned: false,
+                                      recipientPhoneNo: otheruser.phoneNo));
+                              final Users currentuser =
+                                  (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(
+                                  otheruser.id,
+                                  UserChat(
+                                      id: "${widget.otherUserId}$cid",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: currentuser.photoUrl!,
+                                      deleted: false,
+                                      pinned: false,
+                                      recipientPhoneNo: currentuser.phoneNo));
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
                               });
@@ -261,9 +274,30 @@ class _ChatWindowState extends State<ChatWindow> {
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOut,
                             );
-                            await RemoteServices().updateUserChat(cid, "$cid${widget.otherUserId}",
-                            {'lastMessage': (messageController.text.length>100?"${messageController.text.substring(0,100)}":messageController.text),'lastMessageType': "text",'lastMessageTime': DateTime.now()}
-                            );
+                            await RemoteServices().updateUserChat(
+                                cid,
+                                {
+                                  'lastMessage': (messageController
+                                              .text.length >
+                                          100
+                                      ? "${messageController.text.substring(0, 100)}"
+                                      : messageController.text),
+                                  'lastMessageType': "text",
+                                  'lastMessageTime': DateTime.now()
+                                },
+                                "$cid${widget.otherUserId}");
+                            await RemoteServices().updateUserChat(
+                                widget.otherUserId,
+                                {
+                                  'lastMessage': (messageController
+                                              .text.length >
+                                          100
+                                      ? "${messageController.text.substring(0, 100)}"
+                                      : messageController.text),
+                                  'lastMessageType': "text",
+                                  'lastMessageTime': DateTime.now()
+                                },
+                                "${widget.otherUserId}$cid");
                           },
                           icon: Icon(Icons.send_rounded, color: Colors.blue),
                         ),

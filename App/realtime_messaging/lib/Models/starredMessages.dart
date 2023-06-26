@@ -1,9 +1,9 @@
 
 import 'dart:convert';
 
-StarMessage StarMessageFromJson(String str) => StarMessage.fromJson(json.decode(str));
-String chatMessageToJson(StarMessage data) => json.encode(data.toJson());
-class StarMessage{
+StarredMessage StarMessageFromJson(String str) => StarredMessage.fromJson(json.decode(str));
+String chatMessageToJson(StarredMessage data) => json.encode(data.toJson());
+class StarredMessage{
   String id;
   String messageId;
   String collectionId;
@@ -16,7 +16,7 @@ class StarMessage{
   String contentType;
   DateTime timestamp;
 
-  StarMessage({
+  StarredMessage({
     required this.id,
     required this.messageId,
     required this.collectionId,
@@ -30,8 +30,8 @@ class StarMessage{
     required this.timestamp,
 
   });
-  factory StarMessage.fromJson(Map<String,dynamic>json){
-    return StarMessage(
+  factory StarredMessage.fromJson(Map<String,dynamic>json){
+    return StarredMessage(
         id: json['id'],
         messageId: json['messageId'],
         collectionId: json['collectionId'],
