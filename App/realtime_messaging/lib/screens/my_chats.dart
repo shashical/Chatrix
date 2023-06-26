@@ -30,14 +30,10 @@ class _ChatsPageState extends State<ChatsPage> {
                 child: Text('No chats to display.'),
               );
             }
-            final List<UserChat> sorteduserchats = [
-              ...userchats.where((element) => element.pinned),
-              ...userchats.where((element) => !element.pinned)
-            ];
             return ListView.builder(
               itemCount: userchats.length,
               itemBuilder: (context, index) {
-                final UserChat userchat = sorteduserchats[index];
+                final UserChat userchat = userchats[index];
                 if (userchat.deleted) {
                   return const SizedBox();
                 }

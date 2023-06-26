@@ -9,6 +9,13 @@ class UserGroup {
   bool exited;
   String? backgroundImage;
   bool pinned;
+  String name;
+  String imageUrl;
+  int? unreadMessageCount;
+  String? lastMessage;
+  DateTime? lastMessageTime;
+  String? lastMessageType;
+  bool muted;
 
   UserGroup({
     required this.id,
@@ -16,6 +23,13 @@ class UserGroup {
     required this.exited,
     this.backgroundImage,
     required this.pinned,
+    required this.name,
+    required this.imageUrl,/* = "https://geodash.gov.bd/uploaded/people_group/default_group.png"*/
+    this.unreadMessageCount,
+    this.lastMessage,
+    this.lastMessageTime,
+    this.lastMessageType,
+    this.muted = false,
   });
 
   factory UserGroup.fromJson(Map<String, dynamic> json) {
@@ -25,6 +39,13 @@ class UserGroup {
       exited: json['exited'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
+      name: json['name'],
+      imageUrl: json['imageUrl'],
+      unreadMessageCount: json['unreadMessageCount'],
+      lastMessage: json['lastMessage'],
+      lastMessageTime: DateTime.parse(json['lastMessageTime']),
+      lastMessageType: json['lastMessageType'],
+      muted: json['muted'],
     );
   }
 
@@ -35,6 +56,13 @@ class UserGroup {
       'exited': exited,
       'backgroundImage': backgroundImage,
       'pinned': pinned,
+      'name': name,
+      'imageUrl': imageUrl,
+      'unreadMessageCount': unreadMessageCount,
+      'lastMessage': lastMessage,
+      'lastMessageTime': lastMessageTime?.toIso8601String(),
+      'lastMessageType': lastMessageType,
+      'muted': muted
     };
   }
 }

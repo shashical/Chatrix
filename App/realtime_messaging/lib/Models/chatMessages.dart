@@ -14,7 +14,6 @@ class ChatMessage {
   String? repliedTo;
   bool delivered;
   bool read;
-  List<String>? starredBy;
   bool edited;
 
   ChatMessage({
@@ -28,7 +27,6 @@ class ChatMessage {
     this.repliedTo,
     this.delivered = false,
     this.read = false,
-    this.starredBy,
     this.edited = false,
   });
 
@@ -44,7 +42,6 @@ class ChatMessage {
       repliedTo: json['repliedTo'],
       delivered: json['delivered'] ?? false,
       read: json['read'] ?? false,
-      starredBy: List<String>.from(json['starredBy'] ?? []),
       edited: json['edited'] ?? false,
     );
   }
@@ -61,7 +58,6 @@ class ChatMessage {
       'repliedTo': repliedTo,
       'delivered': delivered,
       'read': read,
-      'starredBy': starredBy,
       'edited': edited,
     };
   }

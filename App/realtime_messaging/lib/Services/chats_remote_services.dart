@@ -2,7 +2,6 @@ import '../Models/chatMessages.dart';
 import '../Models/chats.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
 
 class ChatsRemoteServices {
   final reference = FirebaseFirestore.instance;
@@ -34,6 +33,21 @@ class ChatsRemoteServices {
             .catchError((e) => throw Exception('$e'));
       } on FirebaseException catch (e) {
         throw Exception('$e');
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> setChatMessage(String chatId, ChatMessage chatmessage)async{
+    final DocumentSnapshot docSnap = 
+    await reference.collection("chats/$chatId/chatMessages").doc(chatmessage.id).get();
+    if(!docSnap.exists){
+      try{
+        reference.collection("chats/$chatId/chatMessages").doc(chatmessage.id).set(chatmessage.toJson()).catchError((e)=>throw Exception("$e"));
+      }
+      on FirebaseException catch (e){
+        throw Exception("$e");
       } catch (e) {
         rethrow;
       }

@@ -135,7 +135,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                               .catchError((e) =>
                                           throw Exception(
                                               '$e'));
-                                          GroupsRemoteServices().updateUser(cid, {
+                                          GroupsRemoteServices().updateGroup(cid, {
                                             "imageUrl": photoUrl
                                           }).catchError(
                                                   (e) => throw Exception('$e'));
@@ -196,7 +196,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                               .catchError((e) =>
                                           throw Exception(
                                               '$e'));
-                                          GroupsRemoteServices().updateUser(cid, {
+                                          GroupsRemoteServices().updateGroup(cid, {
                                             "imageUrl": photoUrl
                                           }).catchError(
                                                   (e) => throw Exception('$e'));
@@ -250,7 +250,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                           photoUploading = true;
                                         });
 
-                                       GroupsRemoteServices().updateUser(
+                                       GroupsRemoteServices().updateGroup(
                                             widget.groupId, {
                                           "imageUrl":
                                           "https://geodash.gov.bd/uploaded/people_group/default_group.png"

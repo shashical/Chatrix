@@ -14,9 +14,9 @@ class GroupsRemoteServices{
     if(docsnap.exists) {
       return Group.fromJson(docsnap.data()!);
     }
-    throw Exception('Document does not exists');
+    throw Exception('Document does not exist');
   }
-  Future<void> updateUser(String id,Map<String,dynamic> upd)async{
+  Future<void> updateGroup(String id,Map<String,dynamic> upd)async{
     try{
       reference.collection('groups').doc(id).update(upd).catchError((e)=>
       throw Exception('$e'));

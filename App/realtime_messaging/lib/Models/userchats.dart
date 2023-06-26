@@ -11,6 +11,12 @@ class UserChat {
   String? backgroundImage;
   bool pinned;
   String recipientPhoneNo;
+  int? unreadMessageCount;
+  String? lastMessage;
+  String? lastMessageType;
+  DateTime? lastMessageTime;
+  bool muted;
+  bool blocked;
 
   UserChat({
     required this.id,
@@ -20,6 +26,12 @@ class UserChat {
     this.backgroundImage,
     required this.pinned,
     required this.recipientPhoneNo,
+    this.unreadMessageCount,
+    this.lastMessage,
+    this.lastMessageType,
+    this.lastMessageTime,
+    this.muted = false,
+    this.blocked = false,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {
@@ -30,7 +42,13 @@ class UserChat {
       deleted: json['deleted'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
-      recipientPhoneNo: json['recipientPhoneNo']
+      recipientPhoneNo: json['recipientPhoneNo'],
+      unreadMessageCount: json['unreadMessageCount'],
+      lastMessage: json['lastMessage'],
+      lastMessageType: json['lastMessageType'],
+      lastMessageTime: DateTime.parse(json['lastMessageTime']),
+      muted: json['muted'],
+      blocked: json['blocked'],
     );
   }
 
@@ -43,6 +61,12 @@ class UserChat {
       'backgroundImage': backgroundImage,
       'pinned': pinned,
       'recipientPhoneNo': recipientPhoneNo,
+      'unreadMessageCount': unreadMessageCount,
+      'lastMessage': lastMessage,
+      'lastMessageType': lastMessageType,
+      'lastMessageTime': lastMessageTime?.toIso8601String(),
+      'muted': muted,
+      'blocked': blocked
     };
   }
 }
