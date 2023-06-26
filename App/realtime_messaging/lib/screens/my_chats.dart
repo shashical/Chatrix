@@ -29,15 +29,21 @@ class _ChatsPageState extends State<ChatsPage> {
               );
             }
             isSelected = List.filled(userchats.length, false);
-            final List<UserChat> sorteduserchats = [
-              ...userchats.where((element) => element.pinned),
-              ...userchats.where((element) => !element.pinned)
-            ];
+
+            userchats.sort((a, b) {
+              if (a.pinned != b.pinned) {
+                return a.pinned ? -1 : 1;
+              }
+              if (a.pinned) {
+                return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+              }
+              return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+            });
 
             return ListView.builder(
               itemCount: userchats.length,
               itemBuilder: (context, index) {
-                final UserChat userchat = sorteduserchats[index];
+                final UserChat userchat = userchats[index];
                 if (userchat.deleted) {
                   return const SizedBox();
                 }

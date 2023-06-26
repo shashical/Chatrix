@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:realtime_messaging/Services/chats_remote_services.dart';
+import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
@@ -143,6 +145,28 @@ List<Widget> MergeAppUserAndSendInvite(
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
+          onTap: () async{
+            bool found = await ChatsRemoteServices().checkChat("$cid${users[index].id}");
+            if(found){
+              //final String backgroundimage = await RemoteServices().getDocumentField("users/$cid/userChats", fieldName)
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                 return ChatWindow(otherUserId: users[index].id,chatId: "$cid${users[index].id}",);
+              },));
+            }
+            else{
+              found = await ChatsRemoteServices().checkChat("${users[index].id}$cid");
+              if(found){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                  return ChatWindow(otherUserId: users[index].id,chatId: "${users[index].id}$cid",);
+                },));
+              }
+              else{
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                  return ChatWindow(otherUserId: users[index].id,);
+                },));
+              }
+            }
+          },
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage('${users[index].photoUrl}'),

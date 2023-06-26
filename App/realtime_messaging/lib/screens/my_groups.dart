@@ -31,10 +31,16 @@ class _GroupsPageState extends State<GroupsPage> {
                 child: Text('No groups to display.'),
               );
             }
-            final List<UserGroup> sortedusergroups = [
-              ...usergroups.where((element) => element.pinned),
-              ...usergroups.where((element) => !element.pinned)
-            ];
+
+            usergroups.sort((a, b) {
+              if (a.pinned != b.pinned) {
+                return a.pinned ? -1 : 1;
+              }
+              if (a.pinned) {
+                return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+              }
+              return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+            });
 
             List<int> unMutedSelected=[];
             List<int> unPinnedSelected=[];
@@ -200,7 +206,7 @@ class _GroupsPageState extends State<GroupsPage> {
                 ListView.builder(
                   itemCount: usergroups.length,
                   itemBuilder: (context, index) {
-                    final UserGroup usergroup = sortedusergroups[index];
+                    final UserGroup usergroup = usergroups[index];
                     return ListTile(
                           leading: InkWell(
                             child: Stack(
