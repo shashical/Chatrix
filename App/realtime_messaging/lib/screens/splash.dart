@@ -25,7 +25,8 @@ class _SplashPageState extends State<SplashPage> {
             builder: (context) => StreamBuilder(
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
-                  return (snapshot.hasData)? const WelcomePage() :HomePage();
+                  debugPrint('${snapshot.hasData}');
+                  return (snapshot.hasData)? HomePage():const WelcomePage();
                 })),
       );
     });

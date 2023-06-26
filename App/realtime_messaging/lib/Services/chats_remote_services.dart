@@ -1,3 +1,5 @@
+import 'package:realtime_messaging/Models/userchats.dart';
+
 import '../Models/chatMessages.dart';
 import '../Models/chats.dart';
 import 'dart:async';

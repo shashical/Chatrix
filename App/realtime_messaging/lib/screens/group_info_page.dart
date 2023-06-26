@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
@@ -17,9 +18,11 @@ import 'dart:io';
 
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
+List<Widget> participant=[];
 class GroupInfoPage extends StatefulWidget {
   final String groupId;
-  const GroupInfoPage({Key? key, required this.groupId}) : super(key: key);
+  final String userGroupId;
+  const GroupInfoPage({Key? key, required this.groupId, required this.userGroupId}) : super(key: key);
 
   @override
   State<GroupInfoPage> createState() => _GroupInfoPageState();
@@ -34,15 +37,24 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   File ?_image;
   List<String> appUsersIds=[];
   List<String> appUserNumber=[];
+  UserGroup ?currentUserGroup;
+  bool currentuserchatloading=true;
   @override
   void initState() {
     super.initState();
     getCurrentGroup();
+    getUserCurrentGroup();
   }
-  getCurrentGroup()async{
+  void getCurrentGroup()async{
     currentGroup=await GroupsRemoteServices().getSingleGroup(widget.groupId);
     setState(() {
       isloaded=true;
+    });
+  }
+  void getUserCurrentGroup()async{
+    currentUserGroup=await RemoteServices().getSingleUserGroup(cid,widget.userGroupId);
+    setState(() {
+      currentuserchatloading=false;
     });
   }
   Future getImage(ImageSource source) async {
@@ -60,7 +72,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:(isloaded)?
+      body:(isloaded && !currentuserchatloading)?
           ListView(
             children: [
               const SizedBox(
@@ -97,7 +109,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                       ),
                     )
                         : Image(
-                      image: NetworkImage(currentGroup!.imageUrl!),
+                      image: NetworkImage(currentUserGroup!.imageUrl),
                       fit: BoxFit.cover,
                       width: 200,
                       height: 200,
@@ -140,7 +152,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                           }).catchError(
                                                   (e) => throw Exception('$e'));
                                           setState(() {
-                                            currentGroup!.imageUrl =
+                                            currentUserGroup!.imageUrl =
                                                 photoUrl;
                                             photoUploading = false;
                                           });
@@ -241,7 +253,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                       ],
                                     ),
                                   ),
-                                  (currentGroup!.imageUrl !=
+                                  (currentUserGroup!.imageUrl !=
                                       "https://geodash.gov.bd/uploaded/people_group/default_group.png")
                                       ? SimpleDialogOption(
                                     onPressed: () async {
@@ -257,7 +269,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                         }).catchError((e) =>
                                         throw Exception('$e'));
                                         setState(() {
-                                          currentGroup!.imageUrl =
+                                          currentUserGroup!.imageUrl =
                                           "https://geodash.gov.bd/uploaded/people_group/default_group.png";
                                           photoUploading = false;
                                         });
@@ -322,7 +334,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               const SizedBox(
                 height: 10,
               ),
-              Text((currentGroup!.name),
+              Text((currentUserGroup!.name),
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
@@ -373,21 +385,22 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                     appUsersIds =
                         users.map((user) => user.id).toList();
                     appUserNumber=users.map((user)=>user.id).toList();
+                    List<List<String>> contentList=convertToList(currentGroup!.admins!, currentGroup!.participantIds, appUsersIds, users,context);
                     return Column(
                       children: [
                         Row(
                           children: [
                             Text(currentGroup!.participantIds.length as String,
                               style: const TextStyle(color: Colors.grey,fontSize: 15),),
-                            Spacer(),
+                            const Spacer(),
                             IconButton(onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchWithinGroup(ListItem: showableWidget(currentGroup!.admins!, currentGroup!.participantIds, context, appUsersIds, users), ListContent: convertToList(currentGroup!.admins!, currentGroup!.participantIds, appUsersIds, users))));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchWithinGroup(ListItem: participant, ListContent:contentList)));
                             }, icon: const Icon(Icons.search))
 
                           ],
                         ),
                         Column(
-                          children: getTopTen(showableWidget(currentGroup!.admins!, currentGroup!.participantIds, context, appUsersIds, users),convertToList(currentGroup!.admins!, currentGroup!.participantIds, appUsersIds, users),context),
+                          children: getTopTen(participant,contentList,context),
                         ),
                       ],
                     );
@@ -402,10 +415,12 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     );
   }
 }
-List<List<String>>convertToList(List<String> adminsids,List<String>participantIds,List<String> usersIds,List<Users> users){
+
+
+List<List<String>>convertToList(List<String> adminsids,List<String>participantIds,List<String> usersIds,List<Users> users,BuildContext context){
   List<List<String>> returnableList=[[]];
   List<List<String>> aux=[[]];
-  List<List<String>> extrAux=[[]];
+  List<List<String>> extraAux=[[]];
   for(int i=0;i<adminsids.length;i++){
     int  pl=usersIds.indexOf(adminsids[i]);
     int   kl=savedNumber.indexOf(users[pl].phoneNo);
@@ -413,7 +428,7 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
       aux.add([savedUsers[kl],users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
     }
     else{
-      extrAux.add([users[pl].name??'',users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
+      extraAux.add([users[pl].name??'',users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
     }
 
   }
@@ -433,18 +448,18 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
     }
   }
   aux.sort();
-  extrAux.sort();
+  extraAux.sort();
   pAux.sort();
   epAux.sort();
+  participant=showableWidget(context, aux, extraAux, pAux, epAux,usersIds,users,adminsids);
   returnableList.addAll(aux);
-  returnableList.addAll(extrAux);
+  returnableList.addAll(extraAux);
   returnableList.addAll(pAux);
   returnableList.addAll(epAux);
   return returnableList;
 
 }
-
-List<Widget> showableWidget(List<String> adminsids,List<String>participantIds,BuildContext context,List<String> usersIds,List<Users> users){
+List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List<String>>extrAux,List<List<String>>pAux,List<List<String>>epAux ,List<String>usersIds,List<Users>users,List<String>adminsids){
   List<Widget> admins=[];
   int index=usersIds.indexOf(cid);
   admins.add(ListTile(
@@ -470,43 +485,12 @@ List<Widget> showableWidget(List<String> adminsids,List<String>participantIds,Bu
       overflow: TextOverflow.ellipsis,
     ),
   ));
-  List<List<String>> aux=[[]];
-  List<List<String>> extrAux=[[]];
-  for(int i=0;i<adminsids.length;i++){
-    int  pl=usersIds.indexOf(adminsids[i]);
-    int   kl=savedNumber.indexOf(users[pl].phoneNo);
-    if(kl!=-1){
-      aux.add([savedUsers[kl],users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
-    }
-    else{
-      extrAux.add([users[pl].name??'',users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
-    }
 
-  }
-  List<List<String>> pAux=[[]];
-  List<List<String>> epAux=[[]];
-  for(int j=0;j<participantIds.length;j++){
-    if(!adminsids.contains(participantIds[j])&& participantIds[j]!=cid){
-      int pl=usersIds.indexOf(participantIds[j]);
-      int kl=savedNumber.indexOf(users[pl].phoneNo);
-      if(kl!=-1){
-        pAux.add([savedUsers[kl],users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
-      }
-      else{
-        epAux.add([users[pl].name??'',users[pl].phoneNo,users[pl].photoUrl!,users[pl].about??'',users[pl].id]);
-      }
-
-    }
-  }
-  aux.sort();
-  extrAux.sort();
-  pAux.sort();
-  epAux.sort();
   for(int i=0;i<aux.length;i++) {
     admins.add(ListTile(
       leading: InkWell(
         child: CircleAvatar(
-          foregroundImage: NetworkImage('${aux[i][2]}'),
+          foregroundImage: NetworkImage(aux[i][2]),
         ),
         onTap: () {
           Navigator.push(
@@ -514,7 +498,7 @@ List<Widget> showableWidget(List<String> adminsids,List<String>participantIds,Bu
               MaterialPageRoute(
 
                   builder: (context) =>
-                      OtherUserProfilePage(userId: aux[i][4] as String)));
+                      OtherUserProfilePage(userId: aux[i][4])));
         },
       ),
       trailing: Container(
@@ -523,7 +507,7 @@ List<Widget> showableWidget(List<String> adminsids,List<String>participantIds,Bu
       ),
       title: Text(aux[i][0]),
       subtitle: Text(
-        '${aux[i][3]}',
+        aux[i][3],
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -617,7 +601,7 @@ List<Widget> getTopTen(List<Widget> admins,List<List<String>> contentlist,BuildC
   if(admins.length>10){
     returnAble.add(TextButton(onPressed: (){
       Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchWithinGroup(ListItem: admins, ListContent: contentlist)));
-    }, child: Text('View All')));
+    }, child: const Text('View All')));
   }
   return returnAble;
 }
