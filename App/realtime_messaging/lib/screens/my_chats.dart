@@ -16,6 +16,7 @@ class _ChatsPageState extends State<ChatsPage> {
   final RemoteServices _usersremoteServices = RemoteServices();
   final ChatsRemoteServices _chatsremoteServices = ChatsRemoteServices();
   int index=-1;
+  List<bool> isSelected=[];
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +31,12 @@ class _ChatsPageState extends State<ChatsPage> {
                 child: Text('No chats to display.'),
               );
             }
+            isSelected=List.filled(userchats.length,false);
             final List<UserChat> sorteduserchats = [
               ...userchats.where((element) => element.pinned),
               ...userchats.where((element) => !element.pinned)
             ];
+
             return ListView.builder(
               itemCount: userchats.length,
               itemBuilder: (context, index) {
@@ -45,17 +48,46 @@ class _ChatsPageState extends State<ChatsPage> {
                   future: _chatsremoteServices.getSingleChat(userchat.chatId),
                   builder: (context, snapshot) {
                     final chat = snapshot.data!;
-                    index=savedNumber.indexOf(userchat.recipientPhoneNo);
+                    final ind=savedNumber.indexOf(userchat.recipientPhoneNo);
                     return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(userchat.recipientPhoto),
+                      leading:Stack(
+                        children:[
+                          CircleAvatar(
+                          backgroundImage: NetworkImage(userchat.recipientPhoto),
+                        ),
+                          (isSelected[index])?
+                          const Positioned(
+                            bottom: 1,
+                              right: 5,
+                              child: Icon(Icons.check_circle,size: 16,color: Colors.cyan,)):
+                          const SizedBox(height: 0,width: 0,)
+                        ]
                       ),
-                      title: Text((index!=-1)?savedUsers[index]:userchat.recipientPhoneNo),
+                      title: Text((index!=-1)?savedUsers[ind]:userchat.recipientPhoneNo),
                       subtitle: Text(chat.lastMessage ?? ""),
                       trailing: Text((chat.lastMessageTime == null
                           ? ""
                           : "${chat.lastMessageTime!.hour}:${chat.lastMessageTime!.minute/10}${chat.lastMessageTime!.minute%10}")),
-                      onTap: () {},
+                      onTap: () {
+                        if(isSelected[index]){
+                          setState(() {
+                            isSelected[index]=false;
+                          });
+                        }
+                      },
+                      onLongPress: (){
+                        if(isSelected[index]){
+                          setState(() {
+                            isSelected[index]=false;
+                          });
+
+                        }
+                        else{
+                          setState(() {
+                            isSelected[index]=true;
+                          });
+                        }
+                      },
                     );
                   },
                 );

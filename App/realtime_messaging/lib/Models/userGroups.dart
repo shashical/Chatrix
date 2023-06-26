@@ -9,6 +9,7 @@ class UserGroup {
   bool exited;
   String? backgroundImage;
   bool pinned;
+  bool muted;
 
   UserGroup({
     required this.id,
@@ -16,6 +17,7 @@ class UserGroup {
     required this.exited,
     this.backgroundImage,
     required this.pinned,
+    this.muted=false,
   });
 
   factory UserGroup.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class UserGroup {
       exited: json['exited'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
+      muted: json['muted'],
     );
   }
 
@@ -35,6 +38,7 @@ class UserGroup {
       'exited': exited,
       'backgroundImage': backgroundImage,
       'pinned': pinned,
+      'muted':muted,
     };
   }
 }

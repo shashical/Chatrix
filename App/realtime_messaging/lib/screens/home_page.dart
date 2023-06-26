@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:realtime_messaging/screens/welcome.dart';
 
 import '../Models/users.dart';
 import 'my_chats.dart';
@@ -57,8 +59,20 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
              onTap: (){
-               Navigator.push(context, MaterialPageRoute(builder: (context)=>CurrentUserProfilePage()));
-             },)
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
+             },),
+            PopupMenuItem(child: const Row(
+              children: [
+                Icon(Icons.logout),
+                Text('Log Out'),
+              ],
+            ),
+            onTap: ()async{
+             await FirebaseAuth.instance.signOut();
+             Navigator.pushAndRemoveUntil(context,
+                 MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
+             
+            },)
           ])
         ],
         flexibleSpace: Container(

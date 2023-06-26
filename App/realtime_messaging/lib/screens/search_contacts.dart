@@ -155,6 +155,7 @@ List<Widget> MergeAppUserAndSendInvite(
                             userId: users[index].id,
                           )));
             },
+
           ),
           title: Text(savedUsers[i]),
           subtitle: Text(
