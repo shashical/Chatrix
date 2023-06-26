@@ -85,7 +85,7 @@ class RemoteServices {
     if (!docSnap.exists) {
       try {
         reference
-            .collection("users")
+            .collection("users").doc(userid).collection('userChats')
             .doc(userchat.id)
             .set(userchat.toJson())
             .catchError((e) => throw Exception('$e'));
