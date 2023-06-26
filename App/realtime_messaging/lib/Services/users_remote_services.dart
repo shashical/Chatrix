@@ -51,12 +51,39 @@ class RemoteServices{
           rethrow;
         }
       }
-
-
   }
+
+  Future<void> setUserChat(String userid,UserChat userchat)async{
+    final DocumentSnapshot docSnap = await reference.collection("users").doc(userchat.id).get();
+    if(!docSnap.exists)
+      {
+        try{
+          reference.collection("users").doc(userchat.id).set(userchat.toJson()).catchError((e)=>
+          throw Exception('$e'));
+          }on FirebaseException catch(e){
+          throw Exception('$e');
+        }catch(e){
+          rethrow;
+        }
+      }
+  }
+
   Future<void> updateUser(String id,Map<String,dynamic> upd)async{
     try{
         reference.collection('users').doc(id).update(upd).catchError((e)=>
+        throw Exception('$e'));
+    }
+    on FirebaseException catch(e){
+      throw Exception('$e');
+    }
+    catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> updateUserChat(String userid,String userchatid,Map<String,dynamic> upd)async{
+    try{
+        reference.collection('users/$userid/userChats').doc(userchatid).update(upd).catchError((e)=>
         throw Exception('$e'));
     }
     on FirebaseException catch(e){
@@ -85,13 +112,13 @@ class RemoteServices{
       throw Exception("Document does not exist.");
     }
   }
-  Future<String> uploadNewImage(File _image,String id)async{
+  Future<String> uploadNewImage(File image,String id)async{
     try {
       firebase_storage.Reference ref = firebase_storage
           .FirebaseStorage.instance.ref(
           '/Profile_images/$id');
       firebase_storage.UploadTask uploadTask = ref.putFile(
-          _image.absolute);
+          image.absolute);
       await Future.value(uploadTask).catchError((e) => throw Exception('$e'));
 
       return ref.getDownloadURL().catchError((e) => throw Exception('$e'));

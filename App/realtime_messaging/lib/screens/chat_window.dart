@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
+import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
@@ -235,10 +236,17 @@ class _ChatWindowState extends State<ChatWindow> {
                                 id: "$cid${widget.otherUserId}",
                                 participantIds: [cid, widget.otherUserId],
                               ));
+                              await RemoteServices().setUserChat(cid,
+                                UserChat(id: "$cid${widget.otherUserId}", chatId: "$cid${widget.otherUserId}", recipientPhoto: otheruser.photoUrl!, deleted: false, pinned: false, recipientPhoneNo: otheruser.phoneNo)
+                              );
+                              final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(otheruser.id,
+                                UserChat(id: "${widget.otherUserId}$cid", chatId: "$cid${widget.otherUserId}", recipientPhoto: currentuser.photoUrl!, deleted: false, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                              );
+                              setState(() {
+                                chatid = "$cid${widget.otherUserId}";
+                              });
                             }
-                            setState(() {
-                              chatid = "$cid${widget.otherUserId}";
-                            });
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
                                 ChatMessage(
@@ -252,6 +260,9 @@ class _ChatWindowState extends State<ChatWindow> {
                               scrollController.position.maxScrollExtent + 50,
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOut,
+                            );
+                            await RemoteServices().updateUserChat(cid, "$cid${widget.otherUserId}",
+                            {'lastMessage': (messageController.text.length>100?"${messageController.text.substring(0,100)}":messageController.text),'lastMessageType': "text",'lastMessageTime': DateTime.now()}
                             );
                           },
                           icon: Icon(Icons.send_rounded, color: Colors.blue),
