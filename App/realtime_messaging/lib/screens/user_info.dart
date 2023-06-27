@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../Models/users.dart';
 import 'home_page.dart';
 
-final cid = FirebaseAuth.instance.currentUser!.uid;
+String cid ='';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -27,6 +27,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   @override
   void initState() {
+    cid=FirebaseAuth.instance.currentUser!.uid;
     try {
       getCurrentUser();
     } on FirebaseAuthException catch (e) {
@@ -109,7 +110,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body:(currentUserLoaded)? Stack(
+      body: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
@@ -208,7 +209,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               image: FileImage(_image!),
                               fit: BoxFit.cover,
                             )
-                          : (isUserLoaded?
+                          : (isUserLoaded)?
                           DecorationImage(
                               image: NetworkImage(currentUser!.photoUrl!),fit: BoxFit.cover)
                               :DecorationImage(
@@ -223,7 +224,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     //       )
                     //     : null,
                   ),
-                ),
+
                 const SizedBox(height: 20.0),
                 TextFormInput(
                   label: 'Username',
@@ -344,7 +345,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
             ),
           ),
         ],
-      ):const CircularProgressIndicator(color: Colors.deepPurpleAccent,),
+      )
+
     );
   }
 }

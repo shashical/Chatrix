@@ -4,13 +4,14 @@ import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
+import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Services/chats_remote_services.dart';
 
 class MyBubble extends StatelessWidget {
-  MyBubble(
-      {required this.message,
+  const MyBubble(
+      {super.key, required this.message,
       required this.time,
       required this.delivered,
       required this.isUser,
@@ -25,12 +26,12 @@ class MyBubble extends StatelessWidget {
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = delivered ? Icons.done_all : Icons.done;
     final radius = !isUser
-        ? BorderRadius.only(
+        ? const BorderRadius.only(
             topRight: Radius.circular(5.0),
             bottomLeft: Radius.circular(10.0),
             bottomRight: Radius.circular(5.0),
           )
-        : BorderRadius.only(
+        : const BorderRadius.only(
             topLeft: Radius.circular(5.0),
             bottomLeft: Radius.circular(5.0),
             bottomRight: Radius.circular(10.0),
@@ -57,11 +58,11 @@ class MyBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(message, style: TextStyle(fontSize: 17)),
-              SizedBox(
+              const SizedBox(
                 height: 1,
               ),
               ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 55.0),
+                constraints: const BoxConstraints(maxWidth: 55.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -69,7 +70,7 @@ class MyBubble extends StatelessWidget {
                       time,
                       style: TextStyle(fontSize: 13),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     Icon(
@@ -109,11 +110,15 @@ class _ChatWindowState extends State<ChatWindow> {
   late Users otheruser;
   bool isTheOtherUserLoaded = false;
   String? chatid;
+  int indexInContact=-1;
+  bool isSending=false;
+  bool blocked=false;
 
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
     setState(() {
       isTheOtherUserLoaded = true;
+      indexInContact=savedNumber.indexOf(otheruser.phoneNo);
     });
   }
 
@@ -121,20 +126,31 @@ class _ChatWindowState extends State<ChatWindow> {
   void initState() {
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
+
     super.initState();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return (isTheOtherUserLoaded == false
-        ? CircularProgressIndicator()
+        ? const CircularProgressIndicator()
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
-              title: Text(otheruser.phoneNo),
-              actions: <Widget>[
 
-              ],
+              title: Row(
+                children: [
+                  CircleAvatar(
+                    foregroundImage: NetworkImage(otheruser.photoUrl!),
+                  ),
+                  SizedBox(width: 10,),
+                  Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
+                ],
+              ),
+              // actions: <Widget>[
+              //
+              // ],
             ),
             body: Container(
               decoration: BoxDecoration(
@@ -145,58 +161,61 @@ class _ChatWindowState extends State<ChatWindow> {
               ),
               child: Column(
                 children: [
-                  StreamBuilder<List<ChatMessage>>(
-                    stream: (chatid == null
-                        ? null
-                        : ChatsRemoteServices().getChatMessages(chatid!)),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final List<ChatMessage> chatmessages = snapshot.data!;
-                        // return ListView.builder(
-                        //   itemCount: chatmessages.length,
-                        //   itemBuilder: (context, index) {
-                        //     final ChatMessage chatmessage = chatmessages[index];
-                        //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
-                        //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
-                        //       if(chatmessage.delivered==false){
-                        //         if(!event.metadata.hasPendingWrites){
-                        //           chatmessage.delivered = true;
-                        //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
-                        //         }
-                        //       }
-                        //     });
-                        //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
-                        //   },
-                        // );
-                        return ListView.builder(
-                          itemCount: chatmessages.length,
-                          itemBuilder: (context, index) {
-                            final ChatMessage chatmessage = chatmessages[index];
-                            if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
-                              return MyBubble(
-                                  message: chatmessage.text,
-                                  time:
-                                      ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"),
-                                  delivered: chatmessage.delivered,
-                                  isUser: (chatmessage.senderId == cid),
-                                  read: chatmessage.read);
-                            } else {
-                              return SizedBox(
-                                height: 0,
-                              );
-                            }
-                          },
-                        );
-                      } else {
-                        return Text("No conversations yet.");
-                      }
-                    },
+                  Flexible(
+                    child: StreamBuilder<List<ChatMessage>>(
+                      stream: (chatid == null
+                          ? null
+                          : ChatsRemoteServices().getChatMessages(chatid!)),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final List<ChatMessage> chatmessages = snapshot.data!;
+                          // return ListView.builder(
+                          //   itemCount: chatmessages.length,
+                          //   itemBuilder: (context, index) {
+                          //     final ChatMessage chatmessage = chatmessages[index];
+                          //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
+                          //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
+                          //       if(chatmessage.delivered==false){
+                          //         if(!event.metadata.hasPendingWrites){
+                          //           chatmessage.delivered = true;
+                          //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
+                          //         }
+                          //       }
+                          //     });
+                          //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
+                          //   },
+                          // );
+                          return ListView.builder(
+                            controller: scrollController,
+                            itemCount: chatmessages.length,
+                            itemBuilder: (context, index) {
+                              final ChatMessage chatmessage = chatmessages[index];
+                              if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                                return MyBubble(
+                                    message: chatmessage.text,
+                                    time:
+                                        ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                    delivered: chatmessage.delivered,
+                                    isUser: (chatmessage.senderId == cid),
+                                    read: chatmessage.read);
+                              } else {
+                                return const SizedBox(
+                                  height: 0,
+                                );
+                              }
+                            },
+                          );
+                        } else {
+                          return Center(child: Text("No conversations yet."));
+                        }
+                      },
+                    ),
                   ),
                   Container(
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.95),
-                    margin: EdgeInsets.all(8.0),
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    margin: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24.0),
@@ -207,10 +226,15 @@ class _ChatWindowState extends State<ChatWindow> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: TextField(
-                              style: TextStyle(fontSize: 19),
+                              style: const TextStyle(fontSize: 19),
                               maxLines: null,
                               controller: messageController,
-                              decoration: InputDecoration(
+                              onChanged: (e){
+                                setState(() {
+
+                                });
+                              },
+                              decoration: const InputDecoration(
                                 hintText: "Type here...",
                                 border: InputBorder.none,
                               ),
@@ -218,12 +242,15 @@ class _ChatWindowState extends State<ChatWindow> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.attach_file),
+                          icon: const Icon(Icons.attach_file),
                           onPressed: () {},
                         ),
-                        IconButton(
-                          iconSize: (messageController.text == "" ? 0 : 24.0),
+                        (messageController.text.isEmpty && !isSending)?const SizedBox(width: 0,):IconButton(
+                          iconSize: (24.0),
                           onPressed: () async {
+                            setState(() {
+                              isSending=true;
+                            });
                             if (chatid == null) {
                               await ChatsRemoteServices().setChat(Chat(
                                 id: "$cid${widget.otherUserId}",
@@ -263,10 +290,10 @@ class _ChatWindowState extends State<ChatWindow> {
                                     text: messageController.text,
                                     contentType: "text",
                                     timestamp: DateTime.now()));
-                            messageController.clear();
+
                             scrollController.animateTo(
                               scrollController.position.maxScrollExtent + 50,
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut,
                             );
                             await RemoteServices().updateUserChat(
@@ -275,7 +302,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                   'lastMessage': (messageController
                                               .text.length >
                                           100
-                                      ? "${messageController.text.substring(0, 100)}"
+                                      ? messageController.text.substring(0, 100)
                                       : messageController.text),
                                   'lastMessageType': "text",
                                   'lastMessageTime': DateTime.now()
@@ -287,14 +314,18 @@ class _ChatWindowState extends State<ChatWindow> {
                                   'lastMessage': (messageController
                                               .text.length >
                                           100
-                                      ? "${messageController.text.substring(0, 100)}"
+                                      ? messageController.text.substring(0, 100)
                                       : messageController.text),
                                   'lastMessageType': "text",
                                   'lastMessageTime': DateTime.now()
                                 },
                                 "${widget.otherUserId}$cid");
+                            messageController.clear();
+                            setState(() {
+                              isSending=false;
+                            });
                           },
-                          icon: Icon(Icons.send_rounded, color: Colors.blue),
+                          icon: const Icon(Icons.send_rounded, color: Colors.blue),
                         ),
                       ],
                     ),

@@ -23,6 +23,7 @@ class _SearchGroupState extends State<SearchGroup> {
         children: [
         const SizedBox(
         height: 20,
+         width: double.infinity,
       ),
       SizedBox(
         height: 50,
@@ -44,7 +45,7 @@ class _SearchGroupState extends State<SearchGroup> {
           },
           decoration: InputDecoration(
               filled: true,
-              hintText: 'Search Contacts',
+              hintText: 'Search Groups',
               fillColor: Colors.blue[100],
               prefixIcon: const Icon(
                 Icons.search,
@@ -60,53 +61,55 @@ class _SearchGroupState extends State<SearchGroup> {
                   borderRadius: BorderRadius.circular(20))),
         ),
       ),
-          ListView.builder(itemCount: widget.usergroup.length,
-              itemBuilder: (context,index)=>
-              (_searchController.text.isEmpty)?
-              ListTile(
-                leading: InkWell(
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(widget.usergroup[index].imageUrl),
+          Flexible(
+            child: ListView.builder(itemCount: widget.usergroup.length,
+                itemBuilder: (context,index)=>
+                (_searchController.text.isEmpty)?
+                ListTile(
+                  leading: InkWell(
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(widget.usergroup[index].imageUrl),
+                    ),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
+                    },
                   ),
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
+                  title: Text(widget.usergroup[index].name),
+                  subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
+                  trailing: Text((widget.usergroup[index].lastMessageTime == null
+                      ? ""
+                      : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
+                  onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
+                      },));
+
                   },
-                ),
-                title: Text(widget.usergroup[index].name),
-                subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                trailing: Text((widget.usergroup[index].lastMessageTime == null
-                    ? ""
-                    : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
-                onTap: () {
+
+                ):(widget.usergroup[index].name.toLowerCase().contains(_searchController.text.toLowerCase()))?
+                ListTile(
+                  leading: InkWell(
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(widget.usergroup[index].imageUrl),
+                    ),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
+                    },
+                  ),
+                  title: Text(widget.usergroup[index].name),
+                  subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
+                  trailing: Text((widget.usergroup[index].lastMessageTime == null
+                      ? ""
+                      : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
+                  onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
                     },));
 
-                },
-
-              ):(widget.usergroup[index].name.toLowerCase().contains(_searchController.text.toLowerCase()))?
-              ListTile(
-                leading: InkWell(
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(widget.usergroup[index].imageUrl),
-                  ),
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                   },
-                ),
-                title: Text(widget.usergroup[index].name),
-                subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                trailing: Text((widget.usergroup[index].lastMessageTime == null
-                    ? ""
-                    : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
-                  },));
 
-                },
-
-              ):SizedBox()
+                ):SizedBox()
+            ),
           )
         ]
       )

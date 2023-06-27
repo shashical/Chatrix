@@ -74,7 +74,7 @@ class RemoteServices {
   //UserChat
 
   Stream<List<UserChat>> getUserChats(String id) {
-    return reference.collection('users/$id/userChats').snapshots().map(
+    return reference.collection('users').doc(id).collection('userChats').snapshots().map(
         (event) =>
             event.docs.map((doc) => UserChat.fromJson(doc.data())).toList());
   }
@@ -114,7 +114,7 @@ class RemoteServices {
       String id, Map<String, dynamic> upd, String chatId) async {
     try {
       reference
-          .collection('users/$id/userChat')
+          .collection('users').doc(id).collection('userChats')
           .doc(chatId)
           .update(upd)
           .catchError((e) => throw Exception('$e'));
@@ -151,7 +151,7 @@ class RemoteServices {
 
   Future<UserGroup?> getSingleUserGroup(String id, String userGroupId) async {
     final docsnap = await reference
-        .collection('users/$id/userGroups')
+        .collection('users').doc(id).collection('userGroup')
         .doc(userGroupId)
         .get()
         .catchError((e) => throw Exception('$e'));

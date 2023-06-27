@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
+import 'package:realtime_messaging/screens/new_group_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:realtime_messaging/screens/welcome.dart';
 
@@ -24,6 +25,14 @@ class _HomePageState extends State<HomePage> {
     ChatsPage(),
     GroupsPage(),
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    cid=FirebaseAuth.instance.currentUser!.uid;
+    getCurUser();
+
+  }
   void getCurUser()async{
     curUser=await RemoteServices().getSingleUser(cid);
     setState(() {
@@ -47,7 +56,8 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         actions: [
           PopupMenuButton(itemBuilder: (context)=>[
-             PopupMenuItem(child: Row(
+             PopupMenuItem(
+               child: Row(
               children: [
                 CircleAvatar(
                   foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
@@ -58,25 +68,35 @@ class _HomePageState extends State<HomePage> {
                 const Text('Account',style: TextStyle(fontSize: 20),)
               ],
             ),
+             value: 0,
              onTap: (){
+                 WidgetsBinding.instance.addPostFrameCallback((_) {
                Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
+                 });
              },),
             PopupMenuItem(child: Text('New Group'),
-
+                value: 1,
+                onTap: (){
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>const NewGroupPage()));
+              });
+                },
             ),
-            PopupMenuItem(child: const Row(
-              children: [
-                Icon(Icons.logout),
-                Text('Log Out'),
-              ],
-            ),
-            onTap: ()async{
+            PopupMenuItem(value: 3,
+            onTap: (){
+              WidgetsBinding.instance.addPostFrameCallback((_) async{
              await FirebaseAuth.instance.signOut();
              Navigator.pushAndRemoveUntil(context,
                  MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
-             
-            },)
-          ])
+              });
+            },child: const Row(
+              children: [
+                Icon(Icons.logout,color: Colors.black,),
+                Text('Log Out'),
+              ],
+            ),),
+          ],
+          )
         ],
         flexibleSpace: Container(
           decoration: BoxDecoration(

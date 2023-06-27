@@ -20,6 +20,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('printingcid $cid');
     return Scaffold(
       body: StreamBuilder<List<UserChat>>(
         stream: _usersremoteServices.getUserChats(cid),
@@ -35,15 +36,15 @@ class _ChatsPageState extends State<ChatsPage> {
 
             isSelected = List.filled(userchats.length, false);
 
-            userchats.sort((a, b) {
-              if (a.pinned != b.pinned) {
-                return a.pinned ? -1 : 1;
-              }
-              if (a.pinned) {
-                return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-              }
-              return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-            });
+            // userchats.sort((a, b) {
+            //   if (a.pinned != b.pinned) {
+            //     return a.pinned ? -1 : 1;
+            //   }
+            //   if (a.pinned) {
+            //     return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+            //   }
+            //   return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+            // });
             int trueCount=0;
             List<int> unMutedSelected=[];
             List<int> unPinnedSelected=[];
@@ -274,7 +275,7 @@ class _ChatsPageState extends State<ChatsPage> {
                         trailing: Text((userchat.lastMessageTime == null
                             ? ""
                             : "${userchat.lastMessageTime!.hour}:${userchat
-                            .lastMessageTime!.minute / 10}${userchat
+                            .lastMessageTime!.minute ~/ 10}${userchat
                             .lastMessageTime!.minute % 10}")),
                         onTap: () {
                           if(trueCount!=0) {

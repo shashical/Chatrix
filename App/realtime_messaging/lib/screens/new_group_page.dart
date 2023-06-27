@@ -66,9 +66,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   ),
                   suffixIcon: IconButton(
                     onPressed: () {
-                      if (_searchController.text.isEmpty) {}
+                      if (_searchController.text.isEmpty) {
+                        Navigator.pop(context);
+                      }
+                      else{
+                        setState(() {
+                          _searchController.text='';
+                        });
+
+                      }
                     },
-                    icon: Icon(Icons.cancel_outlined),
+                    icon: const Icon(Icons.cancel_outlined),
                   ),
                   border: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -101,53 +109,61 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
                 return Column(
                   children: [
-                    ListView.builder(
-                        itemCount: participantIds.length,
-                        itemBuilder: (context, index) => InkWell(
-                              child: Stack(
-                                children: [
-                                  CircleAvatar(
-                                    foregroundImage: NetworkImage(users[
-                                            appUserIds
-                                                .indexOf(participantIds[index])]
-                                        .photoUrl!),
-                                  ),
-                                  const Positioned(
-                                      top: 2,
-                                      left: 5,
-                                      child: Icon(Icons.cancel_outlined))
-                                ],
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  participantIds.remove(participantIds[index]);
-                                });
-                              },
-                            )),
-                    ListView(
-                        children: (_searchController.text.isEmpty)
-                            ? usersPresentList(users, appUserNumber, context,
-                                (index) {
-                                setState(() {
-                                  if (participantIds
-                                      .contains(users[index].id)) {
-                                    participantIds.remove(users[index].id);
-                                  } else {
-                                    participantIds.add(users[index].id);
-                                  }
-                                });
-                              })
-                            : SearchMerge(users, appUserNumber, searchedNumber,
-                                searchedUser, context, (index) {
-                                setState(() {
-                                  if (participantIds
-                                      .contains(users[index].id)) {
-                                    participantIds.remove(users[index].id);
-                                  } else {
-                                    participantIds.add(users[index].id);
-                                  }
-                                });
-                              })),
+                    (participantIds.isEmpty)?const SizedBox(height: 0,):
+                    Flexible(
+                      flex: 1,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                          itemCount: participantIds.length,
+                          itemBuilder: (context, index) => InkWell(
+                                child: Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      foregroundImage: NetworkImage(users[
+                                              appUserIds
+                                                  .indexOf(participantIds[index])]
+                                          .photoUrl!),
+                                    ),
+                                    const Positioned(
+                                        top: 2,
+                                        left: 5,
+                                        child: Icon(Icons.cancel_outlined))
+                                  ],
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    participantIds.remove(participantIds[index]);
+                                  });
+                                },
+                              )),
+                    ),
+                    Flexible(
+                      flex:5,
+                      child: ListView(
+                          children: (_searchController.text.isEmpty)
+                              ? usersPresentList(users, appUserNumber, context,
+                                  (index) {
+                                  setState(() {
+                                    if (participantIds
+                                        .contains(users[index].id)) {
+                                      participantIds.remove(users[index].id);
+                                    } else {
+                                      participantIds.add(users[index].id);
+                                    }
+                                  });
+                                })
+                              : SearchMerge(users, appUserNumber, searchedNumber,
+                                  searchedUser, context, (index) {
+                                  setState(() {
+                                    if (participantIds
+                                        .contains(users[index].id)) {
+                                      participantIds.remove(users[index].id);
+                                    } else {
+                                      participantIds.add(users[index].id);
+                                    }
+                                  });
+                                })),
+                    ),
                   ],
                 );
               }
