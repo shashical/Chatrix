@@ -168,11 +168,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           : ChatsRemoteServices().getChatMessages(chatid!)),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          scrollController.animateTo(
-                              scrollController.position.maxScrollExtent + 60,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
-                            );
+
                           final List<ChatMessage> chatmessages = snapshot.data!;
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
@@ -190,7 +186,8 @@ class _ChatWindowState extends State<ChatWindow> {
                           //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
                           //   },
                           // );
-                          return ListView.builder(
+
+                            Widget listBuilder=ListView.builder(
                             controller: scrollController,
                             itemCount: chatmessages.length,
                             itemBuilder: (context, index) {
@@ -210,8 +207,19 @@ class _ChatWindowState extends State<ChatWindow> {
                               }
                             },
                           );
+                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                           if (scrollController.hasClients)
+                           { scrollController.animateTo(
+                             scrollController.position.maxScrollExtent + 60,
+                             duration: const Duration(milliseconds: 300),
+                             curve: Curves.easeOut,
+                           );}
+                         }) ;
+
+                          return listBuilder;
+
                         } else {
-                          return Center(child: Text("No conversations yet."));
+                          return const Center(child: Text("No conversations yet."));
                         }
                       },
                     ),
