@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:realtime_messaging/Services/chats_remote_services.dart';
@@ -141,25 +142,16 @@ List<Widget> MergeAppUserAndSendInvite(
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
           onTap: () async{
-            bool found = await ChatsRemoteServices().checkChat("$cid${users[index].id}");
-            if(found){
-              //final String backgroundimage = await RemoteServices().getDocumentField("users/$cid/userChats", fieldName)
+            final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${users[index].id}").get();
+            if(docsnap.exists){
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                 return ChatWindow(otherUserId: users[index].id,chatId: "$cid${users[index].id}",);
+                return ChatWindow(otherUserId: users[index].id,chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
               },));
             }
             else{
-              found = await ChatsRemoteServices().checkChat("${users[index].id}$cid");
-              if(found){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                  return ChatWindow(otherUserId: users[index].id,chatId: "${users[index].id}$cid",);
-                },));
-              }
-              else{
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                  return ChatWindow(otherUserId: users[index].id,);
-                },));
-              }
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: users[index].id);
+              },));
             }
           },
           leading: InkWell(

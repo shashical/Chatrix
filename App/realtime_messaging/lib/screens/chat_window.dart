@@ -1,7 +1,3 @@
-import 'dart:html';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
@@ -135,12 +131,9 @@ class _ChatWindowState extends State<ChatWindow> {
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
-              title: Text('Friend'),
+              title: Text(otheruser.phoneNo),
               actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.more_vert),
-                  onPressed: () {},
-                )
+
               ],
             ),
             body: Container(
@@ -179,7 +172,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           itemCount: chatmessages.length,
                           itemBuilder: (context, index) {
                             final ChatMessage chatmessage = chatmessages[index];
-                            if (chatmessage.deletedForMe[cid] == null) {
+                            if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
                               return MyBubble(
                                   message: chatmessage.text,
                                   time:
@@ -195,7 +188,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           },
                         );
                       } else {
-                        return Text("Say hi to ${otheruser.phoneNo}!");
+                        return Text("No conversations yet.");
                       }
                     },
                   ),
@@ -244,7 +237,9 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: otheruser.photoUrl!,
                                       deleted: false,
                                       pinned: false,
-                                      recipientPhoneNo: otheruser.phoneNo));
+                                      recipientPhoneNo: otheruser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      ));
                               final Users currentuser =
                                   (await RemoteServices().getSingleUser(cid))!;
                               await RemoteServices().setUserChat(

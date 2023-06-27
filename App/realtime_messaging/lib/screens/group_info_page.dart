@@ -18,6 +18,7 @@ import 'dart:io';
 
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
+import 'chat_window.dart';
 List<Widget> participant=[];
 class GroupInfoPage extends StatefulWidget {
   final String groupId;
@@ -488,6 +489,19 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
 
   for(int i=0;i<aux.length;i++) {
     admins.add(ListTile(
+      onTap: () async{
+        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${aux[i][4]}").get();
+            if(docsnap.exists){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: aux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
+              },));
+            }
+            else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: aux[i][4]);
+              },));
+            }
+      },
       leading: InkWell(
         child: CircleAvatar(
           foregroundImage: NetworkImage(aux[i][2]),
@@ -515,6 +529,19 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   }
   for(int i=0;i<extrAux.length;i++) {
     admins.add(ListTile(
+      onTap: () async{
+        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${extrAux[i][4]}").get();
+            if(docsnap.exists){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: extrAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
+              },));
+            }
+            else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: extrAux[i][4]);
+              },));
+            }
+      },
       leading: InkWell(
         child: CircleAvatar(
           foregroundImage: NetworkImage(extrAux[i][2]),
@@ -544,6 +571,19 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   }
   for(int i=0;i<pAux.length;i++) {
     admins.add(ListTile(
+      onTap: () async{
+        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${pAux[i][4]}").get();
+            if(docsnap.exists){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: pAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
+              },));
+            }
+            else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: pAux[i][4]);
+              },));
+            }
+      },
       leading: InkWell(
         child: CircleAvatar(
           foregroundImage: NetworkImage(pAux[i][2]),
@@ -568,6 +608,19 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   }
   for(int i=0;i<epAux.length;i++) {
     admins.add(ListTile(
+      onTap: () async{
+        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${epAux[i][4]}").get();
+            if(docsnap.exists){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: epAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
+              },));
+            }
+            else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: epAux[i][4]);
+              },));
+            }
+      },
       leading: InkWell(
         child: CircleAvatar(
           foregroundImage: NetworkImage(epAux[i][2]),

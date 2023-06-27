@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Services/users_remote_services.dart';
@@ -269,7 +270,7 @@ class _ChatsPageState extends State<ChatsPage> {
                         ),
                         title: Text((ind != -1) ? savedUsers[ind] : userchat
                             .recipientPhoneNo),
-                        subtitle: Text(userchat.lastMessage ?? ""),
+                        subtitle: Text(userchat.lastMessage ?? "",maxLines: 1, overflow: TextOverflow.ellipsis,),
                         trailing: Text((userchat.lastMessageTime == null
                             ? ""
                             : "${userchat.lastMessageTime!.hour}:${userchat
@@ -304,6 +305,12 @@ class _ChatsPageState extends State<ChatsPage> {
                               });
                             }
 
+                          }
+                          else{
+                            final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) {
+                              return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                            },));
                           }
                         },
                         onLongPress: () {

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
+import 'package:realtime_messaging/screens/group_window.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Services/users_remote_services.dart';
@@ -233,7 +234,7 @@ class _GroupsPageState extends State<GroupsPage> {
                             },
                           ),
                           title: Text(usergroup.name),
-                          subtitle: Text(usergroup.lastMessage ?? ""),
+                          subtitle: Text(usergroup.lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
                           trailing: Text((usergroup.lastMessageTime == null
                               ? ""
                               : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute/10}${usergroup.lastMessageTime!.minute%10}")),
@@ -266,6 +267,11 @@ class _GroupsPageState extends State<GroupsPage> {
                                 });
                               }
 
+                            }
+                            else{
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
+                              },));
                             }
                           },
                           onLongPress: (){
