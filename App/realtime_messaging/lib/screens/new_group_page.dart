@@ -1,14 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-
-import '../Models/groups.dart';
-import '../Models/userGroups.dart';
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import '../main.dart';
-import 'otherUser_profile_page.dart';
+import 'group_initialization.dart';
 
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
@@ -165,60 +161,27 @@ class _NewGroupPageState extends State<NewGroupPage> {
             showDialog(
                 context: (context),
                 builder: (context) => AlertDialog(
-                      title: Text('Select atleast 1'),
-                      content: Text(
+                      title: const Text('Select atleast 1'),
+                      content: const Text(
                           'please select atleast one participant to form group'),
                       actions: [
                         ElevatedButton(
                             onPressed: () {
                               Navigator.of(context, rootNavigator: true).pop();
                             },
-                            child: Text('Ok'))
+                            child: const Text('Ok'))
                       ],
-                    ));
-          // } else {
-          //   final String groupid = "${DateTime.now().microsecondsSinceEpoch}";
-          //   GroupsRemoteServices().setGroups(Group(
-          //       id: groupid,
-          //       participantIds: participantIds,
-          //       creationTimestamp: DateTime.now(),
-          //       createdBy: users[cui].phoneNo,
-          //       admins: [cid]));
-          //   for (var i in participantIds) {
-          //     RemoteServices().setUserGroup(
-          //         i,
-          //         UserGroup(
-          //             id: groupid,
-          //             groupId: groupid,
-          //             exited: false,
-          //             pinned: false,
-          //             name: 'Default',
-          //             imageUrl:
-          //                 ' https://geodash.gov.bd/uploaded/people_group/default_group.png',
-          //             backgroundImage:
-          //                 "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
-          //   }
-        // onPressed: (){
-        //   if(participantIds.isEmpty){
-        //     showDialog(context: (context), builder: (context)=>AlertDialog(
-        //       title: const Text('Select atleast 1'),
-        //       content: const Text('please select atleast one participant to form group'),
-        //       actions: [
-        //         ElevatedButton(onPressed: (){
-        //           Navigator.of(context,rootNavigator: true).pop();
-        //         }, child: const Text('Ok'))
-        //       ],
-        //     ));
-        //   }
+                    )
+            );
+           }
           else {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context)=>
-                      GroupInitialization(participantIds: participantIds, users: users,index:cui)));
+                      GroupInitialization(participantIds: participantIds, users: users,index:cui, appUserIds: appUserIds,)));
           }
-        // },
-        // child: const Icon(Icons.arrow_forward
-        ),
-        child: Icon(Icons.arrow_forward),
+         },// child: const Icon(Icons.arrow_forward
+
+        child: const Icon(Icons.arrow_forward),
       ),
     );
   }

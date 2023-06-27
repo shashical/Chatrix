@@ -5,6 +5,7 @@ import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/group_window.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
+import 'package:realtime_messaging/screens/search_group.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Services/users_remote_services.dart';
 
@@ -16,7 +17,7 @@ class GroupsPage extends StatefulWidget {
 class _GroupsPageState extends State<GroupsPage> {
   final RemoteServices _remoteServices = RemoteServices();
   List<bool> isSelected=[];
-
+  List<UserGroup> usergroups=[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +25,7 @@ class _GroupsPageState extends State<GroupsPage> {
         stream: _remoteServices.getUserGroups(cid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final List<UserGroup> usergroups = snapshot.data!;
+             usergroups = snapshot.data!;
             isSelected=List.filled(usergroups.length, false);
             int trueCount=0;
             if (usergroups.isEmpty) {
@@ -329,7 +330,7 @@ class _GroupsPageState extends State<GroupsPage> {
         onPressed: () {
           showModalBottomSheet(
             context: context,
-            builder: (context) => SearchContactPage(),
+            builder: (context) => SearchGroup(usergroup: usergroups),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(40),
