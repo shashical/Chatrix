@@ -242,7 +242,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               maxLines: null,
                               controller: messageController,
                               onChanged: (e){
-                                if(messageController.text.length ==1 || messageController.text.length == 0){
+                                if(messageController.text.length ==1 || messageController.text.isEmpty){
                                   setState(() {
                                     
                                   });

@@ -152,12 +152,7 @@ class _GroupWindowState extends State<GroupWindow> {
               child: StreamBuilder<List<GroupMessage>>(
                 stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                                          scrollController.animateTo(
-                          scrollController.position.maxScrollExtent + 50,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                        );
+                  if (snapshot.hasData) {                
                     final List<GroupMessage> groupmessages = snapshot.data!;
                     // return ListView.builder(
                     //   itemCount: chatmessages.length,
@@ -175,7 +170,8 @@ class _GroupWindowState extends State<GroupWindow> {
                     //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
                     //   },
                     // );
-                    return ListView.builder(
+
+                    Widget listBuilder = ListView.builder(
                       controller: scrollController,
                       itemCount: groupmessages.length,
                       itemBuilder: (context, index) {
@@ -200,8 +196,19 @@ class _GroupWindowState extends State<GroupWindow> {
                         }
                       },
                     );
+
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      scrollController.animateTo(
+                        scrollController.position.maxScrollExtent + 50,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    });
+
+                    return listBuilder;
+
                   } else {
-                    return Text("No conversations yet.");
+                    return const Center(child: Text("No conversations yet."));
                   }
                 },
               ),
