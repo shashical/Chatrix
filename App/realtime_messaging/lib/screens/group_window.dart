@@ -148,61 +148,65 @@ class _GroupWindowState extends State<GroupWindow> {
         ),
         child: Column(
           children: [
-            StreamBuilder<List<GroupMessage>>(
-              stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                                        scrollController.animateTo(
+            Flexible(
+              child: StreamBuilder<List<GroupMessage>>(
+                stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      scrollController.animateTo(
                         scrollController.position.maxScrollExtent + 50,
                         duration: Duration(milliseconds: 300),
                         curve: Curves.easeOut,
                       );
-                  final List<GroupMessage> groupmessages = snapshot.data!;
-                  // return ListView.builder(
-                  //   itemCount: chatmessages.length,
-                  //   itemBuilder: (context, index) {
-                  //     final ChatMessage chatmessage = chatmessages[index];
-                  //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
-                  //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
-                  //       if(chatmessage.delivered==false){
-                  //         if(!event.metadata.hasPendingWrites){
-                  //           chatmessage.delivered = true;
-                  //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
-                  //         }
-                  //       }
-                  //     });
-                  //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
-                  //   },
-                  // );
-                  return ListView.builder(
-                    controller: scrollController,
-                    itemCount: groupmessages.length,
-                    itemBuilder: (context, index) {
-                      final GroupMessage groupmessage = groupmessages[index];
-                      if (groupmessage.deletedForMe[cid] == null &&
-                          groupmessage.deletedForEveryone == false) {
-                        return MyBubble(
-                          message: groupmessage.text,
-                          time:
-                              ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
-                          delivered: false,
-                          isUser: (groupmessage.senderId == cid),
-                          read: false,
-                          displayName: groupmessage.senderName,
-                          isAcontact: false,
-                          phoneNo: groupmessage.senderPhoneNo,
-                        );
-                      } else {
-                        return SizedBox(
-                          height: 0,
-                        );
-                      }
-                    },
-                  );
-                } else {
-                  return Text("No conversations yet.");
-                }
-              },
+                    });                
+                    final List<GroupMessage> groupmessages = snapshot.data!;
+                    // return ListView.builder(
+                    //   itemCount: chatmessages.length,
+                    //   itemBuilder: (context, index) {
+                    //     final ChatMessage chatmessage = chatmessages[index];
+                    //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
+                    //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
+                    //       if(chatmessage.delivered==false){
+                    //         if(!event.metadata.hasPendingWrites){
+                    //           chatmessage.delivered = true;
+                    //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
+                    //         }
+                    //       }
+                    //     });
+                    //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
+                    //   },
+                    // );
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: groupmessages.length,
+                      itemBuilder: (context, index) {
+                        final GroupMessage groupmessage = groupmessages[index];
+                        if (groupmessage.deletedForMe[cid] == null &&
+                            groupmessage.deletedForEveryone == false) {
+                          return MyBubble(
+                            message: groupmessage.text,
+                            time:
+                                ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
+                            delivered: false,
+                            isUser: (groupmessage.senderId == cid),
+                            read: false,
+                            displayName: groupmessage.senderName,
+                            isAcontact: false,
+                            phoneNo: groupmessage.senderPhoneNo,
+                          );
+                        } else {
+                          return SizedBox(
+                            height: 0,
+                          );
+                        }
+                      },
+                    );
+                  } else {
+                    return Text("No conversations yet.");
+                  }
+                },
+              ),
             ),
             Container(
               constraints: BoxConstraints(

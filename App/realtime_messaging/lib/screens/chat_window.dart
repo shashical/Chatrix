@@ -208,12 +208,11 @@ class _ChatWindowState extends State<ChatWindow> {
                             },
                           );
                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                           if (scrollController.hasClients)
-                           { scrollController.animateTo(
+                          scrollController.animateTo(
                              scrollController.position.maxScrollExtent + 60,
                              duration: const Duration(milliseconds: 300),
                              curve: Curves.easeOut,
-                           );}
+                           );
                          }) ;
 
                           return listBuilder;
@@ -243,7 +242,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               maxLines: null,
                               controller: messageController,
                               onChanged: (e){
-                                if(messageController.text.length ==1 || messageController.text.length == 0){
+                                if(messageController.text.length ==1 || messageController.text.isEmpty){
                                   setState(() {
                                     
                                   });
