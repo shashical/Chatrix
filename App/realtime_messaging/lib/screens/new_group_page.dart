@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
+import 'package:realtime_messaging/screens/group_initialization.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Models/groups.dart';
@@ -167,23 +168,22 @@ class _NewGroupPageState extends State<NewGroupPage> {
         onPressed: (){
           if(participantIds.isEmpty){
             showDialog(context: (context), builder: (context)=>AlertDialog(
-              title: Text('Select atleast 1'),
-              content: Text('please select atleast one participant to form group'),
+              title: const Text('Select atleast 1'),
+              content: const Text('please select atleast one participant to form group'),
               actions: [
                 ElevatedButton(onPressed: (){
                   Navigator.of(context,rootNavigator: true).pop();
-                }, child: Text('Ok'))
+                }, child: const Text('Ok'))
               ],
             ));
           }
-          else{
-            GroupsRemoteServices().setGroups(Group(id:cid+DateTime.fromMillisecondsSinceEpoch.toString(), participantIds: participantIds, creationTimestamp: DateTime.now(), createdBy:users[cui].phoneNo,admins: [cid]));
-            for(var i in participantIds){
-              RemoteServices().setUserGroup(i, UserGroup(id:DateTime.fromMillisecondsSinceEpoch.toString(), groupId:cid+DateTime.fromMillisecondsSinceEpoch.toString(), exited: false, pinned: false, name: '', imageUrl:' https://geodash.gov.bd/uploaded/people_group/default_group.png'));
-            }
+          else {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=>
+                      GroupInitialization(participantIds: participantIds, users: users,index:cui)));
           }
         },
-        child: Icon(Icons.arrow_forward
+        child: const Icon(Icons.arrow_forward
         ),
       ),
     );
