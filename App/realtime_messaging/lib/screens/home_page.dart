@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController();
   Users? curUser;
   bool isLoaded=false;
 
@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('printingcid $cid');
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -57,6 +58,12 @@ class _HomePageState extends State<HomePage> {
         actions: [
           PopupMenuButton(itemBuilder: (context)=>[
              PopupMenuItem(
+               value: 0,
+             onTap: (){
+                 WidgetsBinding.instance.addPostFrameCallback((_) {
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
+                 });
+             },
                child: Row(
               children: [
                 CircleAvatar(
@@ -67,20 +74,13 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const Text('Account',style: TextStyle(fontSize: 20),)
               ],
-            ),
-             value: 0,
-             onTap: (){
-                 WidgetsBinding.instance.addPostFrameCallback((_) {
-               Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
-                 });
-             },),
-            PopupMenuItem(child: Text('New Group'),
-                value: 1,
+            ),),
+            PopupMenuItem(value: 1,
                 onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.push(context, MaterialPageRoute(builder: (context)=>const NewGroupPage()));
               });
-                },
+                },child: const Text('New Group'),
             ),
             PopupMenuItem(value: 3,
             onTap: (){

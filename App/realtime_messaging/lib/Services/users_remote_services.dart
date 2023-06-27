@@ -99,7 +99,7 @@ class RemoteServices {
 
   Future<UserChat?> getSingleUserChat(String id, String userChatId) async {
     final docsnap = await reference
-        .collection('users/$id/userChats')
+        .collection("users").doc(id).collection('userChats')
         .doc(userChatId)
         .get()
         .catchError((e) => throw Exception('$e'));
@@ -144,14 +144,14 @@ class RemoteServices {
     }
   }
   Stream<List<UserGroup>> getUserGroups(String id) {
-    return reference.collection('users/$id/userGroups').snapshots().map(
+    return reference.collection('users').doc(id).collection('userGroups').snapshots().map(
         (event) =>
             event.docs.map((doc) => UserGroup.fromJson(doc.data())).toList());
   }
 
   Future<UserGroup?> getSingleUserGroup(String id, String userGroupId) async {
     final docsnap = await reference
-        .collection('users').doc(id).collection('userGroup')
+        .collection('users').doc(id).collection('userGroups')
         .doc(userGroupId)
         .get()
         .catchError((e) => throw Exception('$e'));
@@ -165,7 +165,7 @@ class RemoteServices {
       String id, Map<String, dynamic> upd, String groupId) async {
     try {
       reference
-          .collection('users/$id/userGroups')
+          .collection('users').doc(id).collection('userGroups')
           .doc(groupId)
           .update(upd)
           .catchError((e) => throw Exception('$e'));

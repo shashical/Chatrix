@@ -68,7 +68,7 @@ class MyBubble extends StatelessWidget {
                   children: [
                     Text(
                       time,
-                      style: TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: 13),
                     ),
                     const SizedBox(
                       width: 5,
@@ -144,7 +144,7 @@ class _ChatWindowState extends State<ChatWindow> {
                   CircleAvatar(
                     foregroundImage: NetworkImage(otheruser.photoUrl!),
                   ),
-                  SizedBox(width: 10,),
+                  const SizedBox(width: 10,),
                   Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
                 ],
               ),

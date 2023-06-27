@@ -190,7 +190,7 @@ class _GroupWindowState extends State<GroupWindow> {
                             phoneNo: groupmessage.senderPhoneNo,
                           );
                         } else {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 0,
                           );
                         }
@@ -200,7 +200,7 @@ class _GroupWindowState extends State<GroupWindow> {
                     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                       scrollController.animateTo(
                         scrollController.position.maxScrollExtent + 50,
-                        duration: Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeOut,
                       );
                     });
