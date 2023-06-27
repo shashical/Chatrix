@@ -245,7 +245,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           icon: const Icon(Icons.attach_file),
                           onPressed: () {},
                         ),
-                        (messageController.text.isEmpty && !isSending)?const SizedBox(width: 0,):IconButton(
+                        (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
                           iconSize: (24.0),
                           onPressed: () async {
                             setState(() {
@@ -305,7 +305,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       ? messageController.text.substring(0, 100)
                                       : messageController.text),
                                   'lastMessageType': "text",
-                                  'lastMessageTime': DateTime.now()
+                                  'lastMessageTime': DateTime.now().toIso8601String(),
                                 },
                                 "$cid${widget.otherUserId}");
                             await RemoteServices().updateUserChat(
@@ -317,7 +317,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       ? messageController.text.substring(0, 100)
                                       : messageController.text),
                                   'lastMessageType': "text",
-                                  'lastMessageTime': DateTime.now()
+                                  'lastMessageTime': DateTime.now().toIso8601String()
                                 },
                                 "${widget.otherUserId}$cid");
                             messageController.clear();
