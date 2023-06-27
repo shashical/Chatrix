@@ -55,8 +55,10 @@ final TextEditingController _groupNameController=TextEditingController();
       ),
       body:Column(
         children: [
+          const SizedBox(height: 10,),
           Row(
             children: [
+              const SizedBox(width: 10,),
               GestureDetector(
                 onTap: () {
                   SimpleDialog alert =
@@ -108,8 +110,9 @@ final TextEditingController _groupNameController=TextEditingController();
                               alert,barrierDismissible: true,);
                             },
                 child: Container(
-                  width: 120.0,
-                  height: 120.0,
+                  padding: const EdgeInsets.only(bottom:10 ),
+                  width: 50,
+                  height:50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.grey[300],
@@ -124,13 +127,23 @@ final TextEditingController _groupNameController=TextEditingController();
                   ),
                 ),
               ),
-               TextField(
-                controller: _groupNameController,
-                 decoration:const InputDecoration(
-                   hintText: 'Enter a subject to group'
-                 ),
+               const SizedBox(width: 15,),
+               SizedBox(
+                 width: 300,
+                 child: TextField(
+                  controller: _groupNameController,
+                   decoration: InputDecoration(
+                     filled:true,
+                     fillColor: Colors.cyan[100],
+                     hintText: 'Enter a subject to group',
+                     border: OutlineInputBorder(
+                       borderSide: BorderSide.none,
+                         borderRadius: BorderRadius.circular(20)
+                     )
+                   ),
 
-              )
+              ),
+               )
             ],
           ),
           Container(
@@ -138,29 +151,31 @@ final TextEditingController _groupNameController=TextEditingController();
             height: 20,
           ),
           Text('Participants: ${participantIds.length}'),
-          GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          Flexible(
+            child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
 
-                  crossAxisCount: 3,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
+                    crossAxisCount: 3,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
 
-              ),
-              itemCount: participantIds.length,
-              itemBuilder: (context,index){
-                int ri=widget.appUserIds.indexOf(participantIds[index]);
-                int savedIndex=savedNumber.indexOf(widget.users[ri].phoneNo);
-                return Column(
-                children: [
-                  CircleAvatar(
-                    foregroundImage: NetworkImage(widget.users[ri].photoUrl!),
-                  ),
-                  Text(savedUsers[savedIndex],
-                  maxLines:1,
-                  overflow: TextOverflow.ellipsis,),
-                ],
-              );
-              }
+                ),
+                itemCount: participantIds.length,
+                itemBuilder: (context,index){
+                  int ri=widget.appUserIds.indexOf(participantIds[index]);
+                  int savedIndex=savedNumber.indexOf(widget.users[ri].phoneNo);
+                  return Column(
+                  children: [
+                    CircleAvatar(
+                      foregroundImage: NetworkImage(widget.users[ri].photoUrl!),
+                    ),
+                    Text(savedUsers[savedIndex],
+                    maxLines:1,
+                    overflow: TextOverflow.ellipsis,),
+                  ],
+                );
+                }
+            ),
           )
         ],
       ),
@@ -201,7 +216,8 @@ final TextEditingController _groupNameController=TextEditingController();
             }
           }
 
-        }
+        },
+        child: Icon(Icons.done),
       ),
 
     );

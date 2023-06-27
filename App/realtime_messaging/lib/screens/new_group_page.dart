@@ -118,16 +118,21 @@ class _NewGroupPageState extends State<NewGroupPage> {
                           itemBuilder: (context, index) => InkWell(
                                 child: Stack(
                                   children: [
-                                    CircleAvatar(
-                                      foregroundImage: NetworkImage(users[
-                                              appUserIds
-                                                  .indexOf(participantIds[index])]
-                                          .photoUrl!),
+                                    const SizedBox(width: 60,height: 60,),
+                                    Positioned(
+                                      top: 10,
+                                      left: 10,
+                                      child: CircleAvatar(
+                                        foregroundImage: NetworkImage(users[
+                                                appUserIds
+                                                    .indexOf(participantIds[index])]
+                                            .photoUrl!),
+                                      ),
                                     ),
                                     const Positioned(
-                                        top: 2,
-                                        left: 5,
-                                        child: Icon(Icons.cancel_outlined))
+                                        bottom:30,
+                                        right: 10,
+                                        child: Icon(Icons.cancel,size: 15,color: Colors.grey,))
                                   ],
                                 ),
                                 onTap: () {
@@ -138,7 +143,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                               )),
                     ),
                     Flexible(
-                      flex:5,
+                      flex:8,
                       child: ListView(
                           children: (_searchController.text.isEmpty)
                               ? usersPresentList(users, appUserNumber, context,
