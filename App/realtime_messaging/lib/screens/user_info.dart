@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../Models/users.dart';
-import 'chat_window.dart';
 import 'home_page.dart';
 
 final cid = FirebaseAuth.instance.currentUser!.uid;

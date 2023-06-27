@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:realtime_messaging/Services/chats_remote_services.dart';
+import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Models/users.dart';
@@ -138,6 +141,19 @@ List<Widget> MergeAppUserAndSendInvite(
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
+          onTap: () async{
+            final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${users[index].id}").get();
+            if(docsnap.exists){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: users[index].id,chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
+              },));
+            }
+            else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                return ChatWindow(otherUserId: users[index].id);
+              },));
+            }
+          },
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage('${users[index].photoUrl}'),

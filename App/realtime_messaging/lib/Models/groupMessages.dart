@@ -15,8 +15,8 @@ class GroupMessage {
   Map<String, bool> deletedForMe;
   bool deletedForEveryone;
   String? repliedTo;
-  Map<String, bool>? deliveredTo;
-  Map<String, bool>? readBy;
+  Map<String, bool> deliveredTo;
+  Map<String, bool> readBy;
   bool edited;
 
   GroupMessage({
@@ -31,8 +31,8 @@ class GroupMessage {
     this.deletedForMe = const {},
     this.deletedForEveryone = false,
     this.repliedTo,
-    this.deliveredTo,
-    this.readBy,
+    this.deliveredTo = const {},
+    this.readBy = const {},
     this.edited = false,
   });
 

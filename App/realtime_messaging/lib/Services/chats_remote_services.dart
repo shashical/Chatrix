@@ -41,14 +41,19 @@ class ChatsRemoteServices {
     }
   }
 
-  Future<void> setChatMessage(String chatId, ChatMessage chatmessage)async{
-    final DocumentSnapshot docSnap = 
-    await reference.collection("chats/$chatId/chatMessages").doc(chatmessage.id).get();
-    if(!docSnap.exists){
-      try{
-        reference.collection("chats/$chatId/chatMessages").doc(chatmessage.id).set(chatmessage.toJson()).catchError((e)=>throw Exception("$e"));
-      }
-      on FirebaseException catch (e){
+  Future<void> setChatMessage(String chatId, ChatMessage chatmessage) async {
+    final DocumentSnapshot docSnap = await reference
+        .collection("chats/$chatId/chatMessages")
+        .doc(chatmessage.id)
+        .get();
+    if (!docSnap.exists) {
+      try {
+        reference
+            .collection("chats/$chatId/chatMessages")
+            .doc(chatmessage.id)
+            .set(chatmessage.toJson())
+            .catchError((e) => throw Exception("$e"));
+      } on FirebaseException catch (e) {
         throw Exception("$e");
       } catch (e) {
         rethrow;
@@ -56,14 +61,14 @@ class ChatsRemoteServices {
     }
   }
 
-  Future<bool>checkChat(String chatId)async{
-    final DocumentSnapshot docSnap =
-        await reference.collection('chats').doc(chatId).get();
-    if(docSnap.exists){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
+  // Future<bool>checkChat(String chatId)async{
+  //   final DocumentSnapshot docSnap =
+  //       await reference.collection('chats').doc(chatId).get();
+  //   if(docSnap.exists){
+  //     return true;
+  //   }
+  //   else{
+  //     return false;
+  //   }
+  // }
 }

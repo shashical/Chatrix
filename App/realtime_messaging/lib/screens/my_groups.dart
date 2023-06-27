@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
+import 'package:realtime_messaging/screens/group_window.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Services/users_remote_services.dart';
@@ -31,10 +32,16 @@ class _GroupsPageState extends State<GroupsPage> {
                 child: Text('No groups to display.'),
               );
             }
-            final List<UserGroup> sortedusergroups = [
-              ...usergroups.where((element) => element.pinned),
-              ...usergroups.where((element) => !element.pinned)
-            ];
+
+            usergroups.sort((a, b) {
+              if (a.pinned != b.pinned) {
+                return a.pinned ? -1 : 1;
+              }
+              if (a.pinned) {
+                return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+              }
+              return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+            });
 
             List<int> unMutedSelected=[];
             List<int> unPinnedSelected=[];
@@ -206,7 +213,7 @@ class _GroupsPageState extends State<GroupsPage> {
                 ListView.builder(
                   itemCount: usergroups.length,
                   itemBuilder: (context, index) {
-                    final UserGroup usergroup = sortedusergroups[index];
+                    final UserGroup usergroup = usergroups[index];
                     return ListTile(
                           leading: InkWell(
                             child: Stack(
@@ -227,7 +234,7 @@ class _GroupsPageState extends State<GroupsPage> {
                             },
                           ),
                           title: Text(usergroup.name),
-                          subtitle: Text(usergroup.lastMessage ?? ""),
+                          subtitle: Text(usergroup.lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
                           trailing: Text((usergroup.lastMessageTime == null
                               ? ""
                               : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute/10}${usergroup.lastMessageTime!.minute%10}")),
@@ -260,6 +267,11 @@ class _GroupsPageState extends State<GroupsPage> {
                                 });
                               }
 
+                            }
+                            else{
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
+                              },));
                             }
                           },
                           onLongPress: (){
