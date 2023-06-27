@@ -80,7 +80,7 @@ class _SearchGroupState extends State<SearchGroup> {
                       ? ""
                       : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
                   onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                         return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
                       },));
 

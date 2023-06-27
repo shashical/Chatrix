@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 
-StarredMessage StarMessageFromJson(String str) => StarredMessage.fromJson(json.decode(str));
+StarredMessage StarredMessageFromJson(String str) => StarredMessage.fromJson(json.decode(str));
 String chatMessageToJson(StarredMessage data) => json.encode(data.toJson());
 class StarredMessage{
   String id;

@@ -168,6 +168,11 @@ class _ChatWindowState extends State<ChatWindow> {
                           : ChatsRemoteServices().getChatMessages(chatid!)),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
+                          scrollController.animateTo(
+                              scrollController.position.maxScrollExtent + 60,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
                           final List<ChatMessage> chatmessages = snapshot.data!;
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
@@ -230,9 +235,11 @@ class _ChatWindowState extends State<ChatWindow> {
                               maxLines: null,
                               controller: messageController,
                               onChanged: (e){
-                                setState(() {
-
-                                });
+                                if(messageController.text.length ==1 || messageController.text.length == 0){
+                                  setState(() {
+                                    
+                                  });
+                                }
                               },
                               decoration: const InputDecoration(
                                 hintText: "Type here...",
@@ -245,7 +252,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           icon: const Icon(Icons.attach_file),
                           onPressed: () {},
                         ),
-                        (messageController.text.isEmpty && !isSending)?const SizedBox(width: 0,):IconButton(
+                        (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
                           iconSize: (24.0),
                           onPressed: () async {
                             setState(() {
@@ -277,50 +284,47 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       deleted: false,
                                       pinned: false,
-                                      recipientPhoneNo: currentuser.phoneNo));
+                                      recipientPhoneNo: currentuser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"
+                                      ));
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
                               });
                             }
+                            String temp = messageController.text;
+                            messageController.clear();
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
                                 ChatMessage(
                                     id: "${DateTime.now().microsecondsSinceEpoch}",
                                     senderId: cid,
-                                    text: messageController.text,
+                                    text: temp,
                                     contentType: "text",
                                     timestamp: DateTime.now()));
-
-                            scrollController.animateTo(
-                              scrollController.position.maxScrollExtent + 50,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
-                            );
-                            await RemoteServices().updateUserChat(
+                            RemoteServices().updateUserChat(
                                 cid,
                                 {
-                                  'lastMessage': (messageController
-                                              .text.length >
+                                  'lastMessage': (temp
+                                              .length >
                                           100
-                                      ? messageController.text.substring(0, 100)
-                                      : messageController.text),
+                                      ? temp.substring(0, 100)
+                                      : temp),
                                   'lastMessageType': "text",
-                                  'lastMessageTime': DateTime.now()
+                                  'lastMessageTime': DateTime.now().toIso8601String()
                                 },
                                 "$cid${widget.otherUserId}");
-                            await RemoteServices().updateUserChat(
+                            RemoteServices().updateUserChat(
                                 widget.otherUserId,
                                 {
-                                  'lastMessage': (messageController
-                                              .text.length >
+                                  'lastMessage': (temp
+                                              .length >
                                           100
-                                      ? messageController.text.substring(0, 100)
-                                      : messageController.text),
+                                      ? temp.substring(0, 100)
+                                      : temp),
                                   'lastMessageType': "text",
-                                  'lastMessageTime': DateTime.now()
+                                  'lastMessageTime': DateTime.now().toIso8601String()
                                 },
                                 "${widget.otherUserId}$cid");
-                            messageController.clear();
                             setState(() {
                               isSending=false;
                             });

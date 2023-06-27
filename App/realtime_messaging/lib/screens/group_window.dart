@@ -126,6 +126,7 @@ class GroupWindow extends StatefulWidget {
 class _GroupWindowState extends State<GroupWindow> {
   TextEditingController messageController = TextEditingController();
   ScrollController scrollController = ScrollController();
+  bool isSending=false;
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +152,11 @@ class _GroupWindowState extends State<GroupWindow> {
               stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                                        scrollController.animateTo(
+                        scrollController.position.maxScrollExtent + 50,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
                   final List<GroupMessage> groupmessages = snapshot.data!;
                   // return ListView.builder(
                   //   itemCount: chatmessages.length,
@@ -169,6 +175,7 @@ class _GroupWindowState extends State<GroupWindow> {
                   //   },
                   // );
                   return ListView.builder(
+                    controller: scrollController,
                     itemCount: groupmessages.length,
                     itemBuilder: (context, index) {
                       final GroupMessage groupmessage = groupmessages[index];
@@ -226,9 +233,14 @@ class _GroupWindowState extends State<GroupWindow> {
                     icon: Icon(Icons.attach_file),
                     onPressed: () {},
                   ),
-                  IconButton(
-                    iconSize: (messageController.text == "" ? 0 : 24.0),
+                  ((messageController.text.isEmpty || isSending)?SizedBox(width: 0,):IconButton(
+                    iconSize: 24,
                     onPressed: () async {
+                      setState(() {
+                        isSending=true;
+                      });
+                      String temp = messageController.text;
+                      messageController.clear();
                       final Users currentuser =
                           (await RemoteServices().getSingleUser(cid))!;
                       await GroupsRemoteServices().setGroupMessage(
@@ -236,19 +248,13 @@ class _GroupWindowState extends State<GroupWindow> {
                           GroupMessage(
                             id: "${DateTime.now().microsecondsSinceEpoch}",
                             senderId: cid,
-                            text: messageController.text,
+                            text: temp,
                             contentType: "text",
                             timestamp: DateTime.now(),
                             senderName: currentuser.name!,
                             senderPhoneNo: currentuser.phoneNo,
                             senderPhotoUrl: currentuser.photoUrl!,
                           ));
-                      messageController.clear();
-                      scrollController.animateTo(
-                        scrollController.position.maxScrollExtent + 50,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                      );
                       final List<String> participants = await RemoteServices()
                           .getDocumentField(
                               "groups/${widget.groupId}", 'participantIds');
@@ -256,18 +262,21 @@ class _GroupWindowState extends State<GroupWindow> {
                         RemoteServices().updateUserGroup(
                             x,
                             {
-                              'lastMessage': (messageController.text.length >
+                              'lastMessage': (temp.length >
                                       100
-                                  ? "${messageController.text.substring(0, 100)}"
-                                  : messageController.text),
+                                  ? "${temp.substring(0, 100)}"
+                                  : temp),
                               'lastMessageType': "text",
-                              'lastMessageTime': DateTime.now()
+                              'lastMessageTime': DateTime.now().toIso8601String()
                             },
                             widget.groupId);
                       }
+                      setState(() {
+                        isSending = false;
+                      });
                     },
                     icon: Icon(Icons.send_rounded, color: Colors.blue),
-                  ),
+                  )),
                 ],
               ),
             ),
