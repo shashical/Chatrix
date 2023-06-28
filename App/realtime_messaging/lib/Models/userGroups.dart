@@ -42,8 +42,8 @@ class UserGroup {
       name: json['name'],
       imageUrl: json['imageUrl'],
       unreadMessageCount: json['unreadMessageCount'],
-      lastMessage: json['lastMessage'],
-      lastMessageTime: DateTime.parse(json['lastMessageTime']),
+      lastMessage: json['lastMessage']??'',
+      lastMessageTime: (json['lastMessageTime']!=null)?DateTime.parse(json['lastMessageTime']):null,
       lastMessageType: json['lastMessageType'],
       muted: json['muted'],
     );
