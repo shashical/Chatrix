@@ -44,6 +44,9 @@ class ContactServices{
       for (int i = 0; i < contacts.length; i++) {
         int a = helper.length;
         if (contacts[i].phones.isNotEmpty) {
+          if(!contacts[i].phones[0].normalizedNumber.startsWith('+91')){
+            contacts[i].phones[0].normalizedNumber='+91${contacts[i].phones[0].normalizedNumber}';
+          }
           helper.add(contacts[i].phones[0].normalizedNumber);
           if (helper.length > a) {
             savedNumber.add(contacts[i].phones[0].normalizedNumber);
@@ -51,6 +54,8 @@ class ContactServices{
           }
         }
       }
+      debugPrint("${savedUsers.length}");
+      debugPrint('${savedNumber.length}');
 
   }
 }

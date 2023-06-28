@@ -21,6 +21,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
   List<String> searchedUser = [];
   List<String> searchedNumber = [];
   List<String> appUserNumber = [];
+
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -59,29 +60,16 @@ class _SearchContactPageState extends State<SearchContactPage> {
                                 size: 25,
                                 color: Colors.black,
                               ),
-                              suffixIcon: PopupMenuButton(
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.group),
-                                        Text(
-                                          'Invite a friend',
-                                        )
-                                      ],
-                                    ),
-                                    onTap: () {},
-                                  ),
-                                  PopupMenuItem(
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.arrow_back),
-                                        Text('Go back')
-                                      ],
-                                    ),
-                                    onTap: () {},
-                                  )
-                                ],
+                              suffixIcon: IconButton(
+                                onPressed: (){
+                                  if(_searchController.text.isEmpty){
+                                    Navigator.pop(context);
+                                  }
+                                  else{
+                                    _searchController.clear();
+                                  }
+                                },
+                                icon: const Icon(Icons.cancel),
                               ),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -112,6 +100,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
 
                             appUserNumber =
                                 users.map((user) => user.phoneNo).toList();
+                            //debugPrint('$appUserNumber');
 
                             if (_searchController.text.isEmpty) {
                               return ListView(

@@ -227,6 +227,13 @@ class _GroupWindowState extends State<GroupWindow> {
                         style: const TextStyle(fontSize: 19),
                         maxLines: null,
                         controller: messageController,
+                        onChanged: (e){
+                          if(messageController.text.isEmpty||messageController.text.length==1){
+                            setState(() {
+
+                            });
+                          }
+                        },
                         decoration: const InputDecoration(
                           hintText: "Type here...",
                           border: InputBorder.none,

@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/group_window.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/new_group_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:io';
@@ -180,7 +182,7 @@ final TextEditingController _groupNameController=TextEditingController();
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if(_groupNameController.text.isEmpty){
             showDialog(context: context, builder: (context)=> AlertDialog(
               title: const Text('please provide subject to continue'),
@@ -194,7 +196,7 @@ final TextEditingController _groupNameController=TextEditingController();
           else {
             participantIds.add(cid);
 
-            GroupsRemoteServices().setGroups(Group(
+           await  GroupsRemoteServices().setGroups(Group(
                 id: groupid,
                 participantIds: participantIds,
                 creationTimestamp: DateTime.now(),
@@ -214,12 +216,24 @@ final TextEditingController _groupNameController=TextEditingController();
                       backgroundImage:
                       "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
             }
+         final    nav=Navigator.of(context);
+            nav.pop();
+            nav.pop();
+            nav.push(
+                MaterialPageRoute(builder: (context)=>
+                GroupWindow(groupName: _groupNameController.text,
+                    groupPhoto:
+                imageUrl??'https://geodash.gov.bd/uploaded/people_group/default_group.png',
+                    backgroundImage: 'https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg',
+                    groupId: groupid)));
           }
 
         },
-        child: Icon(Icons.done),
+        child: const Icon(Icons.done),
       ),
 
     );
   }
 }
+
+

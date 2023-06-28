@@ -273,7 +273,7 @@ class _GroupsPageState extends State<GroupsPage> {
                               children: [
                                 Text((usergroup.lastMessageTime == null
                                     ? ""
-                                    : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute/10}${usergroup.lastMessageTime!.minute%10}")),
+                                    : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
                                 Row(
                                   children: [
                                     usergroup.pinned? Transform.rotate(angle: math.pi/7,
