@@ -61,6 +61,40 @@ class ChatsRemoteServices {
     }
   }
 
+  Future<void> deleteAllChatMessages(String chatid)async{
+    try{
+                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                        final batch = FirebaseFirestore.instance.batch();
+
+                        querySnapshot.docs.forEach((documentSnapshot) {
+                          batch.delete(documentSnapshot.reference);
+                        });
+
+                        await batch.commit();
+                      }
+                      catch(e){
+                        throw Exception("$e");
+                      }
+  }
+
+  Future<void> deleteAllChatMessagesForMe(String cid, String chatid)async{
+    try{
+                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                        final batch = FirebaseFirestore.instance.batch();
+
+                        querySnapshot.docs.forEach((documentSnapshot) {
+                          batch.update(documentSnapshot.reference,
+                            {'deletedForMe.$cid' : true}
+                          );
+                        });
+
+                        await batch.commit();
+                      }
+                      catch(e){
+                        throw Exception("$e");
+                      }
+  }
+
   // Future<bool>checkChat(String chatId)async{
   //   final DocumentSnapshot docSnap =
   //       await reference.collection('chats').doc(chatId).get();

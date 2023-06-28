@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
+import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
@@ -218,38 +219,10 @@ class _ChatsPageState extends State<ChatsPage> {
                     String otheruserid = temp.substring(cid.length, temp.length);
                     DocumentSnapshot docsnap = await FirebaseFirestore.instance.collection('users').doc(otheruserid).collection('userChats').doc("$otheruserid$cid").get();
                     if(!docsnap.exists){
-                      try{
-                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
-                        final batch = FirebaseFirestore.instance.batch();
-
-                        querySnapshot.docs.forEach((documentSnapshot) {
-                          batch.delete(documentSnapshot.reference);
-                        });
-
-                        await batch.commit();
-                        debugPrint('Collection deleted successfully!');
-                      }
-                      catch(e){
-                        debugPrint("Error deleting collection: $e");
-                      }
+                      await ChatsRemoteServices().deleteAllChatMessages(chatid);
                     }
                     else{
-                      try{
-                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
-                        final batch = FirebaseFirestore.instance.batch();
-
-                        querySnapshot.docs.forEach((documentSnapshot) {
-                          batch.update(documentSnapshot.reference,
-                            {'deletedForMe.$cid' : true}
-                          );
-                        });
-
-                        await batch.commit();
-                        debugPrint('Collection updated successfully!');
-                      }
-                      catch(e){
-                        debugPrint("Error updating collection: $e");
-                      }
+                      await ChatsRemoteServices().deleteAllChatMessagesForMe(cid, chatid);
                     }
                   }
                 }
