@@ -43,7 +43,7 @@ class UserChat {
       unreadMessageCount: json['unreadMessageCount'],
       lastMessage: json['lastMessage'],
       lastMessageType: json['lastMessageType'],
-      lastMessageTime: DateTime.parse(json['lastMessageTime']),
+      lastMessageTime:(json['lastMessageTime']!=null)? DateTime.parse(json['lastMessageTime']):null,
       muted: json['muted'],
       blocked: json['blocked'],
     );
