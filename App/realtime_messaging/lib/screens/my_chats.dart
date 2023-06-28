@@ -8,6 +8,7 @@ import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import '../Services/users_remote_services.dart';
+import 'dart:math' as math;
 
 class ChatsPage extends StatefulWidget {
   @override
@@ -103,7 +104,7 @@ class _ChatsPageState extends State<ChatsPage> {
                   }
 
                 },
-                icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded):const Icon(Icons.volume_mute_rounded),
+                icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded,semanticLabel: 'Unmute',):const Icon(Icons.volume_mute_rounded,semanticLabel: 'mute',),
               ),
               const SizedBox(
                 width:20,
@@ -173,11 +174,15 @@ class _ChatsPageState extends State<ChatsPage> {
                       setState(() {
                         isSelected=List.filled(userchats.length, false);
                         trueCount=0;
+                        unPinnedSelected=[];
+                        unMutedSelected=[];
                       });
 
                     }
                   },
-                  icon:(unPinnedSelected.isEmpty)? const Icon((CupertinoIcons.pin_slash_fill)):const Icon(CupertinoIcons.pin_fill)),
+                  icon:(unPinnedSelected.isEmpty)? Transform.rotate(angle: math.pi/7,
+                  child: const Icon((CupertinoIcons.pin_slash_fill),semanticLabel: 'unpin',)):Transform.rotate(angle: math.pi/7,
+                  child: const Icon(CupertinoIcons.pin_fill,semanticLabel: 'pin',))),
               const SizedBox(
                 width:20,
               ),
@@ -214,14 +219,18 @@ class _ChatsPageState extends State<ChatsPage> {
                 });
 
 
-              }, icon: const Icon(Icons.delete)),
+              }, icon: const Icon(Icons.delete,semanticLabel: 'delete',)),
               PopupMenuButton(
                   itemBuilder: (context)=>[
                     PopupMenuItem(
                       child: const Text('Select All'),
                       onTap: (){
+                        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                         setState(() {
+                          isSelected=List.filled(userchats.length, true);
+                          trueCount=userchats.length;
 
+                        });
                         });
                       },
                     )
@@ -249,16 +258,16 @@ class _ChatsPageState extends State<ChatsPage> {
 
 
 
-                  // userchats.sort((a, b) {
-                  //   if (a.pinned != b.pinned) {
-                  //     return a.pinned ? -1 : 1;
-                  //   }
-                  //   if (a.pinned) {
-                  //     return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-                  //   }
-                  //   return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-                  // });
-                 // int trueCount=0;
+                  userchats.sort((a, b) {
+                    if (a.pinned != b.pinned) {
+                      return a.pinned ? -1 : 1;
+                    }
+                    if (a.pinned) {
+                      return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+                    }
+                    return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+                  });
+
 
                   return ListView.builder(
                     itemCount: userchats.length,
@@ -365,7 +374,7 @@ class _ChatsPageState extends State<ChatsPage> {
                               });
 
                             }
-                            debugPrint( 'truecount here $isSelected');
+                            //debugPrint( 'truecount here $isSelected');
                           },
                         );
                       }
