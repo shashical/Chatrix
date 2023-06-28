@@ -111,11 +111,11 @@ class RemoteServices {
   }
 
   Future<void> updateUserChat(
-      String id, Map<String, dynamic> upd, String chatId) async {
+      String id, Map<String, dynamic> upd, String userChatId) async {
     try {
       reference
           .collection('users').doc(id).collection('userChats')
-          .doc(chatId)
+          .doc(userChatId)
           .update(upd)
           .catchError((e) => throw Exception('$e'));
     } on FirebaseException catch (e) {

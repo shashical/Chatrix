@@ -108,6 +108,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    // debugPrint('$isUserLoaded');
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(

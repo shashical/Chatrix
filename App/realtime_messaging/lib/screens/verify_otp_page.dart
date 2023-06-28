@@ -8,7 +8,6 @@ import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
-
 import '../Widgets/BottomWaveClipper.dart';
 
 class VerifyOtpPage extends StatefulWidget {
@@ -287,7 +286,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           controller: _controller,
                           seconds: 30,
                           build: (_, double time) => Text(
-                            time.toString(),
+                            time.toString().substring(0,2),
                             style: TextStyle(
                               fontSize: 35,
                             ),
