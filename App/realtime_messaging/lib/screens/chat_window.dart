@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
@@ -113,6 +114,7 @@ class _ChatWindowState extends State<ChatWindow> {
   int indexInContact=-1;
   bool isSending=false;
   bool blocked=false;
+  bool done = false;
 
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
@@ -266,6 +268,8 @@ class _ChatWindowState extends State<ChatWindow> {
                             setState(() {
                               isSending=true;
                             });
+                            String temp = messageController.text;
+                            messageController.clear();
                             if (chatid == null) {
                               await ChatsRemoteServices().setChat(Chat(
                                 id: "$cid${widget.otherUserId}",
@@ -277,7 +281,6 @@ class _ChatWindowState extends State<ChatWindow> {
                                       id: "$cid${widget.otherUserId}",
                                       chatId: "$cid${widget.otherUserId}",
                                       recipientPhoto: otheruser.photoUrl!,
-                                      deleted: false,
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
                                       backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
@@ -290,7 +293,6 @@ class _ChatWindowState extends State<ChatWindow> {
                                       id: "${widget.otherUserId}$cid",
                                       chatId: "$cid${widget.otherUserId}",
                                       recipientPhoto: currentuser.photoUrl!,
-                                      deleted: false,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
                                       backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"
@@ -299,8 +301,6 @@ class _ChatWindowState extends State<ChatWindow> {
                                 chatid = "$cid${widget.otherUserId}";
                               });
                             }
-                            String temp = messageController.text;
-                            messageController.clear();
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
                                 ChatMessage(
@@ -309,6 +309,18 @@ class _ChatWindowState extends State<ChatWindow> {
                                     text: temp,
                                     contentType: "text",
                                     timestamp: DateTime.now()));
+                            
+                            DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                            .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otherUserId}").get();
+                            if(!docsnap.exists){
+                              await RemoteServices().setUserChat(cid,
+                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo)
+                              );
+                              setState(() {
+                                done = true;
+                              });
+                            }
+
                             RemoteServices().updateUserChat(
                                 cid,
                                 {
@@ -321,6 +333,17 @@ class _ChatWindowState extends State<ChatWindow> {
                                   'lastMessageTime': DateTime.now().toIso8601String()
                                 },
                                 "$cid${widget.otherUserId}");
+
+                            if(!done){
+                              docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otherUserId).collection('userChats').doc("${widget.otherUserId}$cid").get();
+                              if(!docsnap.exists){
+                                final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                await RemoteServices().setUserChat(widget.otherUserId,
+                                UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                );
+                              }
+                            }
+
                             RemoteServices().updateUserChat(
                                 widget.otherUserId,
                                 {

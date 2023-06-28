@@ -190,14 +190,16 @@ class _ChatsPageState extends State<ChatsPage> {
               const SizedBox(
                 width:20,
               ),
-              IconButton(onPressed: (){
+              IconButton(onPressed: ()async{
                 for(int i=0;i<userchats.length;i++) {
+                  String temp = userchats[i].id;
+                  String chatid = userchats[i].chatId;
                   if (isSelected[i]) {
                     try {
-                      _usersremoteServices.updateUserChat(
-                          cid, {'deleted': true}, userchats[i].id)
+                      FirebaseFirestore.instance.collection('users').doc(cid).collection('userChats').doc(userchats[i].id).delete()
+                      // _usersremoteServices.updateUserChat(
+                      //     cid, {'deleted': true}, userchats[i].id)
                           .catchError((e) => throw Exception('$e'));
-                      userchats[i].deleted = true;
                     } on FirebaseException catch (e) {
                       ScaffoldMessenger.of(context)
                         ..removeCurrentSnackBar()
@@ -212,6 +214,42 @@ class _ChatsPageState extends State<ChatsPage> {
                             SnackBar(
                                 content:
                                 Text('$e')));
+                    }
+                    String otheruserid = temp.substring(cid.length, temp.length);
+                    DocumentSnapshot docsnap = await FirebaseFirestore.instance.collection('users').doc(otheruserid).collection('userChats').doc("$otheruserid$cid").get();
+                    if(!docsnap.exists){
+                      try{
+                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                        final batch = FirebaseFirestore.instance.batch();
+
+                        querySnapshot.docs.forEach((documentSnapshot) {
+                          batch.delete(documentSnapshot.reference);
+                        });
+
+                        await batch.commit();
+                        debugPrint('Collection deleted successfully!');
+                      }
+                      catch(e){
+                        debugPrint("Error deleting collection: $e");
+                      }
+                    }
+                    else{
+                      try{
+                        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                        final batch = FirebaseFirestore.instance.batch();
+
+                        querySnapshot.docs.forEach((documentSnapshot) {
+                          batch.update(documentSnapshot.reference,
+                            {'deletedForMe.$cid' : true}
+                          );
+                        });
+
+                        await batch.commit();
+                        debugPrint('Collection updated successfully!');
+                      }
+                      catch(e){
+                        debugPrint("Error updating collection: $e");
+                      }
                     }
                   }
                 }
@@ -282,10 +320,6 @@ class _ChatsPageState extends State<ChatsPage> {
                     itemCount: userchats.length,
                     itemBuilder: (context, index) {
                       final UserChat userchat = userchats[index];
-                      if (userchat.deleted) {
-                        return const SizedBox();
-                      }
-                      else {
                         final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
                         return ListTile(
                           leading: InkWell(
@@ -399,7 +433,6 @@ class _ChatsPageState extends State<ChatsPage> {
 
                           },
                         );
-                      }
                     },
                   );
                 }

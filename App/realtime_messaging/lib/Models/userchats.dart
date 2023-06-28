@@ -7,7 +7,6 @@ class UserChat {
   String id;
   String chatId;
   String recipientPhoto;
-  bool deleted;
   String? backgroundImage;
   bool pinned;
   String recipientPhoneNo;
@@ -22,7 +21,6 @@ class UserChat {
     required this.id,
     required this.chatId,
     required this.recipientPhoto,
-    required this.deleted,
     this.backgroundImage,
     required this.pinned,
     required this.recipientPhoneNo,
@@ -39,7 +37,6 @@ class UserChat {
       id: json['id'],
       chatId: json['chatId'],
       recipientPhoto: json['recipientPhoto'],
-      deleted: json['deleted'],
       backgroundImage: json['backgroundImage'],
       pinned: json['pinned'],
       recipientPhoneNo: json['recipientPhoneNo'],
@@ -57,7 +54,6 @@ class UserChat {
       'id': id,
       'chatId': chatId,
       'recipientPhoto': recipientPhoto,
-      'deleted': deleted,
       'backgroundImage': backgroundImage,
       'pinned': pinned,
       'recipientPhoneNo': recipientPhoneNo,
