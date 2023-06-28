@@ -6,7 +6,7 @@ import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-
+import 'dart:math'as math;
 import '../Services/chats_remote_services.dart';
 
 class MyBubble extends StatelessWidget {
@@ -256,7 +256,8 @@ class _ChatWindowState extends State<ChatWindow> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.attach_file),
+                          icon: Transform.rotate(angle: math.pi/7,
+                          child: const Icon(Icons.attach_file)),
                           onPressed: () {},
                         ),
                         (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
