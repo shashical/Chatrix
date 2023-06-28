@@ -227,7 +227,7 @@ class _GroupsPageState extends State<GroupsPage> {
                    usergroups = snapshot.data!;
                    if(myGroupsLength!=usergroups.length) {
                      isSelected = List.filled(usergroups.length, false);
-                     trueCount=0;
+                     myGroupsLength=usergroups.length;
                    }
                   if (usergroups.isEmpty) {
                     return const Center(
@@ -269,21 +269,26 @@ class _GroupsPageState extends State<GroupsPage> {
                             ),
                             title: Text(usergroup.name),
                             subtitle: Text(usergroup.lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                            trailing: Column(
-                              children: [
-                                Text((usergroup.lastMessageTime == null
-                                    ? ""
-                                    : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                Row(
-                                  children: [
-                                    usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                        child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                    usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                  ],
-                                )
-                              ],
+                            trailing: SizedBox(
+                              width: 80,
+                              height: 50,
+                              child: Column(
+                                children: [
+                                  Text((usergroup.lastMessageTime == null
+                                      ? ""
+                                      : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
+                                  Row(
+                                    children: [
+                                      usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                          child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
+                                      usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                             onTap: () {
+                              debugPrint('${isSelected}');
                               if(trueCount!=0) {
                                 if (isSelected[index]) {
                                   setState(() {
