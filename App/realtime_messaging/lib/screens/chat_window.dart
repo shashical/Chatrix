@@ -59,7 +59,7 @@ class MyBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(message, style: TextStyle(fontSize: 17)),
+              Text(message, style: const TextStyle(fontSize: 17)),
               const SizedBox(
                 height: 1,
               ),
@@ -144,8 +144,11 @@ class _ChatWindowState extends State<ChatWindow> {
 
               title: Row(
                 children: [
-                  CircleAvatar(
-                    foregroundImage: NetworkImage(otheruser.photoUrl!),
+                  InkWell(
+                    child: CircleAvatar(
+                      foregroundImage: NetworkImage(otheruser.photoUrl!),
+                    ),
+
                   ),
                   const SizedBox(width: 10,),
                   Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
@@ -236,24 +239,31 @@ class _ChatWindowState extends State<ChatWindow> {
                       borderRadius: BorderRadius.circular(24.0),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: TextField(
-                              style: const TextStyle(fontSize: 19),
-                              maxLines: null,
-                              controller: messageController,
-                              onChanged: (e){
-                                if(messageController.text.length ==1 || messageController.text.isEmpty){
-                                  setState(() {
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minHeight: 0,
+                              maxHeight: 153,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: TextField(
+                                style: const TextStyle(fontSize: 19),
+                                maxLines: null,
+                                controller: messageController,
+                                onChanged: (e){
+                                  if(messageController.text.length ==1 || messageController.text.isEmpty){
+                                    setState(() {
 
-                                  });
-                                }
-                              },
-                              decoration: const InputDecoration(
-                                hintText: "Type here...",
-                                border: InputBorder.none,
+                                    });
+                                  }
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: "Type here...",
+                                  border: InputBorder.none,
+                                ),
                               ),
                             ),
                           ),
