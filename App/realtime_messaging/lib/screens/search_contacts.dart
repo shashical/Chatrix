@@ -145,7 +145,7 @@ List<Widget> MergeAppUserAndSendInvite(
           },
           leading: InkWell(
             child: CircleAvatar(
-              foregroundImage: NetworkImage('${users[index].photoUrl}'),
+              foregroundImage: NetworkImage('${users[index].photoUrl}',),
             ),
             onTap: () {
               Navigator.push(

@@ -18,7 +18,7 @@ class Users {
   Users({
     required this.id,
     this.name,
-    this.photoUrl = 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1',
+    this.photoUrl = 'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg',
     this.isOnline=true,
     required this.phoneNo,
     this.about,
