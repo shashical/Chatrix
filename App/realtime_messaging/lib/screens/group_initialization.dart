@@ -212,7 +212,7 @@ final TextEditingController _groupNameController=TextEditingController();
                       pinned: false,
                       name: _groupNameController.text,
                       imageUrl:imageUrl??
-                      ' https://geodash.gov.bd/uploaded/people_group/default_group.png',
+                      'https://geodash.gov.bd/uploaded/people_group/default_group.png',
                       backgroundImage:
                       "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
             }
