@@ -23,7 +23,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Users? currentUser;
   bool isUserLoaded = false;
   bool fileUploading = false;
-  bool currentUserLoaded=false;
 
   @override
   void initState() {
@@ -60,7 +59,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
         .getSingleUser(FirebaseAuth.instance.currentUser!.uid)
         .catchError((e) => throw Exception('$e'));
     setState(() {
-      currentUserLoaded=true;
       _usernameController.text = currentUser!.name ?? "";
       _aboutController.text = currentUser!.about ?? "";
       isUserLoaded = true;
@@ -142,7 +140,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 GestureDetector(
                   onTap: () {
                     SimpleDialog alert = SimpleDialog(
@@ -212,7 +210,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           : (isUserLoaded)?
                           DecorationImage(
                               image: NetworkImage(currentUser!.photoUrl!),fit: BoxFit.cover)
-                              :DecorationImage(
+                              :const DecorationImage(
                               image: NetworkImage("https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"),fit: BoxFit.cover)
                           ),
                     ),
@@ -253,12 +251,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             imageUrl = await RemoteServices()
                                 .uploadNewImage(_image!, id);
                           }
-
+                          if(imageUrl!=null){
+                            RemoteServices().updateUser(id, {"photoUrl":imageUrl}).catchError((e)=>throw Exception('$e'));
+                          }
                           RemoteServices().updateUser(id, {
                             "name": _usernameController.text,
-                            "photoUrl": (imageUrl == null)
-                                ? 'https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1'
-                                : imageUrl,
                             "about": _aboutController.text
                           });
                           setState(() {

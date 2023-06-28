@@ -68,6 +68,8 @@ class _ChatsPageState extends State<ChatsPage> {
                     setState(() {
                       isSelected=List.filled(userchats.length,false);
                       trueCount=0;
+                      unMutedSelected=[];
+                      unPinnedSelected=[];
                     });
                   }
                   else{
@@ -99,6 +101,8 @@ class _ChatsPageState extends State<ChatsPage> {
                     setState(() {
                       isSelected=List.filled(userchats.length, false);
                       trueCount=0;
+                      unMutedSelected=[];
+                      unPinnedSelected=[];
                     });
 
                   }
@@ -223,13 +227,18 @@ class _ChatsPageState extends State<ChatsPage> {
               PopupMenuButton(
                   itemBuilder: (context)=>[
                     PopupMenuItem(
-                      child: const Text('Select All'),
+                      child:  Text((trueCount==userchats.length)?'Unselect All':'Select All'),
                       onTap: (){
                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                         setState(() {
-                          isSelected=List.filled(userchats.length, true);
-                          trueCount=userchats.length;
-
+                          if(trueCount!=userchats.length) {
+                            isSelected = List.filled(userchats.length, true);
+                            trueCount = userchats.length;
+                          }
+                          else{
+                            isSelected=List.filled(userchats.length, false);
+                            trueCount=0;
+                          }
                         });
                         });
                       },
@@ -302,19 +311,23 @@ class _ChatsPageState extends State<ChatsPage> {
                           title: Text((ind != -1) ? savedUsers[ind] : userchat
                               .recipientPhoneNo),
                           subtitle: Text(userchat.lastMessage ?? "",maxLines: 1, overflow: TextOverflow.ellipsis,),
-                          trailing: Column(
-                            children: [
-                              Text((userchat.lastMessageTime == null
-                                  ? ""
-                                  : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute/10}${userchat.lastMessageTime!.minute%10}")),
-                              Row(
-                                children: [
-                                  userchat.pinned? Transform.rotate(angle: math.pi/7,
-                                      child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                  userchat.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                ],
-                              )
-                            ],
+                          trailing: SizedBox(
+                            height: 50,
+                            width: 80,
+                            child: Column(
+                              children: [
+                                Text((userchat.lastMessageTime == null
+                                    ? ""
+                                    : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
+                                Row(
+                                  children: [
+                                    userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                        child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,),
+                                    userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                           onTap: () {
                             if(trueCount!=0) {
@@ -383,7 +396,7 @@ class _ChatsPageState extends State<ChatsPage> {
                               });
 
                             }
-                            //debugPrint( 'truecount here $isSelected');
+
                           },
                         );
                       }

@@ -192,14 +192,30 @@ class _GroupsPageState extends State<GroupsPage> {
                       child: const Text('Select All'),
                       onTap: (){
                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                        setState(() {
-                          isSelected=List.filled(usergroups.length, true);
-                          trueCount=usergroups.length;
-
-                        });
+                          if(trueCount!=usergroups.length) {
+                            setState(() {
+                              isSelected = List.filled(usergroups.length, true);
+                              trueCount = usergroups.length;
+                            });
+                          }
+                          else{
+                            setState(() {
+                              isSelected=List.filled(usergroups.length, false);
+                              trueCount=0;
+                            });
+                          }
                         });
                       },
-                    )
+                    ),
+                    PopupMenuItem(child: Text('Exit group'),
+                    onTap:(){
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        setState(() {
+
+                        });
+                      });
+                    },),
+
                   ])
             ],
           ):const SizedBox(width: 0,),
