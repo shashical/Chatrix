@@ -104,7 +104,7 @@ class _ChatsPageState extends State<ChatsPage> {
                   }
 
                 },
-                icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded,semanticLabel: 'Unmute',):const Icon(Icons.volume_mute_rounded,semanticLabel: 'mute',),
+                icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded,semanticLabel: 'Unmute',):const Icon(CupertinoIcons.volume_off,semanticLabel: 'mute',),
               ),
               const SizedBox(
                 width:20,
@@ -336,11 +336,20 @@ class _ChatsPageState extends State<ChatsPage> {
                           title: Text((ind != -1) ? savedUsers[ind] : userchat
                               .recipientPhoneNo),
                           subtitle: Text(userchat.lastMessage ?? "",maxLines: 1, overflow: TextOverflow.ellipsis,),
-                          trailing: Text((userchat.lastMessageTime == null
-                              ? ""
-                              : "${userchat.lastMessageTime!.hour}:${userchat
-                              .lastMessageTime!.minute ~/ 10}${userchat
-                              .lastMessageTime!.minute % 10}")),
+                          trailing: Column(
+                            children: [
+                              Text((userchat.lastMessageTime == null
+                                  ? ""
+                                  : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute/10}${userchat.lastMessageTime!.minute%10}")),
+                              Row(
+                                children: [
+                                  userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                      child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
+                                  userchat.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
+                                ],
+                              )
+                            ],
+                          ),
                           onTap: () {
                             if(trueCount!=0) {
                               if (isSelected[index]) {

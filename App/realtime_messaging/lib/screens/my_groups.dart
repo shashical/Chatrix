@@ -262,7 +262,8 @@ class _GroupsPageState extends State<GroupsPage> {
                                   children: [
                                     usergroup.pinned? Transform.rotate(angle: math.pi/7,
                                         child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                    usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),                              ],
+                                    usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
+                                  ],
                                 )
                               ],
                             ),

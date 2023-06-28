@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:realtime_messaging/Models/chatMessages.dart';
-import 'package:realtime_messaging/Models/chats.dart';
-import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
-
+import 'dart:math'as math;
 import '../Models/groupMessages.dart';
-import '../Services/chats_remote_services.dart';
 
 class MyBubble extends StatelessWidget {
   MyBubble({
@@ -74,24 +70,24 @@ class MyBubble extends StatelessWidget {
                         Text(((isAcontact!) ? '' : (phoneNo!))),
                       ],
                     )),
-              Text(message, style: TextStyle(fontSize: 17)),
-              SizedBox(
+              Text(message, style: const TextStyle(fontSize: 17)),
+              const SizedBox(
                 height: 1,
               ),
               ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 55.0),
+                constraints: const BoxConstraints(maxWidth: 55.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       time,
-                      style: TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: 13),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     (!isUser
-                        ? SizedBox()
+                        ? const SizedBox()
                         : Icon(
                             icon,
                             size: 16,
@@ -137,7 +133,7 @@ class _GroupWindowState extends State<GroupWindow> {
         ),
         elevation: .9,
         title: Text(widget.groupName),
-        actions: <Widget>[],
+        actions:  <Widget>[],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -216,8 +212,8 @@ class _GroupWindowState extends State<GroupWindow> {
             Container(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.95),
-              margin: EdgeInsets.all(8.0),
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              margin: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24.0),
@@ -228,10 +224,10 @@ class _GroupWindowState extends State<GroupWindow> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: TextField(
-                        style: TextStyle(fontSize: 19),
+                        style: const TextStyle(fontSize: 19),
                         maxLines: null,
                         controller: messageController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Type here...",
                           border: InputBorder.none,
                         ),
@@ -239,10 +235,11 @@ class _GroupWindowState extends State<GroupWindow> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.attach_file),
+                    icon: Transform.rotate(angle: math.pi/7,
+                    child: const Icon(Icons.attach_file)),
                     onPressed: () {},
                   ),
-                  ((messageController.text.isEmpty || isSending)?SizedBox(width: 0,):IconButton(
+                  ((messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
                     iconSize: 24,
                     onPressed: () async {
                       setState(() {
@@ -273,7 +270,7 @@ class _GroupWindowState extends State<GroupWindow> {
                             {
                               'lastMessage': (temp.length >
                                       100
-                                  ? "${temp.substring(0, 100)}"
+                                  ? temp.substring(0, 100)
                                   : temp),
                               'lastMessageType': "text",
                               'lastMessageTime': DateTime.now().toIso8601String()
@@ -284,7 +281,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         isSending = false;
                       });
                     },
-                    icon: Icon(Icons.send_rounded, color: Colors.blue),
+                    icon: const Icon(Icons.send_rounded, color: Colors.blue),
                   )),
                 ],
               ),
