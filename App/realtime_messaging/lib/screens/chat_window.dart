@@ -2,12 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
-import 'package:realtime_messaging/Models/userChats.dart';
+
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
+import '../Models/userChats.dart';
 import '../Services/chats_remote_services.dart';
 
 class MyBubble extends StatelessWidget {
@@ -246,7 +247,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               onChanged: (e){
                                 if(messageController.text.length ==1 || messageController.text.isEmpty){
                                   setState(() {
-                                    
+
                                   });
                                 }
                               },
@@ -295,7 +296,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
                                       ));
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
@@ -314,7 +315,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otherUserId}").get();
                             if(!docsnap.exists){
                               await RemoteServices().setUserChat(cid,
-                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo)
+                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo,)
                               );
                               setState(() {
                                 done = true;

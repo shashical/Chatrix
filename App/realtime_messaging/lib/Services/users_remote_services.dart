@@ -6,6 +6,7 @@ import '../Models/users.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'dart:io';
 
+
 class RemoteServices {
   final reference = FirebaseFirestore.instance;
   //users
@@ -121,6 +122,14 @@ class RemoteServices {
     } on FirebaseException catch (e) {
       throw Exception('$e');
     } catch (e) {
+      rethrow;
+    }
+  }
+  Future<void> deleteSingleUserChat(String id,String userchatId)async {
+    try {
+      FirebaseFirestore.instance.collection('users').doc(id).collection('userChats').doc(userchatId).delete()
+          .catchError((e) => throw Exception('$e'));
+    }catch(e){
       rethrow;
     }
   }

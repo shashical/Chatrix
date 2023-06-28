@@ -191,12 +191,12 @@ class _ChatsPageState extends State<ChatsPage> {
                 width:20,
               ),
               IconButton(onPressed: ()async{
-                for(int i=0;i<userchats.length;i++) {
+                for(int i=userchats.length-1;i>=0;i--) {
                   String temp = userchats[i].id;
                   String chatid = userchats[i].chatId;
                   if (isSelected[i]) {
                     try {
-                      FirebaseFirestore.instance.collection('users').doc(cid).collection('userChats').doc(userchats[i].id).delete()
+                      RemoteServices().deleteSingleUserChat(cid, userchats[i].id)
                       // _usersremoteServices.updateUserChat(
                       //     cid, {'deleted': true}, userchats[i].id)
                           .catchError((e) => throw Exception('$e'));
