@@ -236,8 +236,8 @@ class _GroupsPageState extends State<GroupsPage> {
                   }
 
                   usergroups.sort((a, b) {
-                    if(a.lastMessageTime == null){
-                      return -1;
+                    if(a.lastMessageTime == null || b.lastMessageTime == null){
+                      return (a.lastMessageTime == null?-1:1);
                     }
                     if (a.pinned != b.pinned) {
                       return a.pinned ? -1 : 1;
