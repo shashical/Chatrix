@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
@@ -17,17 +19,18 @@ class MyBubble extends StatelessWidget {
     required this.read,
     required this.isAcontact,
     required this.displayName,
-    required this.phoneNo,
+    required this.phoneNo, required this.isSelected,
   });
 
   final String message, time;
-  final bool isUser, delivered, read;
+  final bool isUser, delivered, read,isSelected;
   final String? displayName, phoneNo;
   final bool? isAcontact;
 
+
   @override
   Widget build(BuildContext context) {
-    final bg =
+    final bg =isSelected?Colors.lightBlue.withOpacity(.5):
         !isUser ? Colors.white : const Color.fromARGB(255, 126, 226, 155);
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = delivered ? Icons.done_all : Icons.done;
@@ -125,16 +128,109 @@ class _GroupWindowState extends State<GroupWindow> {
   TextEditingController messageController = TextEditingController();
   ScrollController scrollController = ScrollController();
   bool isSending=false;
+  List<bool> isSelected=[];
+  List<int> otherUserChatSelected=[];
+  int myMessageLength=0;
+  int trueCount=0;
+  List<GroupMessage> groupmessages=[];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(widget.groupPhoto),
-        ),
+
         elevation: .9,
-        title: Text(widget.groupName),
+        title:(trueCount!=0)?Row(
+          children: [
+            IconButton(onPressed: (){
+              setState(() {
+
+                isSelected=List.filled(groupmessages.length, false);
+                trueCount=0;
+                otherUserChatSelected=[];
+              });
+            }, icon: const Icon(Icons.arrow_back)),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text('$trueCount',),
+            ),
+            const Spacer(),
+            IconButton(onPressed: (){
+              showDialog(context: context, builder: (context)=>AlertDialog(
+                title: const Text('Delete message?',style: TextStyle(color: Colors.grey),),
+                actions: [
+                  (otherUserChatSelected.isEmpty)?Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: () async {
+                      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('groupMessages').get();
+                      final batch = FirebaseFirestore.instance.batch();
+
+                      int i=myMessageLength-1;
+
+                      for (var documentSnapshot in querySnapshot.docs) {
+                        if(isSelected[i]) {
+                          batch.delete(documentSnapshot.reference);
+                        }
+                        i--;
+                      }
+                      setState(() {
+                        isSelected=List.filled(myMessageLength, false);
+                        trueCount=0;
+                      });
+
+                    },
+                        child: const Text('Delete for Everyone',style: TextStyle(color: Colors.green),)),
+                  ):const SizedBox(width: 0,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: () async {
+                      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('groupMessages').get();
+                      final batch = FirebaseFirestore.instance.batch();
+                      int i=0;
+                      for (var documentSnapshot in querySnapshot.docs) {
+                        if(isSelected[i]) {
+                          batch.update(documentSnapshot.reference,
+                              {'deletedForMe.$cid' : true}
+                          );
+                        }
+                        i++;
+                      }
+                      setState(() {
+                        isSelected=List.filled(myMessageLength, false);
+                        trueCount=0;
+                      });
+                    }, child: const Text('Delete for Me',style: TextStyle(color: Colors.green),)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: (){
+                      Navigator.of(context,rootNavigator: true).pop();
+                    }, child: const Text('Cancel',style: TextStyle(color: Colors.green),)),
+                  ),
+
+                ],
+              ));
+            },
+                icon: const Icon(CupertinoIcons.delete)),
+            SizedBox(width: 18,),
+            IconButton(onPressed: (){
+
+            }, icon: const Icon(Icons.star)),
+            const SizedBox(width: 18,),
+            (trueCount==1 &&groupmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: groupmessages[isSelected.indexOf(true)].text));
+            }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
+
+          ],
+        ) : Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(widget.groupPhoto),
+            ),
+            const SizedBox(width: 10,),
+            Text(widget.groupName),
+          ],
+        ),
         actions:  <Widget>[],
       ),
       body: Container(
@@ -151,7 +247,13 @@ class _GroupWindowState extends State<GroupWindow> {
                 stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {                
-                    final List<GroupMessage> groupmessages = snapshot.data!;
+                    groupmessages = snapshot.data!;
+                    if(myMessageLength!=groupmessages.length){
+                      myMessageLength=groupmessages.length;
+                      isSelected=List.filled(myMessageLength, false);
+                      trueCount=0;
+
+                    }
                     // return ListView.builder(
                     //   itemCount: chatmessages.length,
                     //   itemBuilder: (context, index) {
@@ -176,16 +278,58 @@ class _GroupWindowState extends State<GroupWindow> {
                         final GroupMessage groupmessage = groupmessages[index];
                         if (groupmessage.deletedForMe[cid] == null &&
                             groupmessage.deletedForEveryone == false) {
-                          return MyBubble(
-                            message: groupmessage.text,
-                            time:
-                                ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
-                            delivered: false,
-                            isUser: (groupmessage.senderId == cid),
-                            read: false,
-                            displayName: (savedNumber.indexOf(groupmessage.senderPhoneNo)==-1?groupmessage.senderName:savedUsers[savedNumber.indexOf(groupmessage.senderPhoneNo)]),
-                            isAcontact: false,
-                            phoneNo: groupmessage.senderPhoneNo,
+                          return GestureDetector(
+                            child: MyBubble(
+                              message: groupmessage.text,
+                              time:
+                                  ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
+                              delivered: false,
+                              isUser: (groupmessage.senderId == cid),
+                              read: false,
+                              displayName: (!savedNumber.contains(groupmessage.senderPhoneNo)?groupmessage.senderName:savedUsers[savedNumber.indexOf(groupmessage.senderPhoneNo)]),
+                              isAcontact: false,
+                              phoneNo: groupmessage.senderPhoneNo, isSelected: isSelected[index],
+                            ),
+                            onTap: () {
+
+                              if (trueCount != 0) {
+                                setState(() {
+
+
+                                  if (isSelected[index]) {
+                                    isSelected[index] = false;
+                                    trueCount--;
+                                    if(groupmessage.senderId!=cid){
+                                      otherUserChatSelected.remove(index);
+                                    }
+                                  }
+                                  else {
+                                    trueCount++;
+                                    isSelected[index] = true;
+                                    if(groupmessage.senderId!=cid){
+                                      otherUserChatSelected.add(index);
+                                    }
+                                  } });
+                              }
+                            },
+                            onLongPress: (){
+                              setState(() {
+                                if(isSelected[index]){
+                                  isSelected[index]=false;
+                                  trueCount--;
+                                  if(groupmessage.senderId!=cid){
+                                    otherUserChatSelected.remove(index);
+                                  }
+                                }
+                                else{
+                                  trueCount++;
+                                  isSelected[index]=true;
+                                  if(groupmessage.senderId!=cid){
+                                    otherUserChatSelected.add(index);
+                                  }
+                                }
+                              });
+                            },
                           );
                         } else {
                           return const SizedBox(

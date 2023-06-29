@@ -1,6 +1,8 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
@@ -19,14 +21,14 @@ class MyBubble extends StatelessWidget {
       required this.time,
       required this.delivered,
       required this.isUser,
-      required this.read});
+      required this.read, required this.isSelected});
 
   final String message, time;
-  final bool isUser, delivered, read;
+  final bool isUser, delivered, read,isSelected;
 
   @override
   Widget build(BuildContext context) {
-    final bg = !isUser ? Colors.white : Colors.greenAccent.shade100;
+    final bg =isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? Colors.white : Colors.greenAccent.shade100;
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = delivered ? Icons.done_all : Icons.done;
     final radius = !isUser
@@ -121,6 +123,9 @@ class _ChatWindowState extends State<ChatWindow> {
   File? _image;
   List<bool> isSelected=[];
   List<int> otherUserChatSelected=[];
+  int myMessageLength=0;
+  int trueCount=0;
+  List<ChatMessage> chatmessages=[];
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -158,8 +163,91 @@ class _ChatWindowState extends State<ChatWindow> {
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
+            leading: (trueCount!=0)? IconButton(onPressed: (){
+              setState(() {
 
-              title: Row(
+                isSelected=List.filled(chatmessages.length, false);
+                trueCount=0;
+                otherUserChatSelected=[];
+              });
+            }, icon: const Icon(Icons.arrow_back)):const BackButton(),
+              title:(trueCount!=0)?Row(
+                children: [
+
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text('$trueCount',),
+                  ),
+                  const Spacer(),
+                  IconButton(onPressed: (){
+                    showDialog(context: context, builder: (context)=>AlertDialog(
+                      title: const Text('Delete message?',style: TextStyle(color: Colors.grey),),
+                      actions: [
+                        (otherUserChatSelected.isEmpty)?Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: () async {
+                            QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                            final batch = FirebaseFirestore.instance.batch();
+
+                              int i=myMessageLength-1;
+
+                              for (var documentSnapshot in querySnapshot.docs) {
+                                if(isSelected[i]) {
+                                  batch.delete(documentSnapshot.reference);
+                                }
+                                i--;
+                              }
+                              setState(() {
+                               isSelected=List.filled(myMessageLength, false);
+                               trueCount=0;
+                              });
+                              Navigator.of(context,rootNavigator: true).pop();
+
+                          },
+                              child: const Text('Delete for Everyone',style: TextStyle(color: Colors.green),)),
+                        ):const SizedBox(width: 0,),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: () async {
+                            QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('chats').doc(chatid).collection('chatMessages').get();
+                            final batch = FirebaseFirestore.instance.batch();
+                                int i=0;
+                            for (var documentSnapshot in querySnapshot.docs) {
+                              if(isSelected[i]) {
+                                batch.update(documentSnapshot.reference,
+                                  {'deletedForMe.$cid' : true}
+                              );
+                              }
+                              i++;
+                            }
+                            setState(() {
+                              isSelected=List.filled(myMessageLength, false);
+                              trueCount=0;
+                            });
+                          }, child: const Text('Delete for Me',style: TextStyle(color: Colors.green),)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: (){
+                            Navigator.of(context,rootNavigator: true).pop();
+                          }, child: const Text('Cancel',style: TextStyle(color: Colors.green),)),
+                        ),
+
+                      ],
+                    ));
+                  },
+                      icon: const Icon(CupertinoIcons.delete)),
+                  SizedBox(width: 18,),
+                  IconButton(onPressed: (){
+
+                    }, icon: const Icon(Icons.star)),
+                  const SizedBox(width: 18,),
+                  (trueCount==1 &&chatmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: chatmessages[isSelected.indexOf(true)].text));
+                  }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
+
+                ],
+              ) :Row(
                 children: [
                   InkWell(
                     child: CircleAvatar(
@@ -192,7 +280,14 @@ class _ChatWindowState extends State<ChatWindow> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
 
-                          final List<ChatMessage> chatmessages = snapshot.data!;
+
+                           chatmessages = snapshot.data!;
+                          if(myMessageLength!=chatmessages.length){
+                            myMessageLength=chatmessages.length;
+                            isSelected=List.filled(myMessageLength, false);
+                            trueCount=0;
+
+                          }
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
@@ -216,13 +311,55 @@ class _ChatWindowState extends State<ChatWindow> {
                             itemBuilder: (context, index) {
                               final ChatMessage chatmessage = chatmessages[index];
                               if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
-                                return MyBubble(
+                                return GestureDetector(
+                                  child: MyBubble(
                                     message: chatmessage.text,
                                     time:
                                         ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
                                     delivered: chatmessage.delivered,
                                     isUser: (chatmessage.senderId == cid),
-                                    read: chatmessage.read);
+                                    read: chatmessage.read, isSelected: isSelected[index],),
+                                  onTap: () {
+
+                                    if (trueCount != 0) {
+                                      setState(() {
+
+
+                                      if (isSelected[index]) {
+                                        isSelected[index] = false;
+                                        trueCount--;
+                                        if(chatmessage.senderId!=cid){
+                                          otherUserChatSelected.remove(index);
+                                        }
+                                      }
+                                      else {
+                                        trueCount++;
+                                        isSelected[index] = true;
+                                        if(chatmessage.senderId!=cid){
+                                          otherUserChatSelected.add(index);
+                                        }
+                                      } });
+                                    }
+                                  },
+                                  onLongPress: (){
+                                    setState(() {
+                                    if(isSelected[index]){
+                                      isSelected[index]=false;
+                                      trueCount--;
+                                      if(chatmessage.senderId!=cid){
+                                        otherUserChatSelected.remove(index);
+                                      }
+                                    }
+                                    else{
+                                      trueCount++;
+                                      isSelected[index]=true;
+                                      if(chatmessage.senderId!=cid){
+                                        otherUserChatSelected.add(index);
+                                      }
+                                    }
+                                    });
+                                  },
+                                );
                               } else {
                                 return const SizedBox(
                                   height: 0,
