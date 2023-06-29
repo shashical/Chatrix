@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
+import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/groupMessages.dart';
@@ -181,7 +183,7 @@ class _GroupWindowState extends State<GroupWindow> {
                             delivered: false,
                             isUser: (groupmessage.senderId == cid),
                             read: false,
-                            displayName: groupmessage.senderName,
+                            displayName: (savedNumber.indexOf(groupmessage.senderPhoneNo)==-1?groupmessage.senderName:savedUsers[savedNumber.indexOf(groupmessage.senderPhoneNo)]),
                             isAcontact: false,
                             phoneNo: groupmessage.senderPhoneNo,
                           );
@@ -268,9 +270,10 @@ class _GroupWindowState extends State<GroupWindow> {
                             senderPhoneNo: currentuser.phoneNo,
                             senderPhotoUrl: currentuser.photoUrl!,
                           ));
-                      final List<String> participants = await RemoteServices()
-                          .getDocumentField(
-                              "groups/${widget.groupId}", 'participantIds');
+                      DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
+                      List<dynamic> participants = docSnap.get('participantIds');
+                          // .getDocumentField(
+                          //     "groups/${widget.groupId}", 'participantIds');
                       for (var x in participants) {
                         RemoteServices().updateUserGroup(
                             x,
@@ -285,6 +288,7 @@ class _GroupWindowState extends State<GroupWindow> {
                             widget.groupId);
                       }
                       setState(() {
+                        debugPrint('$isSending');
                         isSending = false;
                       });
                     },

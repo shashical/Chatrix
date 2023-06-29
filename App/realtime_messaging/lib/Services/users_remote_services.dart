@@ -193,15 +193,15 @@ class RemoteServices {
     return documentSnapshot.exists;
   }
 
-  Future<dynamic> getDocumentField(
-      String documentPath, String fieldName) async {
-    final DocumentSnapshot documentSnapshot =
-        await reference.doc(documentPath).get();
+  // Future<dynamic> getDocumentField(
+  //     String documentPath, String fieldName) async {
+  //   final DocumentSnapshot documentSnapshot =
+  //       await reference.doc(documentPath).get();
 
-    if (documentSnapshot.exists) {
-      return documentSnapshot.get(fieldName);
-    } else {
-      throw Exception("Document does not exist.");
-    }
-  }
+  //   if (documentSnapshot.exists) {
+  //     return documentSnapshot.get(fieldName);
+  //   } else {
+  //     throw Exception("Document does not exist.");
+  //   }
+  // }
 }
