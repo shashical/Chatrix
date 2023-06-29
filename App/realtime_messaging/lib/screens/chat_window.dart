@@ -1,19 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
-import 'package:realtime_messaging/screens/preview_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/userChats.dart';
 import '../Services/chats_remote_services.dart';
 import'dart:io';
-
 class MyBubble extends StatelessWidget {
   const MyBubble(
       {super.key, required this.message,
@@ -118,6 +117,22 @@ class _ChatWindowState extends State<ChatWindow> {
   int indexInContact=-1;
   bool isSending=false;
   bool blocked=false;
+  bool done = false;
+  File? _image;
+  List<bool> isSelected=[];
+  List<int> otherUserChatSelected=[];
+  
+  Future getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) {
+      return;
+    }
+    final imageTemp = File(image.path);
+    Navigator.of(context, rootNavigator: true).pop();
+    setState(() {
+      _image = imageTemp;
+    });
+  }
 
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
@@ -281,11 +296,108 @@ class _ChatWindowState extends State<ChatWindow> {
                                   onPressed: () async {
                                     final files=await ChatsRemoteServices().pickDocument();
                                     if(files!=null){
-                                      final result= Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                                      PreviewPage(result: files, chatid:chatid , otheruser: otheruser,)));
-                                      if(result==true){
-                                        ChatsRemoteServices().uploadDocument(File(files.paths[0]!),DateTime.fromMillisecondsSinceEpoch.toString());
+
+                                      if (chatid == null) {
+                                        await ChatsRemoteServices().setChat(Chat(
+                                          id: "$cid${otheruser.id}",
+                                          participantIds: [cid, otheruser.id],
+                                        ));
                                       }
+                                      await RemoteServices().setUserChat(
+                                          cid,
+                                          UserChat(
+                                            id: "$cid${otheruser.id}",
+                                            chatId: "$cid${otheruser.id}",
+                                            recipientPhoto: otheruser.photoUrl!,
+                                            pinned: false,
+                                            recipientPhoneNo:otheruser.phoneNo,
+                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                          ));
+                                      final Users currentuser =
+                                      (await RemoteServices().getSingleUser(cid))!;
+                                      await RemoteServices().setUserChat(
+                                         otheruser.id,
+                                          UserChat(
+                                            id: "${otheruser.id}$cid",
+                                            chatId: "$cid${otheruser.id}",
+                                            recipientPhoto: currentuser.photoUrl!,
+                                            pinned: false,
+                                            recipientPhoneNo: currentuser.phoneNo,
+                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                          ));
+                                      setState(() {
+                                        chatid = "$cid${otheruser.id}";
+                                      });
+
+
+
+
+
+                                      //     if(!done){
+                                      //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                      //   if(!docsnap.exists){
+                                      //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                      //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                      //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                      //     );
+                                      //   }
+                                      // }
+
+
+
+
+
+                                      for (int i = 0; i < files.files.length; i++) {
+                                        // firebase_storage.Reference ref =
+                                        // firebase_storage.FirebaseStorage.instance.ref(
+                                        //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                        // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                        //     .path!)));
+                                        // await Future.value(uploadTask);
+                                        //
+                                        // final docUrl=await ref.getDownloadURL();
+                                        await ChatsRemoteServices().setChatMessage(
+                                            chatid!,
+                                            ChatMessage(
+                                                id: "${DateTime.now().microsecondsSinceEpoch}",
+                                                senderId: cid,
+                                                text: '',
+                                                contentType: "document ${files.files[i].name}",
+                                                timestamp: DateTime.now(),
+                                                senderUrl: files.paths[i]!));
+
+                                      }
+                                      // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                      //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                      // if(!docsnap.exists){
+                                      //   await RemoteServices().setUserChat(cid,
+                                      //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                      //   );
+                                      //
+                                      // }
+
+                                      RemoteServices().updateUserChat(
+                                          cid,
+                                          {
+                                            'lastMessage': (files.files[files.files.length-1].name.length >
+                                                100
+                                                ?files.files[files.files.length-1].name.substring(0, 100)
+                                                : files.files[files.files.length-1]),
+                                            'lastMessageType': "document",
+                                            'lastMessageTime': DateTime.now().toIso8601String()
+                                          },
+                                          "$cid${otheruser.id}");
+                                      RemoteServices().updateUserChat(
+                                          widget.otherUserId,
+                                          {
+                                            'lastMessage': (files.files[files.files.length-1].name.length >
+                                                100
+                                                ?files.files[files.files.length-1].name.substring(0, 100)
+                                                : files.files[files.files.length-1]),
+                                            'lastMessageType': "document",
+                                            'lastMessageTime': DateTime.now().toIso8601String()
+                                          },
+                                          "${widget.otherUserId}$cid");
 
                                      }
 
@@ -308,8 +420,109 @@ class _ChatWindowState extends State<ChatWindow> {
                                   ),
                                 ),
                                 SimpleDialogOption(
-                                  onPressed: () {
-                                   // getImage(ImageSource.camera);
+                                  onPressed: () async {
+                                    await getImage(ImageSource.camera);
+                                    if(_image!=null){
+
+                                      if (chatid == null) {
+                                        await ChatsRemoteServices().setChat(Chat(
+                                          id: "$cid${otheruser.id}",
+                                          participantIds: [cid, otheruser.id],
+                                        ));
+                                      }
+                                      await RemoteServices().setUserChat(
+                                          cid,
+                                          UserChat(
+                                            id: "$cid${otheruser.id}",
+                                            chatId: "$cid${otheruser.id}",
+                                            recipientPhoto: otheruser.photoUrl!,
+                                            pinned: false,
+                                            recipientPhoneNo:otheruser.phoneNo,
+                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                          ));
+                                      final Users currentuser =
+                                      (await RemoteServices().getSingleUser(cid))!;
+                                    await RemoteServices().setUserChat(
+                                    otheruser.id,
+                                    UserChat(
+                                    id: "${otheruser.id}$cid",
+                                    chatId: "$cid${otheruser.id}",
+                                    recipientPhoto: currentuser.photoUrl!,
+                                    pinned: false,
+                                    recipientPhoneNo: currentuser.phoneNo,
+                                    backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                    ));
+                                    setState(() {
+                                    chatid = "$cid${otheruser.id}";
+                                    });
+
+
+
+
+
+                                    //     if(!done){
+                                    //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                    //   if(!docsnap.exists){
+                                    //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                    //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                    //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                    //     );
+                                    //   }
+                                    // }
+
+
+
+
+
+                                    for (int i = 0; i < 1; i++) {
+                                    // firebase_storage.Reference ref =
+                                    // firebase_storage.FirebaseStorage.instance.ref(
+                                    //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                    // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                    //     .path!)));
+                                    // await Future.value(uploadTask);
+                                    //
+                                    // final docUrl=await ref.getDownloadURL();
+                                    await ChatsRemoteServices().setChatMessage(
+                                    chatid!,
+                                    ChatMessage(
+                                    id: "${DateTime.now().microsecondsSinceEpoch}",
+                                    senderId: cid,
+                                    text: '',
+                                    contentType: "image",
+                                    timestamp: DateTime.now(),
+                                    senderUrl: _image!.path));
+
+                                    }
+                                    // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                    //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                    // if(!docsnap.exists){
+                                    //   await RemoteServices().setUserChat(cid,
+                                    //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                    //   );
+                                    //
+                                    // }
+
+                                    RemoteServices().updateUserChat(
+                                    cid,
+                                    {
+                                    'lastMessage': 'image',
+                                    'lastMessageType': "image",
+                                    'lastMessageTime': DateTime.now().toIso8601String()
+                                    },"$cid${otheruser.id}"
+
+                                    );
+
+                                          RemoteServices().updateUserChat(
+                                          widget.otherUserId,
+                                          {
+                                            'lastMessage': 'image',
+                                            'lastMessageType': "image",
+                                            'lastMessageTime': DateTime.now().toIso8601String()
+                                          },
+                                          "${widget.otherUserId}$cid");
+                                  }
+
                                   },
                                   child: const Row(
                                     children: [
@@ -319,7 +532,129 @@ class _ChatWindowState extends State<ChatWindow> {
                                       ),
                                       SizedBox(width: 8.0),
                                       Text(
-                                        "Capture from camera",
+                                        "send from camera",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () async {
+                                    await getImage(ImageSource.gallery);
+                                    if(_image!=null){
+
+                                      if (chatid == null) {
+                                        await ChatsRemoteServices().setChat(Chat(
+                                          id: "$cid${otheruser.id}",
+                                          participantIds: [cid, otheruser.id],
+                                        ));
+                                      }
+                                      await RemoteServices().setUserChat(
+                                          cid,
+                                          UserChat(
+                                            id: "$cid${otheruser.id}",
+                                            chatId: "$cid${otheruser.id}",
+                                            recipientPhoto: otheruser.photoUrl!,
+                                            pinned: false,
+                                            recipientPhoneNo:otheruser.phoneNo,
+                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                          ));
+                                      final Users currentuser =
+                                      (await RemoteServices().getSingleUser(cid))!;
+                                      await RemoteServices().setUserChat(
+                                          otheruser.id,
+                                          UserChat(
+                                            id: "${otheruser.id}$cid",
+                                            chatId: "$cid${otheruser.id}",
+                                            recipientPhoto: currentuser.photoUrl!,
+                                            pinned: false,
+                                            recipientPhoneNo: currentuser.phoneNo,
+                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                          ));
+                                      setState(() {
+                                        chatid = "$cid${otheruser.id}";
+                                      });
+
+
+
+
+
+                                      //     if(!done){
+                                      //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                      //   if(!docsnap.exists){
+                                      //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                      //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                      //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                      //     );
+                                      //   }
+                                      // }
+
+
+
+
+
+                                      for (int i = 0; i < 1; i++) {
+                                        // firebase_storage.Reference ref =
+                                        // firebase_storage.FirebaseStorage.instance.ref(
+                                        //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                        // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                        //     .path!)));
+                                        // await Future.value(uploadTask);
+                                        //
+                                        // final docUrl=await ref.getDownloadURL();
+                                        await ChatsRemoteServices().setChatMessage(
+                                            chatid!,
+                                            ChatMessage(
+                                                id: "${DateTime.now().microsecondsSinceEpoch}",
+                                                senderId: cid,
+                                                text: '',
+                                                contentType: "image",
+                                                timestamp: DateTime.now(),
+                                                senderUrl: _image!.path));
+
+                                      }
+                                      // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                      //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                      // if(!docsnap.exists){
+                                      //   await RemoteServices().setUserChat(cid,
+                                      //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                      //   );
+                                      //
+                                      // }
+
+                                      RemoteServices().updateUserChat(
+                                          cid,
+                                          {
+                                            'lastMessage': 'image',
+                                            'lastMessageType': "image",
+                                            'lastMessageTime': DateTime.now().toIso8601String()
+                                          },"$cid${otheruser.id}"
+
+                                      );
+
+                                      RemoteServices().updateUserChat(
+                                          widget.otherUserId,
+                                          {
+                                            'lastMessage': 'image',
+                                            'lastMessageType': "image",
+                                            'lastMessageTime': DateTime.now().toIso8601String()
+                                          },
+                                          "${widget.otherUserId}$cid");
+                                    }
+
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.photo,
+                                        color: Colors.green,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Send image from gallery",
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,
