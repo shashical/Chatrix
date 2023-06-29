@@ -685,28 +685,28 @@ class _ChatWindowState extends State<ChatWindow> {
                                 id: "$cid${widget.otherUserId}",
                                 participantIds: [cid, widget.otherUserId],
                               ));
-                              await RemoteServices().setUserChat(
-                                  cid,
-                                  UserChat(
-                                      id: "$cid${widget.otherUserId}",
-                                      chatId: "$cid${widget.otherUserId}",
-                                      recipientPhoto: otheruser.photoUrl!,
-                                      pinned: false,
-                                      recipientPhoneNo: otheruser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
-                                      ));
-                              final Users currentuser =
-                                  (await RemoteServices().getSingleUser(cid))!;
-                              await RemoteServices().setUserChat(
-                                  otheruser.id,
-                                  UserChat(
-                                      id: "${widget.otherUserId}$cid",
-                                      chatId: "$cid${widget.otherUserId}",
-                                      recipientPhoto: currentuser.photoUrl!,
-                                      pinned: false,
-                                      recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
-                                      ));
+                              // await RemoteServices().setUserChat(
+                              //     cid,
+                              //     UserChat(
+                              //         id: "$cid${widget.otherUserId}",
+                              //         chatId: "$cid${widget.otherUserId}",
+                              //         recipientPhoto: otheruser.photoUrl!,
+                              //         pinned: false,
+                              //         recipientPhoneNo: otheruser.phoneNo,
+                              //         backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                              //         ));
+                              // final Users currentuser =
+                              //     (await RemoteServices().getSingleUser(cid))!;
+                              // await RemoteServices().setUserChat(
+                              //     otheruser.id,
+                              //     UserChat(
+                              //         id: "${widget.otherUserId}$cid",
+                              //         chatId: "$cid${widget.otherUserId}",
+                              //         recipientPhoto: currentuser.photoUrl!,
+                              //         pinned: false,
+                              //         recipientPhoneNo: currentuser.phoneNo,
+                              //         backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                              //         ));
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
                               });
@@ -724,11 +724,8 @@ class _ChatWindowState extends State<ChatWindow> {
                             .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otherUserId}").get();
                             if(!docsnap.exists){
                               await RemoteServices().setUserChat(cid,
-                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo,)
+                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo, backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg")
                               );
-                              setState(() {
-                                done = true;
-                              });
                             }
 
                             RemoteServices().updateUserChat(
@@ -744,15 +741,14 @@ class _ChatWindowState extends State<ChatWindow> {
                                 },
                                 "$cid${widget.otherUserId}");
 
-                            if(!done){
                               docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otherUserId).collection('userChats').doc("${widget.otherUserId}$cid").get();
                               if(!docsnap.exists){
                                 final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
                                 await RemoteServices().setUserChat(widget.otherUserId,
-                                UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo, backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg")
                                 );
                               }
-                            }
+
 
                             RemoteServices().updateUserChat(
                                 widget.otherUserId,
