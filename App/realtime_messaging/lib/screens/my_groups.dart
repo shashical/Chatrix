@@ -235,15 +235,18 @@ class _GroupsPageState extends State<GroupsPage> {
                     );
                   }
 
-                  // usergroups.sort((a, b) {
-                  //   if (a.pinned != b.pinned) {
-                  //     return a.pinned ? -1 : 1;
-                  //   }
-                  //   if (a.pinned) {
-                  //     return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-                  //   }
-                  //   return b.lastMessageTime!.compareTo(a.lastMessageTime!);
-                  // });
+                  usergroups.sort((a, b) {
+                    if(a.lastMessageTime == null){
+                      return -1;
+                    }
+                    if (a.pinned != b.pinned) {
+                      return a.pinned ? -1 : 1;
+                    }
+                    if (a.pinned) {
+                      return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+                    }
+                    return b.lastMessageTime!.compareTo(a.lastMessageTime!);
+                  });
                   return ListView.builder(
                     itemCount: usergroups.length,
                     itemBuilder: (context, index) {
