@@ -121,14 +121,14 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                   ),
                   (currentGroup!.admins!.contains(cid))?Positioned(
                     bottom: 0,
-                    right: 4,
+                    right: 0,
                     child: ClipOval(
                       child: Container(
                         padding: const EdgeInsets.all(7),
                         color: Colors.white,
                         child: ClipOval(
                           child: Container(
-                            padding: const EdgeInsets.all(15),
+                            padding: const EdgeInsets.all(5),
                             color: Colors.lightBlue,
                             child: IconButton(
                               onPressed: () {
@@ -431,6 +431,10 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
   List<List<String>> aux=[];
   List<List<String>> extraAux=[];
   for(int i=0;i<adminsids.length;i++){
+    if(adminsids[i]==cid){
+      i++;
+      if(i==adminsids.length)break;
+    }
     int  pl=usersIds.indexOf(adminsids[i]);
     int   kl=savedNumber.indexOf(users[pl].phoneNo);
     if(kl!=-1){
@@ -444,6 +448,10 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
   List<List<String>> pAux=[];
   List<List<String>> epAux=[];
   for(int j=0;j<participantIds.length;j++){
+    if(participantIds[j]==cid){
+      j++;
+      if(j==participantIds.length)break;
+    }
     if(!adminsids.contains(participantIds[j])&& participantIds[j]!=cid){
       int pl=usersIds.indexOf(participantIds[j]);
       int kl=savedNumber.indexOf(users[pl].phoneNo);
