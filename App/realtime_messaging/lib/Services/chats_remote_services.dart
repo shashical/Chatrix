@@ -116,7 +116,7 @@ class ChatsRemoteServices {
     }
   }
   Future<FilePickerResult?> pickDocument() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
 
     if (result != null) {
 

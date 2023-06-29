@@ -500,8 +500,11 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       },
     ),
     trailing: (adminsids.contains(cid))?Container(
-      color: Colors.lightBlue,
-      child: const Text('Admin',style: TextStyle(color: Colors.green),),
+      color: Colors.deepOrange,
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text('Admin',style: TextStyle(color: Colors.white70),),
+      ),
     ):const SizedBox(height: 0,),
     title: const Text('You'),
     subtitle: Text(
@@ -584,7 +587,7 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       ),
       trailing: Column(
         children: [
-          const Text('Admin', style: TextStyle(color: Colors.green),),
+          const Text('Admin', style: TextStyle(color: Colors.white70),),
            Text(extrAux[i][1]),
         ],
       ),
