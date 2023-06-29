@@ -1,13 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Widgets/progress-indicator.dart';
+import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:io';
+
+import '../Models/chatMessages.dart';
+import '../Models/chats.dart';
+import '../Models/userChats.dart';
+import '../Models/users.dart';
+import '../Services/chats_remote_services.dart';
+import '../Services/users_remote_services.dart';
 
 class PreviewPage extends StatefulWidget {
   final FilePickerResult result;
-  const PreviewPage( {Key? key,required this.result}) : super(key: key);
+  final String? chatid;
+  final Users otheruser;
+  const PreviewPage( {Key? key,required this.result, required this.chatid, required this.otheruser}) : super(key: key);
 
   @override
   State<PreviewPage> createState() => _PreviewPageState();
@@ -15,6 +26,14 @@ class PreviewPage extends StatefulWidget {
 
 class _PreviewPageState extends State<PreviewPage> {
   List<firebase_storage.UploadTask> uploadTask=[];
+  List<String> docUrl=[];
+  String? chatid;
+  @override
+  void initState() {
+    chatid=widget.chatid;
+    // TODO: implement initState
+    super.initState();
+  }
   bool isuploading=false;
   @override
   Widget build(BuildContext context) {
@@ -71,6 +90,64 @@ class _PreviewPageState extends State<PreviewPage> {
                 shape: BoxShape.circle
               ),
               child: IconButton(onPressed: () async {
+                if (chatid == null) {
+                  await ChatsRemoteServices().setChat(Chat(
+                    id: "$cid${widget.otheruser.id}",
+                    participantIds: [cid, widget.otheruser.id],
+                  ));
+                  await RemoteServices().setUserChat(
+                      cid,
+                      UserChat(
+                        id: "$cid${widget.otheruser.id}",
+                        chatId: "$cid${widget.otheruser.id}",
+                        recipientPhoto: widget.otheruser.photoUrl!,
+                        pinned: false,
+                        recipientPhoneNo: widget.otheruser.phoneNo,
+                        backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                      ));
+                  final Users currentuser =
+                  (await RemoteServices().getSingleUser(cid))!;
+                  await RemoteServices().setUserChat(
+                      widget.otheruser.id,
+                      UserChat(
+                        id: "${widget.otheruser.id}$cid",
+                        chatId: "$cid${widget.otheruser.id}",
+                        recipientPhoto: currentuser.photoUrl!,
+                        pinned: false,
+                        recipientPhoneNo: currentuser.phoneNo,
+                        backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                      ));
+                  setState(() {
+                    chatid = "$cid${widget.otheruser.id}";
+                  });
+                }
+
+
+
+
+                if(!done){
+                  docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otherUserId).collection('userChats').doc("${widget.otherUserId}$cid").get();
+                  if(!docsnap.exists){
+                    final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                    await RemoteServices().setUserChat(widget.otherUserId,
+                        UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                    );
+                  }
+                }
+
+                RemoteServices().updateUserChat(
+                    widget.otherUserId,
+                    {
+                      'lastMessage': (temp
+                          .length >
+                          100
+                          ? temp.substring(0, 100)
+                          : temp),
+                      'lastMessageType': "text",
+                      'lastMessageTime': DateTime.now().toIso8601String()
+                    },
+                    "${widget.otherUserId}$cid");
+
 
 
                   for (int i = 0; i < widget.result.files.length; i++) {
@@ -82,8 +159,37 @@ class _PreviewPageState extends State<PreviewPage> {
                     await Future.value(uploadTask);
 
                     final docUrl=await ref.getDownloadURL();
+                    await ChatsRemoteServices().setChatMessage(
+                        chatid!,
+                        ChatMessage(
+                            id: "${DateTime.now().microsecondsSinceEpoch}",
+                            senderId: cid,
+                            text: docUrl,
+                            contentType: "document ${widget.result.files[i].name}",
+                            timestamp: DateTime.now()));
 
                   }
+                DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                    .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                if(!docsnap.exists){
+                  await RemoteServices().setUserChat(cid,
+                      UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                  );
+
+                }
+
+                RemoteServices().updateUserChat(
+                    cid,
+                    {
+                      'lastMessage': (widget.result.files[widget.result.files.length-1].name.length >
+                          100
+                          ?widget.result.files[widget.result.files.length-1].name.substring(0, 100)
+                          : temp),
+                      'lastMessageType': "text",
+                      'lastMessageTime': DateTime.now().toIso8601String()
+                    },
+                    "$cid${widget.otherUserId}");
+
 
                 Navigator.pop(context,true);
                 
