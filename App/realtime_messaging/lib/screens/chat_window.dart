@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
@@ -6,6 +7,7 @@ import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/preview_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/userChats.dart';
@@ -271,7 +273,66 @@ class _ChatWindowState extends State<ChatWindow> {
                         IconButton(
                           icon: Transform.rotate(angle: math.pi/7,
                           child: const Icon(Icons.attach_file)),
-                          onPressed: () {},
+                          onPressed: () {
+                            SimpleDialog alert = SimpleDialog(
+                              title: const Text("Choose an action"),
+                              children: [
+                                SimpleDialogOption(
+                                  onPressed: () async {
+                                    final files=await ChatsRemoteServices().pickDocument();
+                                    if(files!=null){
+                                       Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                                      PreviewPage(result: files)));
+
+                                    }
+
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.doc,
+                                        color: Colors.blue,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Send document",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                   // getImage(ImageSource.camera);
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.green,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Capture from camera",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                            showDialog(
+                              context: context,
+                              builder: (context) => alert,
+                              barrierDismissible: true,
+                            );
+                          },
                         ),
                         (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
                           iconSize: (24.0),
@@ -380,7 +441,9 @@ class _ChatWindowState extends State<ChatWindow> {
               ),
             ),
           ));
+
   }
+
 }
 
 // import 'package:flutter/material.dart';
@@ -571,6 +634,7 @@ class _ChatWindowState extends State<ChatWindow> {
 //           ],
 //         ),
 //       ),
+//       }
 //     );
 //   }
 // }
