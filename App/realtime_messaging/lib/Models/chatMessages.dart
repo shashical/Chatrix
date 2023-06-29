@@ -15,6 +15,10 @@ class ChatMessage {
   bool delivered;
   bool read;
   bool edited;
+  String? senderUrl;
+  String? receiverUrl;
+  bool uploaded;
+  bool downloaded;
 
   ChatMessage({
     required this.id,
@@ -28,6 +32,10 @@ class ChatMessage {
     this.delivered = false,
     this.read = false,
     this.edited = false,
+    this.senderUrl,
+    this.receiverUrl,
+    this.uploaded=false,
+    this.downloaded=false
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
@@ -43,6 +51,10 @@ class ChatMessage {
       delivered: json['delivered'] ?? false,
       read: json['read'] ?? false,
       edited: json['edited'] ?? false,
+      senderUrl:json['senderUrl'],
+      receiverUrl: json['receiverUrl'],
+      uploaded: json['uploaded'],
+      downloaded: json['downloaded'],
     );
   }
 
@@ -59,6 +71,10 @@ class ChatMessage {
       'delivered': delivered,
       'read': read,
       'edited': edited,
+      'senderUrl':senderUrl,
+      'receiverUrl':receiverUrl,
+      'uploaded':uploaded,
+      'downloaded':downloaded,
     };
   }
 }

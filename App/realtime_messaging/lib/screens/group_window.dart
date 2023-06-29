@@ -32,12 +32,12 @@ class MyBubble extends StatelessWidget {
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = delivered ? Icons.done_all : Icons.done;
     final radius = !isUser
-        ? BorderRadius.only(
+        ? const BorderRadius.only(
             topRight: Radius.circular(5.0),
             bottomLeft: Radius.circular(10.0),
             bottomRight: Radius.circular(5.0),
           )
-        : BorderRadius.only(
+        : const BorderRadius.only(
             topLeft: Radius.circular(5.0),
             bottomLeft: Radius.circular(5.0),
             bottomRight: Radius.circular(10.0),
@@ -232,7 +232,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         onChanged: (e){
                           if(messageController.text.isEmpty||messageController.text.length==1){
                             setState(() {
-
+                               // debugPrint('${messageController.text.length}');
                             });
                           }
                         },

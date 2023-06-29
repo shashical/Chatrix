@@ -12,6 +12,7 @@ import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/userChats.dart';
 import '../Services/chats_remote_services.dart';
+import'dart:io';
 
 class MyBubble extends StatelessWidget {
   const MyBubble(
@@ -273,64 +274,67 @@ class _ChatWindowState extends State<ChatWindow> {
                           icon: Transform.rotate(angle: math.pi/7,
                           child: const Icon(Icons.attach_file)),
                           onPressed: () {
-                          //   SimpleDialog alert = SimpleDialog(
-                          //     title: const Text("Choose an action"),
-                          //     children: [
-                          //       SimpleDialogOption(
-                          //         onPressed: () async {
-                          //           final files=await ChatsRemoteServices().pickDocument();
-                          //           if(files!=null){
-                          //              Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                          //             PreviewPage(result: files)));
-                          //
-                          //            }
-                          //
-                          //         },
-                          //         child: const Row(
-                          //           children: [
-                          //             Icon(
-                          //               CupertinoIcons.doc,
-                          //               color: Colors.blue,
-                          //             ),
-                          //             SizedBox(width: 8.0),
-                          //             Text(
-                          //               "Send document",
-                          //               style: TextStyle(
-                          //                 fontSize: 15,
-                          //                 fontWeight: FontWeight.w500,
-                          //               ),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //       SimpleDialogOption(
-                          //         onPressed: () {
-                          //          // getImage(ImageSource.camera);
-                          //         },
-                          //         child: const Row(
-                          //           children: [
-                          //             Icon(
-                          //               Icons.camera_alt,
-                          //               color: Colors.green,
-                          //             ),
-                          //             SizedBox(width: 8.0),
-                          //             Text(
-                          //               "Capture from camera",
-                          //               style: TextStyle(
-                          //                 fontSize: 15,
-                          //                 fontWeight: FontWeight.w500,
-                          //               ),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   );
-                          //   showDialog(
-                          //     context: context,
-                          //     builder: (context) => alert,
-                          //     barrierDismissible: true,
-                          //   );
+                            SimpleDialog alert = SimpleDialog(
+                              title: const Text("Choose an action"),
+                              children: [
+                                SimpleDialogOption(
+                                  onPressed: () async {
+                                    final files=await ChatsRemoteServices().pickDocument();
+                                    if(files!=null){
+                                      final result= Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                                      PreviewPage(result: files, chatid:chatid , otheruser: otheruser,)));
+                                      if(result==true){
+                                        ChatsRemoteServices().uploadDocument(File(files.paths[0]!),DateTime.fromMillisecondsSinceEpoch.toString());
+                                      }
+
+                                     }
+
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.doc,
+                                        color: Colors.blue,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Send document",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                   // getImage(ImageSource.camera);
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.green,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Capture from camera",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                            showDialog(
+                              context: context,
+                              builder: (context) => alert,
+                              barrierDismissible: true,
+                            );
                           },
                         ),
                         (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
