@@ -31,8 +31,8 @@ class _SearchWithinGroupState extends State<SearchWithinGroup> {
                 setState(() {
                  searchedindex=[];
                  for(int i=0;i<widget.ListContent.length;i++){
-                   if((widget.ListContent[i][0].contains(e))||(widget.ListContent[i][1].contains(e))){
-                     searchedindex.add(i);
+                   if((widget.ListContent[i][0].toLowerCase().contains(e))||(widget.ListContent[i][1].contains(e))){
+                     searchedindex.add(i+1);
                    }
                  }
 
@@ -67,25 +67,27 @@ class _SearchWithinGroupState extends State<SearchWithinGroup> {
                       borderRadius: BorderRadius.circular(20))),
             ),
           ),
-          ListView.builder(
-            itemCount: widget.ListItem.length,
-              itemBuilder: (context,index){
-                search=_searchController.text;
-                if(search.isEmpty){
-                  return widget.ListItem[index];
-                }
-                else{
-                  if(searchedindex.contains(index)){
+          Flexible(
+            child: ListView.builder(
+              itemCount: widget.ListItem.length,
+                itemBuilder: (context,index){
+                  search=_searchController.text;
+                  if(search.isEmpty){
                     return widget.ListItem[index];
                   }
                   else{
-                    return SizedBox(
-                      height: 0,width: 0,
-                    );
-                  }
+                    if(searchedindex.contains(index)){
+                      return widget.ListItem[index];
+                    }
+                    else{
+                      return SizedBox(
+                        height: 0,width: 0,
+                      );
+                    }
 
-                }
-              })
+                  }
+                }),
+          )
 
 
         ],
