@@ -5,7 +5,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   firebase_core
-  native_pdf_renderer
   permission_handler_windows
 )
 
