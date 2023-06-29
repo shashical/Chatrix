@@ -78,7 +78,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
           ListView(
             children: [
               const SizedBox(
-                height: 22,
+                height: 12,
               ),
               const Row(
                 children: [
@@ -90,131 +90,190 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                 ],
               ),
               const SizedBox(
-                height: 50,
+                height: 18,
               ),
-              Stack(children: [
-                ClipOval(
-                  child: Material(
-                    child: (photoUploading)
-                        ? const Center(
-                      child: SizedBox(
-                        height: 100,
-                        width: 100,
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(
-                              color: Colors.purple,
-                            ),
-                            Text('Uploading Image'),
-                          ],
+              Center(
+                child: Stack(children: [
+                  ClipOval(
+                    child: Material(
+                      child: (photoUploading)
+                          ? const Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(
+                                color: Colors.purple,
+                              ),
+                              Text('Uploading Image'),
+                            ],
+                          ),
                         ),
+                      )
+                          : Image(
+                        image: NetworkImage(currentUserGroup!.imageUrl),
+                        fit: BoxFit.cover,
+                        width: 200,
+                        height: 200,
                       ),
-                    )
-                        : Image(
-                      image: NetworkImage(currentUserGroup!.imageUrl),
-                      fit: BoxFit.cover,
-                      width: 200,
-                      height: 200,
                     ),
                   ),
-                ),
-                (currentGroup!.admins!.contains(cid))?Positioned(
-                  bottom: 0,
-                  right: 4,
-                  child: ClipOval(
-                    child: Container(
-                      padding: const EdgeInsets.all(7),
-                      color: Colors.white,
-                      child: ClipOval(
-                        child: Container(
-                          padding: const EdgeInsets.all(15),
-                          color: Colors.lightBlue,
-                          child: IconButton(
-                            onPressed: () {
-                              SimpleDialog alert = SimpleDialog(
-                                title: const Text("Choose an action"),
-                                children: [
-                                  SimpleDialogOption(
-                                    onPressed: () async {
-                                      await getImage(ImageSource.gallery);
-                                      if (_image != null) {
+                  (currentGroup!.admins!.contains(cid))?Positioned(
+                    bottom: 0,
+                    right: 4,
+                    child: ClipOval(
+                      child: Container(
+                        padding: const EdgeInsets.all(7),
+                        color: Colors.white,
+                        child: ClipOval(
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            color: Colors.lightBlue,
+                            child: IconButton(
+                              onPressed: () {
+                                SimpleDialog alert = SimpleDialog(
+                                  title: const Text("Choose an action"),
+                                  children: [
+                                    SimpleDialogOption(
+                                      onPressed: () async {
+                                        await getImage(ImageSource.gallery);
+                                        if (_image != null) {
+                                          try {
+                                            setState(() {
+                                              photoUploading = true;
+                                            });
+                                            String photoUrl =
+                                            await GroupsRemoteServices()
+                                                .uploadNewImage(
+                                                _image!, widget.groupId)
+                                                .catchError((e) =>
+                                            throw Exception(
+                                                '$e'));
+                                            GroupsRemoteServices().updateGroup(cid, {
+                                              "imageUrl": photoUrl
+                                            }).catchError(
+                                                    (e) => throw Exception('$e'));
+                                            setState(() {
+                                              currentUserGroup!.imageUrl =
+                                                  photoUrl;
+                                              photoUploading = false;
+                                            });
+                                          } on FirebaseException catch (e) {
+                                            setState(() {
+                                              photoUploading = false;
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(SnackBar(
+                                                  content:
+                                                  Text('${e.message}')));
+                                          } catch (e) {
+                                            setState(() {
+                                              photoUploading = false;
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(SnackBar(
+                                                  content: Text('$e')));
+                                          }
+                                        }
+                                      },
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            CupertinoIcons.photo,
+                                            color: Colors.blue,
+                                          ),
+                                          SizedBox(width: 8.0),
+                                          Text(
+                                            "Pick from gallery",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SimpleDialogOption(
+                                      onPressed: () async {
+                                        await getImage(ImageSource.camera);
+                                        if (_image != null) {
+                                          try {
+                                            setState(() {
+                                              photoUploading = true;
+                                            });
+                                            String photoUrl =
+                                            await GroupsRemoteServices()
+                                                .uploadNewImage(
+                                                _image!, widget.groupId)
+                                                .catchError((e) =>
+                                            throw Exception(
+                                                '$e'));
+                                            GroupsRemoteServices().updateGroup(cid, {
+                                              "imageUrl": photoUrl
+                                            }).catchError(
+                                                    (e) => throw Exception('$e'));
+                                            setState(() {
+                                              photoUploading = false;
+                                            });
+                                          } on FirebaseException catch (e) {
+                                            setState(() {
+                                              photoUploading = false;
+                                            });
+
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(SnackBar(
+                                                  content:
+                                                  Text('${e.message}')));
+                                          } catch (e) {
+                                            setState(() {
+                                              photoUploading = false;
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(SnackBar(
+                                                  content: Text('$e')));
+                                          }
+                                        }
+                                      },
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.green,
+                                          ),
+                                          SizedBox(width: 8.0),
+                                          Text(
+                                            "Capture from camera",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    (currentUserGroup!.imageUrl !=
+                                        "https://geodash.gov.bd/uploaded/people_group/default_group.png")
+                                        ? SimpleDialogOption(
+                                      onPressed: () async {
                                         try {
                                           setState(() {
                                             photoUploading = true;
                                           });
-                                          String photoUrl =
-                                          await GroupsRemoteServices()
-                                              .uploadNewImage(
-                                              _image!, widget.groupId)
-                                              .catchError((e) =>
-                                          throw Exception(
-                                              '$e'));
-                                          GroupsRemoteServices().updateGroup(cid, {
-                                            "imageUrl": photoUrl
-                                          }).catchError(
-                                                  (e) => throw Exception('$e'));
+
+                                         GroupsRemoteServices().updateGroup(
+                                              widget.groupId, {
+                                            "imageUrl":
+                                            "https://geodash.gov.bd/uploaded/people_group/default_group.png"
+                                          }).catchError((e) =>
+                                          throw Exception('$e'));
                                           setState(() {
                                             currentUserGroup!.imageUrl =
-                                                photoUrl;
-                                            photoUploading = false;
-                                          });
-                                        } on FirebaseException catch (e) {
-                                          setState(() {
-                                            photoUploading = false;
-                                          });
-                                          ScaffoldMessenger.of(context)
-                                            ..removeCurrentSnackBar()
-                                            ..showSnackBar(SnackBar(
-                                                content:
-                                                Text('${e.message}')));
-                                        } catch (e) {
-                                          setState(() {
-                                            photoUploading = false;
-                                          });
-                                          ScaffoldMessenger.of(context)
-                                            ..removeCurrentSnackBar()
-                                            ..showSnackBar(SnackBar(
-                                                content: Text('$e')));
-                                        }
-                                      }
-                                    },
-                                    child: const Row(
-                                      children: [
-                                        Icon(
-                                          CupertinoIcons.photo,
-                                          color: Colors.blue,
-                                        ),
-                                        SizedBox(width: 8.0),
-                                        Text(
-                                          "Pick from gallery",
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SimpleDialogOption(
-                                    onPressed: () async {
-                                      await getImage(ImageSource.camera);
-                                      if (_image != null) {
-                                        try {
-                                          setState(() {
-                                            photoUploading = true;
-                                          });
-                                          String photoUrl =
-                                          await GroupsRemoteServices()
-                                              .uploadNewImage(
-                                              _image!, widget.groupId)
-                                              .catchError((e) =>
-                                          throw Exception(
-                                              '$e'));
-                                          GroupsRemoteServices().updateGroup(cid, {
-                                            "imageUrl": photoUrl
-                                          }).catchError(
-                                                  (e) => throw Exception('$e'));
-                                          setState(() {
+                                            "https://geodash.gov.bd/uploaded/people_group/default_group.png";
                                             photoUploading = false;
                                           });
                                         } on FirebaseException catch (e) {
@@ -225,8 +284,8 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                           ScaffoldMessenger.of(context)
                                             ..removeCurrentSnackBar()
                                             ..showSnackBar(SnackBar(
-                                                content:
-                                                Text('${e.message}')));
+                                                content: Text(
+                                                    '${e.message}')));
                                         } catch (e) {
                                           setState(() {
                                             photoUploading = false;
@@ -236,113 +295,60 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                             ..showSnackBar(SnackBar(
                                                 content: Text('$e')));
                                         }
-                                      }
-                                    },
-                                    child: const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.green,
-                                        ),
-                                        SizedBox(width: 8.0),
-                                        Text(
-                                          "Capture from camera",
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
+                                        },
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.delete,
+                                            color: Colors.green,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  (currentUserGroup!.imageUrl !=
-                                      "https://geodash.gov.bd/uploaded/people_group/default_group.png")
-                                      ? SimpleDialogOption(
-                                    onPressed: () async {
-                                      try {
-                                        setState(() {
-                                          photoUploading = true;
-                                        });
-
-                                       GroupsRemoteServices().updateGroup(
-                                            widget.groupId, {
-                                          "imageUrl":
-                                          "https://geodash.gov.bd/uploaded/people_group/default_group.png"
-                                        }).catchError((e) =>
-                                        throw Exception('$e'));
-                                        setState(() {
-                                          currentUserGroup!.imageUrl =
-                                          "https://geodash.gov.bd/uploaded/people_group/default_group.png";
-                                          photoUploading = false;
-                                        });
-                                      } on FirebaseException catch (e) {
-                                        setState(() {
-                                          photoUploading = false;
-                                        });
-
-                                        ScaffoldMessenger.of(context)
-                                          ..removeCurrentSnackBar()
-                                          ..showSnackBar(SnackBar(
-                                              content: Text(
-                                                  '${e.message}')));
-                                      } catch (e) {
-                                        setState(() {
-                                          photoUploading = false;
-                                        });
-                                        ScaffoldMessenger.of(context)
-                                          ..removeCurrentSnackBar()
-                                          ..showSnackBar(SnackBar(
-                                              content: Text('$e')));
-                                      }
-                                      },
-                                    child: const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.delete,
-                                          color: Colors.green,
-                                        ),
-                                        SizedBox(width: 8.0),
-                                        Text(
-                                          "Remove profile image",
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight:
-                                            FontWeight.w500,
+                                          SizedBox(width: 8.0),
+                                          Text(
+                                            "Remove profile image",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight:
+                                              FontWeight.w500,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                    )
+                                        : const SizedBox(
+                                      height: 0,
+                                      width: 0,
                                     ),
-                                  )
-                                      : const SizedBox(
-                                    height: 0,
-                                    width: 0,
-                                  ),
-                                ],
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (context) => alert,
-                                barrierDismissible: true,
-                              );
-                            },
-                            icon: const Icon(Icons.edit),
+                                  ],
+                                );
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => alert,
+                                  barrierDismissible: true,
+                                );
+                              },
+                              icon: const Icon(Icons.edit),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ):const SizedBox(),
-              ]),
+                  ):const SizedBox(),
+                ]),
+              ),
               const SizedBox(
                 height: 10,
               ),
-              Text((currentUserGroup!.name),
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-              ),),
-              Text('Members: ${currentGroup!.participantIds.length}',
-              style:const TextStyle(fontSize: 16,color: Colors.grey)),
+              Center(
+                child: Text((currentUserGroup!.name),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                ),),
+              ),
+              Center(
+                child: Text('Members: ${currentGroup!.participantIds.length}',
+                style:const TextStyle(fontSize: 16,color: Colors.grey)),
+              ),
               Container(
                 color: Colors.grey[100],
                 height: 20,
@@ -354,10 +360,11 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               ),
               SizedBox(
                 width: double.infinity,
-                child: Text('Created by ${currentGroup!.createdBy},${currentGroup!.creationTimestamp.day}/${currentGroup!.creationTimestamp.month}/${currentGroup!.creationTimestamp.year}',
+                child: Text('   Created by ${currentGroup!.createdBy},${currentGroup!.creationTimestamp.day}/${currentGroup!.creationTimestamp.month}/${currentGroup!.creationTimestamp.year}',
                   style: const TextStyle(fontSize: 16,color: Colors.grey),
                 ),
               ),
+              const SizedBox(height: 10,),
               Container(
                 color: Colors.grey[100],
                 height: 20,
@@ -392,7 +399,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                       children: [
                         Row(
                           children: [
-                            Text(currentGroup!.participantIds.length as String,
+                            Text('${currentGroup!.participantIds.length}',
                               style: const TextStyle(color: Colors.grey,fontSize: 15),),
                             const Spacer(),
                             IconButton(onPressed: (){
@@ -420,9 +427,9 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
 
 
 List<List<String>>convertToList(List<String> adminsids,List<String>participantIds,List<String> usersIds,List<Users> users,BuildContext context){
-  List<List<String>> returnableList=[[]];
-  List<List<String>> aux=[[]];
-  List<List<String>> extraAux=[[]];
+  List<List<String>> returnableList=[];
+  List<List<String>> aux=[];
+  List<List<String>> extraAux=[];
   for(int i=0;i<adminsids.length;i++){
     int  pl=usersIds.indexOf(adminsids[i]);
     int   kl=savedNumber.indexOf(users[pl].phoneNo);
@@ -434,8 +441,8 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
     }
 
   }
-  List<List<String>> pAux=[[]];
-  List<List<String>> epAux=[[]];
+  List<List<String>> pAux=[];
+  List<List<String>> epAux=[];
   for(int j=0;j<participantIds.length;j++){
     if(!adminsids.contains(participantIds[j])&& participantIds[j]!=cid){
       int pl=usersIds.indexOf(participantIds[j]);
@@ -449,10 +456,26 @@ List<List<String>>convertToList(List<String> adminsids,List<String>participantId
 
     }
   }
-  aux.sort();
-  extraAux.sort();
-  pAux.sort();
-  epAux.sort();
+  if(aux.length>=2) {
+    aux.sort((a, b) {
+   return a[0].compareTo(b[0]);
+  });
+  }
+  if(extraAux.length>=2) {
+    extraAux.sort((a, b) {
+    return a[0].compareTo(b[0]);
+  });
+  }
+  if(pAux.length>=2) {
+    pAux.sort((a, b) {
+    return a[0].compareTo(b[0]);
+  });
+  }
+  if(epAux.length>=2) {
+    epAux.sort((a, b) {
+    return a[0].compareTo(b[0]);
+  });
+  }
   participant=showableWidget(context, aux, extraAux, pAux, epAux,usersIds,users,adminsids);
   returnableList.addAll(aux);
   returnableList.addAll(extraAux);
@@ -517,8 +540,11 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
         },
       ),
       trailing: Container(
-        color: Colors.lightBlue,
-        child: const Text('Admin', style: TextStyle(color: Colors.green),),
+        color: Colors.deepOrange,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: const Text(' Admin ', style: TextStyle(color: Colors.white70),),
+        ),
       ),
       title: Text(aux[i][0]),
       subtitle: Text(

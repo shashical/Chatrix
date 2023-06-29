@@ -1,10 +1,12 @@
-import 'package:realtime_messaging/Models/userchats.dart';
+
+import 'package:file_picker/file_picker.dart';
 
 import '../Models/chatMessages.dart';
 import '../Models/chats.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'dart:io';
 class ChatsRemoteServices {
   final reference = FirebaseFirestore.instance;
 
@@ -94,7 +96,35 @@ class ChatsRemoteServices {
                         throw Exception("$e");
                       }
   }
+ firebase_storage.UploadTask createUploadTask(File doc,String name){
+   firebase_storage.Reference ref =
+   firebase_storage.FirebaseStorage.instance.ref('/documents/$name');
+   firebase_storage.UploadTask uploadTask = ref.putFile(doc.absolute);
+   return uploadTask;
+ }
 
+  Future<String> uploadDocument(File doc,String name) async {
+    try {
+      firebase_storage.Reference ref =
+      firebase_storage.FirebaseStorage.instance.ref('/documents/${name}');
+     final uploadTask=createUploadTask(doc,name);
+      await Future.value(uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    } catch (e) {
+      rethrow;
+    }
+  }
+  Future<FilePickerResult?> pickDocument() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null) {
+
+      return result;
+    } else {
+      return null;
+    }
+  }
   // Future<bool>checkChat(String chatId)async{
   //   final DocumentSnapshot docSnap =
   //       await reference.collection('chats').doc(chatId).get();
