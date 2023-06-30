@@ -21,6 +21,92 @@ import '../Models/userChats.dart';
 import '../Services/chats_remote_services.dart';
 import'dart:io';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+class DocBuble extends StatefulWidget {
+  const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded}) : super(key: key);
+  final String message, time,senderUrl,id,chatId,receiverUrl;
+  final bool isUser, delivered, read,isSelected,uploaded,downloaded;
+
+  @override
+  State<DocBuble> createState() => _DocBubleState();
+}
+
+class _DocBubleState extends State<DocBuble> {
+  late Color bg; // =widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Colors.white : Colors.greenAccent.shade100;
+  late CrossAxisAlignment align;
+  late IconData icon;
+  late BorderRadius radius;
+  late bool uploaded;
+  late bool downloaded;
+  UploadTask? _uploadTask;
+  DownloadTask? _downloadTask;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    uploaded = widget.uploaded;
+    downloaded=widget.downloaded;
+    bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
+        ? Colors.white
+        : Colors.greenAccent.shade100;
+    align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    icon = widget.delivered ? Icons.done_all : Icons.done;
+    radius = widget.isUser ? const BorderRadius.only(
+      topRight: Radius.circular(5.0),
+      bottomLeft: Radius.circular(10.0),
+      bottomRight: Radius.circular(5.0),
+    )
+        : const BorderRadius.only(
+      topLeft: Radius.circular(5.0),
+      bottomLeft: Radius.circular(5.0),
+      bottomRight: Radius.circular(10.0),
+    );
+  }
+
+  Future<String> uploadDocument(File doc) async {
+    try {
+      firebase_storage.Reference ref =
+      firebase_storage.FirebaseStorage.instance.ref(
+          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
+      _uploadTask = ref.putFile(doc);
+      await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> downloadImage(String imageUrl) async {
+    try {
+      // Create a Firebase Storage reference
+      final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
+          imageUrl);
+
+      // Download the image to temporary device storage
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/${DateTime
+          .fromMicrosecondsSinceEpoch}.jpg';
+
+      _downloadTask = ref.writeToFile(File(tempPath));
+
+      await Future.value(_downloadTask).catchError((e) =>
+      throw Exception('$e'));
+      return tempPath;
+    } catch (e) {
+      rethrow;
+    }
+
+  }
+  bool downloading = false;
+  bool isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
 class ImageBubble extends StatefulWidget {
   const ImageBubble({Key? key,
     required this.message,
@@ -75,7 +161,7 @@ class _ImageBubbleState extends State<ImageBubble> {
     try {
       firebase_storage.Reference ref =
       firebase_storage.FirebaseStorage.instance.ref(
-          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
+          '/chatdoc/${DateTime.fromMicrosecondsSinceEpoch}');
       _uploadTask = ref.putFile(doc);
       await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
 
@@ -581,21 +667,21 @@ class _ChatWindowState extends State<ChatWindow> {
                               if (!chatmessage.deletedForMe.containsKey(cid)  && chatmessage.deletedForEveryone == false) {
                                 debugPrint('${chatmessage.deletedForMe}');
                                 return GestureDetector(
-                                  child:(chatmessage.contentType=='text')? MyBubble(
+                                  child: MyBubble(
                                     message: chatmessage.text,
                                     time:
                                         ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
                                     delivered: chatmessage.delivered,
                                     isUser: (chatmessage.senderId == cid),
-                                    read: chatmessage.read, isSelected: isSelected[index],):
-                                  (chatmessage) != null?(chatmessage.contentType=='image')?
-                                  ImageBubble(message: chatmessage.text,
-                                      time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                      isUser: cid==chatmessage.senderId,
-                                      delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
-                                      uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
-                                      senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
-                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
+                                    read: chatmessage.read, isSelected: isSelected[index],),
+                                  // (chatmessage) != null?(chatmessage.contentType=='image')?
+                                  // ImageBubble(message: chatmessage.text,
+                                  //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                  //     isUser: cid==chatmessage.senderId,
+                                  //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
+                                  //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
+                                  //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
+                                  //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
                                   onTap: () {
 
                                     if (trueCount != 0) {
