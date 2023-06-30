@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +11,13 @@ import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 import '../Widgets/BottomWaveClipper.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:encrypt/encrypt_io.dart';
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:pointycastle/export.dart' as pointy;
+import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class VerifyOtpPage extends StatefulWidget {
   final String phoneNo;
@@ -286,7 +295,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           controller: _controller,
                           seconds: 30,
                           build: (_, double time) => Text(
-                            time.toString().substring(0,2),
+                            time.toString().substring(0, 2),
                             style: TextStyle(
                               fontSize: 35,
                             ),
@@ -425,13 +434,66 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
                                 final id =
                                     FirebaseAuth.instance.currentUser!.uid;
-                                RemoteServices().setUsers(Users(
-                                  id: id,
-                                  name: '',
-                                  phoneNo: "+91${widget.phoneNo}",
-                                  about: '',
-                                  isOnline: true,
-                                ));
+
+                                DocumentSnapshot docSnap =
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(id)
+                                        .get();
+                                if (!docSnap.exists) {
+
+                                  pointy.RSAKeyGeneratorParameters keyParams =
+                                      pointy.RSAKeyGeneratorParameters(
+                                          BigInt.parse('65537'), 2048, 64);
+                                  pointy.FortunaRandom secureRandom = pointy.FortunaRandom();
+                                  Random random = Random.secure();
+                                  pointy.RSAKeyGenerator keyGenerator = pointy.RSAKeyGenerator()
+                                    ..init(pointy.ParametersWithRandom(
+                                        keyParams, secureRandom));
+                                  pointy.AsymmetricKeyPair<pointy.PublicKey, pointy.PrivateKey> keyPair =
+                                      keyGenerator.generateKeyPair();
+
+                                  RSAPublicKey publicKey =
+                                      keyPair.publicKey as RSAPublicKey;
+                                  RSAPrivateKey privateKey =
+                                      keyPair.privateKey as RSAPrivateKey;
+
+                                  String publicKeyString = rsa.RsaKeyHelper()
+                                      .encodePublicKeyToPemPKCS1(publicKey);
+                                  String privateKeyString = rsa.RsaKeyHelper().encodePrivateKeyToPemPKCS1(privateKey);
+                                  // final mypublickey = rsa.RsaKeyHelper()
+                                  //     .parsePublicKeyFromPem(publicKeyString);
+
+                                  FlutterSecureStorage storage = FlutterSecureStorage();
+
+                                  await storage.write(key: '$id', value: privateKeyString);
+
+                                  Users user = Users(
+                                      id: id,
+                                      phoneNo: "+91${widget.phoneNo}",
+                                      publicKey: publicKeyString,
+                                      name: '');
+                                  try {
+                                    FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(user.id)
+                                        .set(user.toJson())
+                                        .catchError(
+                                            (e) => throw Exception('$e'));
+                                  } on FirebaseException catch (e) {
+                                    throw Exception('$e');
+                                  } catch (e) {
+                                    rethrow;
+                                  }
+                                }
+
+                                // RemoteServices().setUsers(Users(
+                                //   id: id,
+                                //   name: '',
+                                //   phoneNo: "+91${widget.phoneNo}",
+                                //   about: '',
+                                //   isOnline: true,
+                                // ));
 
                                 Navigator.pushReplacement(
                                     context,

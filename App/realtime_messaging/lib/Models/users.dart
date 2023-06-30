@@ -14,6 +14,7 @@ class Users {
   bool isOnlineVisibility;
   bool lastOnlineVisibility;
   List<String>? blockedBy;
+  String publicKey;
 
   Users({
     required this.id,
@@ -26,6 +27,7 @@ class Users {
     this.isOnlineVisibility = true,
     this.lastOnlineVisibility = true,
     this.blockedBy = const [],
+    required this.publicKey,
   });
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
@@ -39,6 +41,7 @@ class Users {
         isOnlineVisibility: json["isOnlineVisibility"],
         lastOnlineVisibility: json["lastOnlineVisibility"],
         blockedBy: List<String>.from(json['blockedBy'] ?? []),
+        publicKey: json['publicKey']
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,5 +55,6 @@ class Users {
         "isOnlineVisibility": isOnlineVisibility,
         "lastOnlineVisibility": lastOnlineVisibility,
         "blockedBy": blockedBy,
+        "publicKey": publicKey
       };
 }

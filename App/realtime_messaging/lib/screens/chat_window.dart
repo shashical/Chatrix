@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +21,9 @@ import 'dart:math'as math;
 import '../Models/userChats.dart';
 import '../Services/chats_remote_services.dart';
 import'dart:io';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 class DocBuble extends StatefulWidget {
   const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded}) : super(key: key);
@@ -161,7 +165,7 @@ class _ImageBubbleState extends State<ImageBubble> {
     try {
       firebase_storage.Reference ref =
       firebase_storage.FirebaseStorage.instance.ref(
-          '/chatdoc/${DateTime.fromMicrosecondsSinceEpoch}');
+          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
       _uploadTask = ref.putFile(doc);
       await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
 
@@ -659,30 +663,34 @@ class _ChatWindowState extends State<ChatWindow> {
                           //   },
                           // );
 
-                            Widget listBuilder=ListView.builder(
+                          Widget listBuilder=ListView.builder(
                             controller: scrollController,
                             itemCount: chatmessages.length,
                             itemBuilder: (context, index) {
                               final ChatMessage chatmessage = chatmessages[index];
-                              if (!chatmessage.deletedForMe.containsKey(cid)  && chatmessage.deletedForEveryone == false) {
-                                debugPrint('${chatmessage.deletedForMe}');
+                              if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                                String? symmKeyString;
+                                return FutureBuilder(
+                                  future: FlutterSecureStorage().read(key: chatid!),
+                                  builder: (context, snapshot) {
+                                    if(snapshot.hasData){
+                                      symmKeyString = snapshot.data;
+                                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                      encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
+                                      String message = encrypter.decrypt(encryptedMessage);
+
                                 return GestureDetector(
-                                  child: MyBubble(
-                                    message: chatmessage.text,
+                                  child:MyBubble(
+                                    message: message,
                                     time:
                                         ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
                                     delivered: chatmessage.delivered,
                                     isUser: (chatmessage.senderId == cid),
-                                    read: chatmessage.read, isSelected: isSelected[index],),
-                                  // (chatmessage) != null?(chatmessage.contentType=='image')?
-                                  // ImageBubble(message: chatmessage.text,
-                                  //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                  //     isUser: cid==chatmessage.senderId,
-                                  //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
-                                  //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
-                                  //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
-                                  //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
-                                  onTap: () {
+                                    read: chatmessage.read,
+                                    isSelected: isSelected[index],
+                                    ),
+                                    onTap: () {
 
                                     if (trueCount != 0) {
                                       setState(() {
@@ -721,7 +729,22 @@ class _ChatWindowState extends State<ChatWindow> {
                                       }
                                     }
                                     });
+                                  },);
+
+                                    }
+                                    else{
+                                      throw Exception("symmKey not found.");
+                                    }
                                   },
+                                  // (chatmessage) != null?(chatmessage.contentType=='image')?
+                                  // ImageBubble(message: chatmessage.text,
+                                  //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                  //     isUser: cid==chatmessage.senderId,
+                                  //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
+                                  //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
+                                  //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
+                                  //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
+
                                 );
                               } else {
                                 return const SizedBox(
@@ -730,6 +753,27 @@ class _ChatWindowState extends State<ChatWindow> {
                               }
                             },
                           );
+
+                          //   Widget listBuilder=ListView.builder(
+                          //   controller: scrollController,
+                          //   itemCount: chatmessages.length,
+                          //   itemBuilder: (context, index) {
+                          //     final ChatMessage chatmessage = chatmessages[index];
+                          //     if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                          //       return MyBubble(
+                          //           message: chatmessage.text,
+                          //           time:
+                          //               ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                          //           delivered: chatmessage.delivered,
+                          //           isUser: (chatmessage.senderId == cid),
+                          //           read: chatmessage.read);
+                          //     } else {
+                          //       return const SizedBox(
+                          //         height: 0,
+                          //       );
+                          //     }
+                          //   },
+                          // );
                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                              scrollController.animateTo(
                              scrollController.position.maxScrollExtent + 60,
@@ -802,12 +846,45 @@ class _ChatWindowState extends State<ChatWindow> {
                                           id: "$cid${otheruser.id}",
                                           participantIds: [cid, otheruser.id],
                                         ));
+                                        await RemoteServices().setUserChat(
+                                  cid,
+                                  UserChat(
+                                      id: "$cid${widget.otherUserId}",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: otheruser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: otheruser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      ));
+                              encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                              String symmKeyString = symmKey.base64;
+                              RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                              encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                              encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                              String encrytedSymmKeyString = encryptedSymmKey.base64;
+                              final Users currentuser =
+                                  (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(
+                                  otheruser.id,
+                                  UserChat(
+                                      id: "${widget.otherUserId}$cid",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: currentuser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: currentuser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      containsSymmKey: encrytedSymmKeyString,
+                                      ));
+                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                        setState(() {
+                                        chatid = "$cid${otheruser.id}";
+                                      });
                                       }
                                       await RemoteServices().setUserChat(
                                           cid,
                                           UserChat(
                                             id: "$cid${otheruser.id}",
-                                            chatId: "$cid${otheruser.id}",
+                                            chatId: chatid!,
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
@@ -819,15 +896,12 @@ class _ChatWindowState extends State<ChatWindow> {
                                          otheruser.id,
                                           UserChat(
                                             id: "${otheruser.id}$cid",
-                                            chatId: "$cid${otheruser.id}",
+                                            chatId: chatid!,
                                             recipientPhoto: currentuser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo: currentuser.phoneNo,
                                             backgroundImage: "assets/backgroundimage.png",
                                           ));
-                                      setState(() {
-                                        chatid = "$cid${otheruser.id}";
-                                      });
 
 
 
@@ -929,12 +1003,45 @@ class _ChatWindowState extends State<ChatWindow> {
                                           id: "$cid${otheruser.id}",
                                           participantIds: [cid, otheruser.id],
                                         ));
+                                        await RemoteServices().setUserChat(
+                                  cid,
+                                  UserChat(
+                                      id: "$cid${widget.otherUserId}",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: otheruser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: otheruser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      ));
+                              encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                              String symmKeyString = symmKey.base64;
+                              RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                              encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                              encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                              String encrytedSymmKeyString = encryptedSymmKey.base64;
+                              final Users currentuser =
+                                  (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(
+                                  otheruser.id,
+                                  UserChat(
+                                      id: "${widget.otherUserId}$cid",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: currentuser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: currentuser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      containsSymmKey: encrytedSymmKeyString,
+                                      ));
+                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                        setState(() {
+                                    chatid = "$cid${otheruser.id}";
+                                    });
                                       }
                                       await RemoteServices().setUserChat(
                                           cid,
                                           UserChat(
                                             id: "$cid${otheruser.id}",
-                                            chatId: "$cid${otheruser.id}",
+                                            chatId: chatid!,
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
@@ -946,15 +1053,13 @@ class _ChatWindowState extends State<ChatWindow> {
                                     otheruser.id,
                                     UserChat(
                                     id: "${otheruser.id}$cid",
-                                    chatId: "$cid${otheruser.id}",
+                                    chatId: chatid!,
                                     recipientPhoto: currentuser.photoUrl!,
                                     pinned: false,
                                     recipientPhoneNo: currentuser.phoneNo,
                                     backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
                                     ));
-                                    setState(() {
-                                    chatid = "$cid${otheruser.id}";
-                                    });
+
 
 
 
@@ -1051,12 +1156,45 @@ class _ChatWindowState extends State<ChatWindow> {
                                           id: "$cid${otheruser.id}",
                                           participantIds: [cid, otheruser.id],
                                         ));
+                                        await RemoteServices().setUserChat(
+                                  cid,
+                                  UserChat(
+                                      id: "$cid${widget.otherUserId}",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: otheruser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: otheruser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      ));
+                              encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                              String symmKeyString = symmKey.base64;
+                              RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                              encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                              encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                              String encrytedSymmKeyString = encryptedSymmKey.base64;
+                              final Users currentuser =
+                                  (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(
+                                  otheruser.id,
+                                  UserChat(
+                                      id: "${widget.otherUserId}$cid",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: currentuser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: currentuser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      containsSymmKey: encrytedSymmKeyString,
+                                      ));
+                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                        setState(() {
+                                        chatid = "$cid${otheruser.id}";
+                                      });
                                       }
                                       await RemoteServices().setUserChat(
                                           cid,
                                           UserChat(
                                             id: "$cid${otheruser.id}",
-                                            chatId: "$cid${otheruser.id}",
+                                            chatId: chatid!,
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
@@ -1068,15 +1206,13 @@ class _ChatWindowState extends State<ChatWindow> {
                                           otheruser.id,
                                           UserChat(
                                             id: "${otheruser.id}$cid",
-                                            chatId: "$cid${otheruser.id}",
+                                            chatId: chatid!,
                                             recipientPhoto: currentuser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo: currentuser.phoneNo,
                                             backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
                                           ));
-                                      setState(() {
-                                        chatid = "$cid${otheruser.id}";
-                                      });
+
 
 
 
@@ -1185,38 +1321,51 @@ class _ChatWindowState extends State<ChatWindow> {
                                 id: "$cid${widget.otherUserId}",
                                 participantIds: [cid, widget.otherUserId],
                               ));
-                              // await RemoteServices().setUserChat(
-                              //     cid,
-                              //     UserChat(
-                              //         id: "$cid${widget.otherUserId}",
-                              //         chatId: "$cid${widget.otherUserId}",
-                              //         recipientPhoto: otheruser.photoUrl!,
-                              //         pinned: false,
-                              //         recipientPhoneNo: otheruser.phoneNo,
-                              //         backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
-                              //         ));
-                              // final Users currentuser =
-                              //     (await RemoteServices().getSingleUser(cid))!;
-                              // await RemoteServices().setUserChat(
-                              //     otheruser.id,
-                              //     UserChat(
-                              //         id: "${widget.otherUserId}$cid",
-                              //         chatId: "$cid${widget.otherUserId}",
-                              //         recipientPhoto: currentuser.photoUrl!,
-                              //         pinned: false,
-                              //         recipientPhoneNo: currentuser.phoneNo,
-                              //         backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
-                              //         ));
+                              await RemoteServices().setUserChat(
+                                  cid,
+                                  UserChat(
+                                      id: "$cid${widget.otherUserId}",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: otheruser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: otheruser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      ));
+                              encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                              String symmKeyString = symmKey.base64;
+                              RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                              encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                              encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                              String encrytedSymmKeyString = encryptedSymmKey.base64;
+                              final Users currentuser =
+                                  (await RemoteServices().getSingleUser(cid))!;
+                              await RemoteServices().setUserChat(
+                                  otheruser.id,
+                                  UserChat(
+                                      id: "${widget.otherUserId}$cid",
+                                      chatId: "$cid${widget.otherUserId}",
+                                      recipientPhoto: currentuser.photoUrl!,
+                                      pinned: false,
+                                      recipientPhoneNo: currentuser.phoneNo,
+                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      containsSymmKey: encrytedSymmKeyString,
+                                      ));
+                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
                               });
                             }
+                            String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
+                            encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                            encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                            encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp);
+                            String encryptedMessageString = encryptedMessage.base64;
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
                                 ChatMessage(
                                     id: "${DateTime.now().microsecondsSinceEpoch}",
                                     senderId: cid,
-                                    text: temp,
+                                    text: encryptedMessageString,
                                     contentType: "text",
                                     timestamp: DateTime.now()));
                             
@@ -1231,11 +1380,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             RemoteServices().updateUserChat(
                                 cid,
                                 {
-                                  'lastMessage': (temp
-                                              .length >
-                                          100
-                                      ? temp.substring(0, 100)
-                                      : temp),
+                                  'lastMessage': encryptedMessageString,
                                   'lastMessageType': "text",
                                   'lastMessageTime': DateTime.now().toIso8601String()
                                 },
@@ -1253,11 +1398,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             RemoteServices().updateUserChat(
                                 widget.otherUserId,
                                 {
-                                  'lastMessage': (temp
-                                              .length >
-                                          100
-                                      ? temp.substring(0, 100)
-                                      : temp),
+                                  'lastMessage': encryptedMessageString,
                                   'lastMessageType': "text",
                                   'lastMessageTime': DateTime.now().toIso8601String()
                                 },
@@ -1279,197 +1420,4 @@ class _ChatWindowState extends State<ChatWindow> {
   }
 
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:realtime_messaging/Models/chats.dart';
-
-// class MyBubble extends StatelessWidget {
-//   MyBubble(
-//       {required this.message, required this.time, required this.delivered,required this.isUser,required this.read});
-
-//   final String message, time;
-//   final bool isUser,delivered,read;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final bg = !isUser ? Colors.white : Colors.greenAccent.shade100;
-//     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-//     final icon = delivered ? Icons.done_all : Icons.done;
-//     final radius = !isUser
-//         ? BorderRadius.only(
-//             topRight: Radius.circular(5.0),
-//             bottomLeft: Radius.circular(10.0),
-//             bottomRight: Radius.circular(5.0),
-//           )
-//         : BorderRadius.only(
-//             topLeft: Radius.circular(5.0),
-//             bottomLeft: Radius.circular(5.0),
-//             bottomRight: Radius.circular(10.0),
-//           );
-//     return Column(
-//       crossAxisAlignment: align,
-//       children: [
-//         Container(
-//           constraints:
-//               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-//           margin: const EdgeInsets.all(3.0),
-//           padding: const EdgeInsets.all(8.0),
-//           decoration: BoxDecoration(
-//             boxShadow: [
-//               BoxShadow(
-//                   blurRadius: .5,
-//                   spreadRadius: 1.0,
-//                   color: Colors.black.withOpacity(.12))
-//             ],
-//             color: bg,
-//             borderRadius: radius,
-//           ),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.end,
-//             children: [
-//               Text(message, style: TextStyle(fontSize: 17)),
-//               SizedBox(
-//                 height: 1,
-//               ),
-//               ConstrainedBox(
-//                 constraints: BoxConstraints(maxWidth: 55.0),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.end,
-//                   children: [
-//                     Text(
-//                       "12:00",
-//                       style: TextStyle(fontSize: 13),
-//                     ),
-//                     SizedBox(
-//                       width: 5,
-//                     ),
-//                     Icon(
-//                       Icons.done_all,
-//                       size: 16,
-//                     )
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-// class ChatWindow extends StatefulWidget {
-//   final String backgroundImage;
-//   final String? chatId;
-
-//   const ChatWindow({
-//     this.backgroundImage = "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
-//     this.chatId,
-//     Key? key,
-//   }) : super(key: key);
-
-//   @override
-//   State<ChatWindow> createState() => _ChatWindowState();
-// }
-
-// class _ChatWindowState extends State<ChatWindow> {
-//   List<String> messages = [
-//     "Hello!",
-//     "Hi! How are you?",
-//     "I'm good. Thanks!",
-//     "That's great! I hope we can meet up soon and catch up on everything.",
-//   ];
-
-//   TextEditingController messageController = TextEditingController();
-//   ScrollController scrollController = ScrollController();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         elevation: .9,
-//         title: Text('Friend'),
-//         actions: <Widget>[
-//           IconButton(
-//             icon: Icon(Icons.more_vert),
-//             onPressed: () {},
-//           )
-//         ],
-//       ),
-//       body: Container(
-//         decoration: BoxDecoration(
-//           image: DecorationImage(
-//             image: NetworkImage(widget.backgroundImage),
-//             fit: BoxFit.cover,
-//           ),
-//         ),
-//         child: Column(
-//           children: [
-//             Expanded(
-//               child: ListView.builder(
-//                 controller: scrollController,
-//                 padding: EdgeInsets.all(16.0),
-//                 itemCount: messages.length,
-//                 itemBuilder: (BuildContext context, int index) {
-//                   return MyBubble(
-//                     message: messages[index],
-//                     time: "12:00",
-//                     delivered: true,
-//                     isUser: index % 2 == 0,
-//                   );
-//                 },
-//               ),
-//             ),
-//                 Container(
-//                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.95),
-//                   margin: EdgeInsets.all(8.0),
-//                   padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(24.0),
-//                   ),
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 16.0),
-//                           child: TextField(
-//                             style: TextStyle(fontSize: 19),
-//                             maxLines: null,
-//                             controller: messageController,
-//                             decoration: InputDecoration(
-//                               hintText: "Type here...",
-//                               border: InputBorder.none,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       IconButton(
-//                         icon: Icon(Icons.attach_file),
-//                         onPressed: () {},
-//                       ),
-//                       IconButton(
-//                         onPressed: () {
-//                           setState(() {
-//                             messages.add(messageController.text);
-//                           });
-//                           messageController.clear();
-//                           scrollController.animateTo(
-//                             scrollController.position.maxScrollExtent+50,
-//                             duration: Duration(milliseconds: 300),
-//                             curve: Curves.easeOut,
-//                           );
-//                         },
-//                         icon: Icon(Icons.send_rounded, color: Colors.blue),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//           ],
-//         ),
-//       ),
-//       }
-//     );
-//   }
-// }
 
