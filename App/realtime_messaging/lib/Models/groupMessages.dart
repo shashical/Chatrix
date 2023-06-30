@@ -18,6 +18,10 @@ class GroupMessage {
   Map<String, bool> deliveredTo;
   Map<String, bool> readBy;
   bool edited;
+  String? senderUrl;
+  bool isUploaded;
+  Map<String,bool>? downloaded;
+  Map<String,String>? receiverUrls;
 
   GroupMessage({
     required this.id,
@@ -34,6 +38,11 @@ class GroupMessage {
     this.deliveredTo = const {},
     this.readBy = const {},
     this.edited = false,
+    this.senderUrl,
+    this.isUploaded=false,
+    this.downloaded,
+    this.receiverUrls,
+
   });
 
   factory GroupMessage.fromJson(Map<String, dynamic> json) {
@@ -52,6 +61,10 @@ class GroupMessage {
       deliveredTo: Map<String, bool>.from(json['deliveredTo'] ?? {}),
       readBy: Map<String, bool>.from(json['readBy'] ?? {}),
       edited: json['edited'] ?? false,
+      senderUrl: json['senderUrl'],
+      isUploaded: json['isUploaded'],
+      downloaded: json['downloaded'],
+      receiverUrls: json['receiverUrls'],
     );
   }
 
@@ -71,6 +84,10 @@ class GroupMessage {
       'deliveredTo': deliveredTo,
       'readBy': readBy,
       'edited': edited,
+      'senderUrl':senderUrl,
+      'isUploaded':isUploaded,
+      'downloaded':downloaded,
+      'receiverUrls':receiverUrls,
     };
   }
 }

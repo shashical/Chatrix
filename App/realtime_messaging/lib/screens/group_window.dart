@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
@@ -132,7 +135,26 @@ class _GroupWindowState extends State<GroupWindow> {
   List<int> otherUserChatSelected=[];
   int myMessageLength=0;
   int trueCount=0;
+  File? _image;
+  String? backgroundImage;
   List<GroupMessage> groupmessages=[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    backgroundImage=widget.backgroundImage;
+    super.initState();
+  }
+  Future getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) {
+      return;
+    }
+    final imageTemp = File(image.path);
+    Navigator.of(context, rootNavigator: true).pop();
+    setState(() {
+      _image = imageTemp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,16 +184,11 @@ class _GroupWindowState extends State<GroupWindow> {
                   (otherUserChatSelected.isEmpty)?Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextButton(onPressed: () async {
-                      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('groupMessages').get();
-                      final batch = FirebaseFirestore.instance.batch();
-
-                      int i=myMessageLength-1;
-
-                      for (var documentSnapshot in querySnapshot.docs) {
-                        if(isSelected[i]) {
-                          batch.delete(documentSnapshot.reference);
+                      for(int i=groupmessages.length-1;i>=0;i--){
+                        if(isSelected[i]){
+                          GroupsRemoteServices().deleteSingleGroupMessage(widget.groupId, groupmessages[i].id);
                         }
-                        i--;
+
                       }
                       setState(() {
                         isSelected=List.filled(myMessageLength, false);
@@ -184,21 +201,22 @@ class _GroupWindowState extends State<GroupWindow> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextButton(onPressed: () async {
-                      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('groupMessages').get();
-                      final batch = FirebaseFirestore.instance.batch();
-                      int i=0;
-                      for (var documentSnapshot in querySnapshot.docs) {
+                      for(int i=0;i<groupmessages.length;i++){
                         if(isSelected[i]) {
-                          batch.update(documentSnapshot.reference,
-                              {'deletedForMe.$cid' : true}
-                          );
+                          groupmessages[i].deletedForMe[cid] = true;
+
+                          GroupsRemoteServices().updateGroupMessage(
+                              widget.groupId,
+                              {'deletedForMe': groupmessages[i].deletedForMe},
+                              groupmessages[i].id);
                         }
-                        i++;
                       }
+
                       setState(() {
                         isSelected=List.filled(myMessageLength, false);
                         trueCount=0;
                       });
+                      Navigator.of(context,rootNavigator: true).pop();
                     }, child: const Text('Delete for Me',style: TextStyle(color: Colors.green),)),
                   ),
                   Padding(
@@ -212,7 +230,7 @@ class _GroupWindowState extends State<GroupWindow> {
               ));
             },
                 icon: const Icon(CupertinoIcons.delete)),
-            SizedBox(width: 18,),
+            const SizedBox(width: 18,),
             IconButton(onPressed: (){
 
             }, icon: const Icon(Icons.star)),
@@ -229,16 +247,81 @@ class _GroupWindowState extends State<GroupWindow> {
             ),
             const SizedBox(width: 10,),
             Text(widget.groupName),
+            Spacer(),
+            PopupMenuButton(itemBuilder: (context)=>
+            [
+              PopupMenuItem(
+                child:const Text('Clear chat'),
+                onTap: (){
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    for(int i=0;i<groupmessages.length;i++){
+                      if(isSelected[i]) {
+                        groupmessages[i].deletedForMe[cid] = true;
+
+                        GroupsRemoteServices().updateGroupMessage(
+                            widget.groupId,
+                            {'deletedForMe': groupmessages[i].deletedForMe},
+                            groupmessages[i].id);
+                      }
+                    }
+
+                  });
+                },),
+
+              PopupMenuItem(child: const Text('Change Wallpaper'),
+                onTap: (){
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    showDialog(context: (context), builder: (context)=>
+                        AlertDialog(
+                          title: const Text('Pick Image from'),
+                          actions: [
+                            ElevatedButton(onPressed: () async {
+                              final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                              if (image == null) {
+                                return;
+                              }
+                              final imageTemp = File(image.path);
+                                backgroundImage=imageTemp.path;
+                              RemoteServices().updateUserGroup(cid, {'backgroundImage':imageTemp.path}, widget.groupId);
+
+                              setState(() {
+
+                              });
+                              Navigator.of(context, rootNavigator: true).pop();
+                            }, child: const Text('Camera')),
+                            ElevatedButton(onPressed: () async {
+                              final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (image == null) {
+                                return;
+                              }
+                              final imageTemp = File(image.path);
+                              backgroundImage=imageTemp.path;
+                              RemoteServices().updateUserGroup(cid, {'backgroundImage':imageTemp.path}, widget.groupId);
+
+                              setState(() {
+
+                              });
+                              Navigator.of(context, rootNavigator: true).pop();
+                            }, child: const Text('Gallery'),)
+                          ],
+                        )
+                    );
+
+
+                  });
+                },
+              )
+            ])
           ],
         ),
-        actions:  <Widget>[],
+        //actions:  <Widget>[],
       ),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(widget.backgroundImage),
-            fit: BoxFit.cover,
-          ),
+          image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
+          image:FileImage(File(backgroundImage!)),
+          fit: BoxFit.cover,
+        ):DecorationImage(image: AssetImage(backgroundImage!),)
         ),
         child: Column(
           children: [
@@ -390,7 +473,216 @@ class _GroupWindowState extends State<GroupWindow> {
                   IconButton(
                     icon: Transform.rotate(angle: math.pi/7,
                     child: const Icon(Icons.attach_file)),
-                    onPressed: () {},
+                    onPressed: () {
+                      SimpleDialog alert = SimpleDialog(
+                        title: const Text("Choose an action"),
+                        children: [
+                          SimpleDialogOption(
+                            onPressed: () async {
+                              final files=await GroupsRemoteServices().pickDocument();
+                              if(files!=null) {
+                                final Users currentuser =
+                                (await RemoteServices().getSingleUser(cid))!;
+                                for (int i = 0; i < files.files.length; i++) {
+                                  await GroupsRemoteServices().setGroupMessage(
+                                      widget.groupId,
+                                      GroupMessage(
+                                        id: "${DateTime
+                                            .now()
+                                            .microsecondsSinceEpoch}",
+                                        senderId: cid,
+                                        text: '',
+                                        contentType: "document ${files.files[i]
+                                            .name}",
+                                        timestamp: DateTime.now(),
+                                        senderName: currentuser.name!,
+                                        senderPhoneNo: currentuser.phoneNo,
+                                        senderPhotoUrl: currentuser.photoUrl!,
+                                        senderUrl: files.files[i].path!
+                                      ));
+                                }
+
+                                DocumentSnapshot docSnap = await RemoteServices()
+                                    .reference.collection('groups').doc(
+                                    widget.groupId)
+                                    .get();
+                                List<dynamic> participants = docSnap.get(
+                                    'participantIds');
+                                // .getDocumentField(
+                                //     "groups/${widget.groupId}", 'participantIds');
+                                for (var x in participants) {
+                                  RemoteServices().updateUserGroup(
+                                      x,
+                                      {
+                                        'lastMessage': (files.files[files.files
+                                            .length - 1].name.length >
+                                            100
+                                            ? files.files[files.files.length -
+                                            1].name.substring(0, 100)
+                                            : files.files[files.files.length -
+                                            1].name),
+                                        'lastMessageType': "document",
+                                        'lastMessageTime': DateTime.now()
+                                            .toIso8601String()
+                                      },
+                                      widget.groupId);
+                                }
+                              }
+
+                            },
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.doc,
+                                  color: Colors.blue,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  "Send document",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () async {
+                              await getImage(ImageSource.camera);
+                              if(_image!=null){
+                                final Users currentuser =
+                                (await RemoteServices().getSingleUser(cid))!;
+                                for (int i = 0; i < 1; i++) {
+                                  await GroupsRemoteServices().setGroupMessage(
+                                      widget.groupId,
+                                      GroupMessage(
+                                          id: "${DateTime
+                                              .now()
+                                              .microsecondsSinceEpoch}",
+                                          senderId: cid,
+                                          text: '',
+                                          contentType: "image",
+                                          timestamp: DateTime.now(),
+                                          senderName: currentuser.name!,
+                                          senderPhoneNo: currentuser.phoneNo,
+                                          senderPhotoUrl: currentuser.photoUrl!,
+                                          senderUrl: _image!.path
+                                      ));
+                                }
+
+                                DocumentSnapshot docSnap = await RemoteServices()
+                                    .reference.collection('groups').doc(
+                                    widget.groupId)
+                                    .get();
+                                List<dynamic> participants = docSnap.get(
+                                    'participantIds');
+                                // .getDocumentField(
+                                //     "groups/${widget.groupId}", 'participantIds');
+                                for (var x in participants) {
+                                  RemoteServices().updateUserGroup(
+                                      x,
+                                      {
+                                        'lastMessage':'image',
+                                        'lastMessageType': "image",
+                                        'lastMessageTime': DateTime.now()
+                                            .toIso8601String()
+                                      },
+                                      widget.groupId);
+                                }
+
+                              }
+
+                            },
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.green,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  "send from camera",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () async {
+                              await getImage(ImageSource.gallery);
+                              if(_image!=null){
+
+                                final Users currentuser =
+                                (await RemoteServices().getSingleUser(cid))!;
+                                for (int i = 0; i < 1; i++) {
+                                  await GroupsRemoteServices().setGroupMessage(
+                                      widget.groupId,
+                                      GroupMessage(
+                                          id: "${DateTime
+                                              .now()
+                                              .microsecondsSinceEpoch}",
+                                          senderId: cid,
+                                          text: '',
+                                          contentType: "image",
+                                          timestamp: DateTime.now(),
+                                          senderName: currentuser.name!,
+                                          senderPhoneNo: currentuser.phoneNo,
+                                          senderPhotoUrl: currentuser.photoUrl!,
+                                          senderUrl: _image!.path
+                                      ));
+                                }
+
+                                DocumentSnapshot docSnap = await RemoteServices()
+                                    .reference.collection('groups').doc(
+                                    widget.groupId)
+                                    .get();
+                                List<dynamic> participants = docSnap.get(
+                                    'participantIds');
+                                // .getDocumentField(
+                                //     "groups/${widget.groupId}", 'participantIds');
+                                for (var x in participants) {
+                                  RemoteServices().updateUserGroup(
+                                      x,
+                                      {
+                                        'lastMessage':'image',
+                                        'lastMessageType': "image",
+                                        'lastMessageTime': DateTime.now()
+                                            .toIso8601String()
+                                      },
+                                      widget.groupId);
+                                }
+                              }
+
+                            },
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.photo,
+                                  color: Colors.green,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  "Send image from gallery",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                      showDialog(
+                        context: context,
+                        builder: (context) => alert,
+                        barrierDismissible: true,
+                      );
+                    },
                   ),
                   ((messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
                     iconSize: 24,

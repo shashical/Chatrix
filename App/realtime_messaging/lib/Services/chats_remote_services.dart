@@ -42,6 +42,27 @@ class ChatsRemoteServices {
       }
     }
   }
+  Future<void> updateChatMessage(String id, Map<String, dynamic> upd,String messageId) async {
+    try {
+      reference
+          .collection('chats')
+          .doc(id).collection('chatMessages').doc(messageId)
+          .update(upd)
+          .catchError((e) => throw Exception('$e'));
+    } on FirebaseException catch (e) {
+      throw Exception('$e');
+    } catch (e) {
+      rethrow;
+    }
+  }
+  Future<void> deleteSingleChatMessage(String id,String messageId)async {
+    try {
+      FirebaseFirestore.instance.collection('chats').doc(id).collection('chatMessages').doc(messageId).delete()
+          .catchError((e) => throw Exception('$e'));
+    }catch(e){
+      rethrow;
+    }
+  }
 
   Future<void> setChatMessage(String chatId, ChatMessage chatmessage) async {
     final DocumentSnapshot docSnap = await reference

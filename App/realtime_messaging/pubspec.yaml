@@ -47,6 +47,7 @@ dependencies:
   restart_app: ^1.2.1
   file_picker: ^5.3.2
   open_file: ^3.3.2
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,8 @@ flutter:
     - assets/login_bgnd.png
     - assets/otpverify_bgnd.png
     - assets/default_logo.jpg
+    - assets/backgroundimage.png
+    - assets/blurimg.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
