@@ -16,6 +16,7 @@ class UserChat {
   DateTime? lastMessageTime;
   bool muted;
   bool blocked;
+  String? containsSymmKey;
 
   UserChat({
     required this.id,
@@ -30,6 +31,7 @@ class UserChat {
     this.lastMessageTime,
     this.muted = false,
     this.blocked = false,
+    this.containsSymmKey,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {
@@ -46,6 +48,7 @@ class UserChat {
       lastMessageTime:(json['lastMessageTime']!=null)? DateTime.parse(json['lastMessageTime']):null,
       muted: json['muted'],
       blocked: json['blocked'],
+      containsSymmKey: json['containsSymmKey']
     );
   }
 
@@ -62,7 +65,8 @@ class UserChat {
       'lastMessageType': lastMessageType,
       'lastMessageTime': lastMessageTime?.toIso8601String(),
       'muted': muted,
-      'blocked': blocked
+      'blocked': blocked,
+      'containsSymmKey': containsSymmKey
     };
   }
 }

@@ -9,8 +9,6 @@ import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import '../main.dart';
 
-
-
 class SearchContactPage extends StatefulWidget {
   const SearchContactPage({super.key});
   @override
@@ -28,96 +26,89 @@ class _SearchContactPageState extends State<SearchContactPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: 390,
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (e) => {
-                            setState(() {
-                              searchedUser = [];
-                              searchedNumber = [];
-                              for (int i = 0; i < savedUsers.length; i++) {
-                                if (savedUsers[i]
-                                    .toLowerCase()
-                                    .contains(e.toLowerCase())) {
-                                  searchedUser.add(savedUsers[i]);
-                                  searchedNumber.add(savedNumber[i]);
-                                }
-                              }
-                            })
-                          },
-                          decoration: InputDecoration(
-                              filled: true,
-                              hintText: 'Search Contacts',
-                              fillColor: Colors.blue[100],
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                size: 25,
-                                color: Colors.black,
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: (){
-                                  if(_searchController.text.isEmpty){
-                                    Navigator.pop(context);
-                                  }
-                                  else{
-                                    _searchController.clear();
-                                  }
-                                },
-                                icon: const Icon(Icons.cancel),
-                              ),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(20))),
-                        ),
-                      ),
-                      Flexible(
-                          child: StreamBuilder<List<Users>>(
-                        stream: RemoteServices().getUsers(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Text(
-                                'Something went wrong !${snapshot.error}');
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.data == null) {
-                            return Center(
-                                child: Container(
-                                  padding: const EdgeInsets.all(15),
-                                  child: const Text(
-                                  'App Users from Your contact will appear here'),
-                            ));
-                          } else {
-                            final users = snapshot.data!;
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        SizedBox(
+          height: 50,
+          width: 390,
+          child: TextField(
+            controller: _searchController,
+            onChanged: (e) => {
+              setState(() {
+                searchedUser = [];
+                searchedNumber = [];
+                for (int i = 0; i < savedUsers.length; i++) {
+                  if (savedUsers[i].toLowerCase().contains(e.toLowerCase())) {
+                    searchedUser.add(savedUsers[i]);
+                    searchedNumber.add(savedNumber[i]);
+                  }
+                }
+              })
+            },
+            decoration: InputDecoration(
+                filled: true,
+                hintText: 'Search Contacts',
+                fillColor: Colors.blue[100],
+                prefixIcon: const Icon(
+                  Icons.search,
+                  size: 25,
+                  color: Colors.black,
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    if (_searchController.text.isEmpty) {
+                      Navigator.pop(context);
+                    } else {
+                      _searchController.clear();
+                    }
+                  },
+                  icon: const Icon(Icons.cancel),
+                ),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(20))),
+          ),
+        ),
+        Flexible(
+            child: StreamBuilder<List<Users>>(
+          stream: RemoteServices().getUsers(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Something went wrong !${snapshot.error}');
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data == null) {
+              return Center(
+                  child: Container(
+                padding: const EdgeInsets.all(15),
+                child:
+                    const Text('App Users from Your contact will appear here'),
+              ));
+            } else {
+              final users = snapshot.data!;
 
-                            appUserNumber =
-                                users.map((user) => user.phoneNo).toList();
-                            //debugPrint('$appUserNumber');
+              appUserNumber = users.map((user) => user.phoneNo).toList();
+              //debugPrint('$appUserNumber');
 
-                            if (_searchController.text.isEmpty) {
-                              return ListView(
-                                children: MergeAppUserAndSendInvite(
-                                    users, appUserNumber, context),
-                              );
-                            } else {
-                              return ListView(
-                                  children: SearchMerge(users, appUserNumber,
-                                      searchedNumber, searchedUser, context));
-                            }
-                          }
-                        },
-                      )),
-                    ],
-                  )
+              if (_searchController.text.isEmpty) {
+                return ListView(
+                  children:
+                      MergeAppUserAndSendInvite(users, appUserNumber, context),
                 );
+              } else {
+                return ListView(
+                    children: SearchMerge(users, appUserNumber, searchedNumber,
+                        searchedUser, context));
+              }
+            }
+          },
+        )),
+      ],
+    ));
   }
 }
 
@@ -130,22 +121,50 @@ List<Widget> MergeAppUserAndSendInvite(
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
-          onTap: () async{
-            final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${users[index].id}").get();
-            if(docsnap.exists){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: users[index].id,chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
-              },));
-            }
-            else{
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: users[index].id);
-              },));
+          onTap: () async {
+            DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                .collection('chats')
+                .doc('$cid${users[index].id}')
+                .get();
+            if (docsnap.exists) {
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: users[index].id,
+                    chatId: docsnap.get('chatId'),
+                    backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+            } else {
+              docsnap = await FirebaseFirestore.instance
+                  .collection('chats')
+                  .doc('${users[index].id}$cid')
+                  .get();
+              if (docsnap.exists) {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return ChatWindow(
+                      otherUserId: users[index].id,
+                      chatId: docsnap.get('chatId'),
+                      backgroundImage: docsnap.get('backgroundImage'),
+                    );
+                  },
+                ));
+              } else {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return ChatWindow(otherUserId: users[index].id);
+                  },
+                ));
+              }
             }
           },
           leading: InkWell(
             child: CircleAvatar(
-              foregroundImage: NetworkImage('${users[index].photoUrl}',),
+              foregroundImage: NetworkImage(
+                '${users[index].photoUrl}',
+              ),
             ),
             onTap: () {
               Navigator.push(
@@ -155,7 +174,6 @@ List<Widget> MergeAppUserAndSendInvite(
                             userId: users[index].id,
                           )));
             },
-
           ),
           title: Text(savedUsers[i]),
           subtitle: Text(
