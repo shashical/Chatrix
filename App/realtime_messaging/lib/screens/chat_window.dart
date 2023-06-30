@@ -1,13 +1,20 @@
+
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
 
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
+import 'package:realtime_messaging/Widgets/progress-indicator.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
@@ -17,6 +24,179 @@ import'dart:io';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+class ImageBubble extends StatefulWidget {
+  const ImageBubble({Key? key,
+    required this.message,
+    required this.time,
+    required this.isUser,
+    required this.delivered,
+    required this.read,
+    required this.isSelected,
+    required this.uploaded,
+    required this.downloaded, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl}) : super(key: key);
+  final String message, time,senderUrl,id,chatId,receiverUrl;
+  final bool isUser, delivered, read,isSelected,uploaded,downloaded;
+
+  @override
+  State<ImageBubble> createState() => _ImageBubbleState();
+}
+
+class _ImageBubbleState extends State<ImageBubble> {
+  late Color bg; // =widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Colors.white : Colors.greenAccent.shade100;
+  late CrossAxisAlignment align;
+  late IconData icon;
+  late BorderRadius radius;
+  late bool uploaded;
+  late bool downloaded;
+  UploadTask? _uploadTask;
+  DownloadTask? _downloadTask;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    uploaded = widget.uploaded;
+    downloaded=widget.downloaded;
+    bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
+        ? Colors.white
+        : Colors.greenAccent.shade100;
+    align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    icon = widget.delivered ? Icons.done_all : Icons.done;
+    radius = widget.isUser ? const BorderRadius.only(
+      topRight: Radius.circular(5.0),
+      bottomLeft: Radius.circular(10.0),
+      bottomRight: Radius.circular(5.0),
+    )
+        : const BorderRadius.only(
+      topLeft: Radius.circular(5.0),
+      bottomLeft: Radius.circular(5.0),
+      bottomRight: Radius.circular(10.0),
+    );
+  }
+
+  Future<String> uploadDocument(File doc) async {
+    try {
+      firebase_storage.Reference ref =
+      firebase_storage.FirebaseStorage.instance.ref(
+          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
+      _uploadTask = ref.putFile(doc);
+      await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> downloadImage(String imageUrl) async {
+    try {
+      // Create a Firebase Storage reference
+      final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
+          imageUrl);
+
+      // Download the image to temporary device storage
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/${DateTime
+          .fromMicrosecondsSinceEpoch}.jpg';
+
+      _downloadTask = ref.writeToFile(File(tempPath));
+
+      await Future.value(_downloadTask).catchError((e) =>
+      throw Exception('$e'));
+      return tempPath;
+    } catch (e) {
+      rethrow;
+    }
+
+  }
+    bool downloading = false;
+    bool isUploading = false;
+
+    @override
+    Widget build(BuildContext context) {
+      return Column(
+        crossAxisAlignment: align,
+        children: [
+          Stack(
+              children: [ Container(
+                padding: const EdgeInsets.all(8),
+                alignment: Alignment.bottomRight,
+                decoration: BoxDecoration(
+                  image:(widget.isUser)? DecorationImage(
+                    image: FileImage(File(widget.senderUrl)),
+                  ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)))
+                      :const DecorationImage(image: AssetImage('assests/blurimg.png')),
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: .5,
+                        spreadRadius: 1.0,
+                        color: Colors.black.withOpacity(.12))
+                  ],
+                  color: bg,
+                  borderRadius: radius,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 55.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        widget.time,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      (widget.isUser) ? Icon(
+                        icon,
+                        size: 16,
+                      ) : const SizedBox(width: 0,)
+                    ],
+                  ),
+                ),),
+                Center(child: (widget.isUser) ? (!isUploading) ? IconButton(
+                    onPressed: () async {
+                      setState(() {
+                        isUploading = true;
+                      });
+                      final docUrl = await uploadDocument(
+                          File(widget.senderUrl));
+                      ChatsRemoteServices().updateChatMessage(widget.chatId, {
+                        'uploaded': true,
+                        'text': docUrl
+                      }, widget.id);
+                      setState(() {
+                        uploaded = true;
+                      });
+                    }, icon: const Icon(Icons.upload))
+                    : (!uploaded) ? progressIndicator(_uploadTask,null)
+                    : const SizedBox(width: 0,) :
+                    (!downloading)?IconButton(
+                    onPressed: () async {
+                      setState(() {
+                        downloading=true;
+                      });
+                      final receiveUrl=await downloadImage(widget.message);
+                      ChatsRemoteServices().updateChatMessage(widget.chatId,
+                          {'receiverUrl':receiveUrl,
+                            'downloaded':true,
+                          }, widget.id);
+                      setState(() {
+                        downloaded=true;
+                      });
+
+
+                    }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                )
+              ]
+          ),
+        ],
+      );
+    }
+  }
+
+
 
 class MyBubble extends StatelessWidget {
   const MyBubble(
@@ -24,14 +204,14 @@ class MyBubble extends StatelessWidget {
       required this.time,
       required this.delivered,
       required this.isUser,
-      required this.read});
+      required this.read, required this.isSelected});
 
   final String message, time;
-  final bool isUser, delivered, read;
+  final bool isUser, delivered, read,isSelected;
 
   @override
   Widget build(BuildContext context) {
-    final bg = !isUser ? Colors.white : Colors.greenAccent.shade100;
+    final bg =isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? Colors.white : Colors.greenAccent.shade100;
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = delivered ? Icons.done_all : Icons.done;
     final radius = !isUser
@@ -82,10 +262,10 @@ class MyBubble extends StatelessWidget {
                     const SizedBox(
                       width: 5,
                     ),
-                    Icon(
+                    (isUser)? Icon(
                       icon,
                       size: 16,
-                    )
+                    ):const SizedBox(width: 0,)
                   ],
                 ),
               ),
@@ -100,13 +280,14 @@ class MyBubble extends StatelessWidget {
 class ChatWindow extends StatefulWidget {
   final String backgroundImage, otherUserId;
   final String? chatId;
+  final int? unReadMeassageCount;
 
   const ChatWindow({
     required this.otherUserId,
     this.backgroundImage =
-        "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+        "assets/backgroundimage.png",
     this.chatId,
-    Key? key,
+    Key? key, this.unReadMeassageCount=0,
   }) : super(key: key);
 
   @override
@@ -126,6 +307,11 @@ class _ChatWindowState extends State<ChatWindow> {
   File? _image;
   List<bool> isSelected=[];
   List<int> otherUserChatSelected=[];
+  int myMessageLength=0;
+  int trueCount=0;
+  List<ChatMessage> chatmessages=[];
+  String backgroundImage ='';
+  int unreadMessageCount=0;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -138,6 +324,8 @@ class _ChatWindowState extends State<ChatWindow> {
       _image = imageTemp;
     });
   }
+ // Replace 'your_image_uri' with the actual URI of your image in Firebase Storage
+
 
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
@@ -151,7 +339,8 @@ class _ChatWindowState extends State<ChatWindow> {
   void initState() {
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
-
+    backgroundImage=widget.backgroundImage;
+    unreadMessageCount=widget.unReadMeassageCount!;
     super.initState();
 
   }
@@ -163,8 +352,91 @@ class _ChatWindowState extends State<ChatWindow> {
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
+            leading: (trueCount!=0)? IconButton(onPressed: (){
+              setState(() {
 
-              title: Row(
+                isSelected=List.filled(chatmessages.length, false);
+                trueCount=0;
+                otherUserChatSelected=[];
+              });
+            }, icon: const Icon(Icons.arrow_back)):const BackButton(),
+              title:(trueCount!=0)?Row(
+                children: [
+
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text('$trueCount',),
+                  ),
+                  const Spacer(),
+                  IconButton(onPressed: (){
+                    showDialog(context: context, builder: (context)=>AlertDialog(
+                      title: const Text('Delete message?',style: TextStyle(color: Colors.grey),),
+                      actions: [
+                        (otherUserChatSelected.isEmpty)?Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: () async {
+                              for (var i=chatmessages.length-1;i>=0;i-- ) {
+                                if(isSelected[i]) {
+                                 ChatsRemoteServices().deleteSingleChatMessage(chatid!,chatmessages[i].id);
+                                }
+
+                              }
+                              setState(() {
+                               isSelected=List.filled(myMessageLength, false);
+                               trueCount=0;
+                              });
+                              Navigator.of(context,rootNavigator: true).pop();
+
+                          },
+                              child: const Text('Delete for Everyone',style: TextStyle(color: Colors.green),)),
+                        ):const SizedBox(width: 0,),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: () async {
+                            for(int i=0;i<chatmessages.length;i++){
+                              if(isSelected[i]) {
+                                if (chatmessages[i].deletedForMe[widget
+                                    .otherUserId] == null) {
+                                  chatmessages[i].deletedForMe[cid] = true;
+                                  ChatsRemoteServices().updateChatMessage(
+                                      chatid!, {
+                                    'deletedForMe': chatmessages[i].deletedForMe
+                                  }, chatmessages[i].id);
+                                }
+                                else{
+                                  ChatsRemoteServices().deleteSingleChatMessage(chatid!, chatmessages[i].id);
+                                }
+                              }
+                            }
+                            setState(() {
+                              isSelected=List.filled(myMessageLength, false);
+                              trueCount=0;
+                            });
+                            Navigator.of(context,rootNavigator: true).pop();
+                          }, child: const Text('Delete for Me',style: TextStyle(color: Colors.green),)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(onPressed: (){
+                            Navigator.of(context,rootNavigator: true).pop();
+                          }, child: const Text('Cancel',style: TextStyle(color: Colors.green),)),
+                        ),
+
+                      ],
+                    ));
+                  },
+                      icon: const Icon(CupertinoIcons.delete)),
+                  const SizedBox(width: 18,),
+                  IconButton(onPressed: (){
+
+                    }, icon: const Icon(Icons.star)),
+                  const SizedBox(width: 18,),
+                  (trueCount==1 &&chatmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: chatmessages[isSelected.indexOf(true)].text));
+                  }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
+
+                ],
+              ) :Row(
                 children: [
                   InkWell(
                     child: CircleAvatar(
@@ -174,18 +446,101 @@ class _ChatWindowState extends State<ChatWindow> {
                   ),
                   const SizedBox(width: 10,),
                   Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
+                  const Spacer(),
+                  PopupMenuButton(itemBuilder: (context)=>
+                  [
+                    PopupMenuItem(
+                        child:const Text('Clear chat'),
+                    onTap: (){
+                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                            for(int i=0;i<chatmessages.length;i++){
+                              
+                                if (chatmessages[i].deletedForMe[widget
+                                    .otherUserId] == null) {
+                                  chatmessages[i].deletedForMe[cid] = true;
+                                  ChatsRemoteServices().updateChatMessage(
+                                      chatid!, {
+                                    'deletedForMe': chatmessages[i].deletedForMe
+                                  }, chatmessages[i].id);
+                                }
+                                else{
+                                  ChatsRemoteServices().deleteSingleChatMessage(chatid!, chatmessages[i].id);
+                                }
+                              }
+                            
+                          });
+                    },),
+                    PopupMenuItem(child:  Text((otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid))?'Unblock':'Block'),
+                    onTap: (){
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        if((otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid))){
+                          otheruser.blockedBy!.remove(cid);
+                        }
+                        else{
+                     if(otheruser.blockedBy!=null){ otheruser.blockedBy!.add(cid);}
+                     else{
+                      otheruser.blockedBy=[cid];
+                      }}
+                     RemoteServices().updateUser(widget.otherUserId, {'blockedBy':otheruser.blockedBy});
+                      });
+                    },
+                    ),
+                    PopupMenuItem(child: const Text('Change Wallpaper'),
+                      onTap: (){
+                        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                          showDialog(context: (context), builder: (context)=>
+                              AlertDialog(
+                                title: Text('Pick Image from'),
+                                actions: [
+                                  ElevatedButton(onPressed: () async {
+                                    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                                    if (image == null) {
+                                      return;
+                                    }
+                                    final imageTemp = File(image.path);
+                                    backgroundImage=imageTemp.path;
+                                    RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
+
+                                    setState(() {
+
+                                    });
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                  }, child: const Text('Camera')),
+                                  ElevatedButton(onPressed: () async {
+                                    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                    if (image == null) {
+                                      return;
+                                    }
+                                    final imageTemp = File(image.path);
+                                    backgroundImage=imageTemp.path;
+                                    RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
+
+                                    setState(() {
+
+                                    });
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                  }, child: const Text('Gallery'),)
+                                ],
+                              )
+                          );
+
+
+                        });
+                      },
+                    )
+                  ])
                 ],
               ),
               // actions: <Widget>[
-              //
+              //    
               // ],
             ),
             body: Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(widget.backgroundImage),
+                image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
+                  image:FileImage(File(backgroundImage)),
                   fit: BoxFit.cover,
-                ),
+                ):DecorationImage(image: AssetImage(backgroundImage),),
               ),
               child: Column(
                 children: [
@@ -197,7 +552,14 @@ class _ChatWindowState extends State<ChatWindow> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
 
-                          final List<ChatMessage> chatmessages = snapshot.data!;
+
+                           chatmessages = snapshot.data!;
+                          if(myMessageLength!=chatmessages.length){
+                            myMessageLength=chatmessages.length;
+                            isSelected=List.filled(myMessageLength, false);
+                            trueCount=0;
+
+                          }
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
@@ -231,18 +593,72 @@ class _ChatWindowState extends State<ChatWindow> {
                                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
                                       String message = encrypter.decrypt(encryptedMessage);
-                                      return MyBubble(
+
+                                return GestureDetector(
+                                  child:MyBubble(
                                     message: message,
                                     time:
                                         ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
                                     delivered: chatmessage.delivered,
                                     isUser: (chatmessage.senderId == cid),
-                                    read: chatmessage.read);
+                                    read: chatmessage.read,
+                                    isSelected: isSelected[index],
+                                    ),
+                                    onTap: () {
+
+                                    if (trueCount != 0) {
+                                      setState(() {
+
+
+                                      if (isSelected[index]) {
+                                        isSelected[index] = false;
+                                        trueCount--;
+                                        if(chatmessage.senderId!=cid){
+                                          otherUserChatSelected.remove(index);
+                                        }
+                                      }
+                                      else {
+                                        trueCount++;
+                                        isSelected[index] = true;
+                                        if(chatmessage.senderId!=cid){
+                                          otherUserChatSelected.add(index);
+                                        }
+                                      } });
+                                    }
+                                  },
+                                  onLongPress: (){
+                                    setState(() {
+                                    if(isSelected[index]){
+                                      isSelected[index]=false;
+                                      trueCount--;
+                                      if(chatmessage.senderId!=cid){
+                                        otherUserChatSelected.remove(index);
+                                      }
+                                    }
+                                    else{
+                                      trueCount++;
+                                      isSelected[index]=true;
+                                      if(chatmessage.senderId!=cid){
+                                        otherUserChatSelected.add(index);
+                                      }
+                                    }
+                                    });
+                                  },);
+
                                     }
                                     else{
                                       throw Exception("symmKey not found.");
                                     }
                                   },
+                                  // (chatmessage) != null?(chatmessage.contentType=='image')?
+                                  // ImageBubble(message: chatmessage.text,
+                                  //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                  //     isUser: cid==chatmessage.senderId,
+                                  //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
+                                  //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
+                                  //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
+                                  //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
+                                  
                                 );
                               } else {
                                 return const SizedBox(
@@ -386,7 +802,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
-                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                            backgroundImage: "assets/backgroundimage.png",
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -398,7 +814,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             recipientPhoto: currentuser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo: currentuser.phoneNo,
-                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                            backgroundImage: "assets/backgroundimage.png",
                                           ));
 
 

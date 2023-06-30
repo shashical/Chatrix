@@ -51,6 +51,7 @@ dependencies:
   rsa_encrypt: ^2.0.0
   flutter_secure_storage: ^8.0.0
   pointycastle: ^3.7.3
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +81,8 @@ flutter:
     - assets/login_bgnd.png
     - assets/otpverify_bgnd.png
     - assets/default_logo.jpg
+    - assets/backgroundimage.png
+    - assets/blurimg.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

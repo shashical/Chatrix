@@ -2,8 +2,8 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-Widget progressIndicator(UploadTask? uploadTask)=>StreamBuilder<TaskSnapshot>(
-    stream:uploadTask?.snapshotEvents,
+Widget progressIndicator(UploadTask? uploadTask,DownloadTask? downloadTask)=>StreamBuilder<TaskSnapshot>(
+    stream:(uploadTask!=null)?uploadTask.snapshotEvents:downloadTask?.snapshotEvents,
     builder: (context,snapshot){
   if(snapshot.hasError){
     return

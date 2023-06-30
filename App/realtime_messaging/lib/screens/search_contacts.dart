@@ -181,6 +181,7 @@ List<Widget> MergeAppUserAndSendInvite(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+
         ));
       }
     } else {

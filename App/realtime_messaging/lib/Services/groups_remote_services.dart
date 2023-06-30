@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:realtime_messaging/Models/groupMessages.dart';
@@ -58,7 +59,19 @@ class GroupsRemoteServices {
       rethrow;
     }
   }
-
+  Future<void> updateGroupMessage(String id, Map<String, dynamic> upd,String messageId) async {
+    try {
+      reference
+          .collection('groups')
+          .doc(id).collection('groupMessages').doc(messageId)
+          .update(upd)
+          .catchError((e) => throw Exception('$e'));
+    } on FirebaseException catch (e) {
+      throw Exception('$e');
+    } catch (e) {
+      rethrow;
+    }
+  }
   Future<void> setGroupMessage(
       String groupId, GroupMessage groupMessage) async {
     final DocumentSnapshot docsnap = await reference
@@ -90,6 +103,24 @@ class GroupsRemoteServices {
       return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
     } catch (e) {
       rethrow;
+    }
+  }
+  Future<void> deleteSingleGroupMessage(String id,String messageId)async {
+    try {
+      FirebaseFirestore.instance.collection('groups').doc(id).collection('groupMessages').doc(messageId).delete()
+          .catchError((e) => throw Exception('$e'));
+    }catch(e){
+      rethrow;
+    }
+  }
+  Future<FilePickerResult?> pickDocument() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null) {
+
+      return result;
+    } else {
+      return null;
     }
   }
 }
