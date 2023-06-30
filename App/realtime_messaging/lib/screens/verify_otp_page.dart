@@ -18,7 +18,6 @@ import 'package:pointycastle/export.dart' as pointy;
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-
 class VerifyOtpPage extends StatefulWidget {
   final String phoneNo;
   final String verificationId;
@@ -441,17 +440,35 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                         .doc(id)
                                         .get();
                                 if (!docSnap.exists) {
+                                  // pointy.RSAKeyGeneratorParameters keyParams =
+                                  //     pointy.RSAKeyGeneratorParameters(
+                                  //         BigInt.parse('65537'), 2048, 64);
+                                  // pointy.FortunaRandom secureRandom = pointy.FortunaRandom();
+                                  // Random random = Random.secure();
+                                  // pointy.RSAKeyGenerator keyGenerator = pointy.RSAKeyGenerator()
+                                  //   ..init(pointy.ParametersWithRandom(
+                                  //       keyParams, secureRandom));
+                                  // pointy.AsymmetricKeyPair<pointy.PublicKey, pointy.PrivateKey> keyPair =
+                                  //     keyGenerator.generateKeyPair();
 
-                                  pointy.RSAKeyGeneratorParameters keyParams =
-                                      pointy.RSAKeyGeneratorParameters(
-                                          BigInt.parse('65537'), 2048, 64);
-                                  pointy.FortunaRandom secureRandom = pointy.FortunaRandom();
-                                  Random random = Random.secure();
-                                  pointy.RSAKeyGenerator keyGenerator = pointy.RSAKeyGenerator()
-                                    ..init(pointy.ParametersWithRandom(
-                                        keyParams, secureRandom));
-                                  pointy.AsymmetricKeyPair<pointy.PublicKey, pointy.PrivateKey> keyPair =
-                                      keyGenerator.generateKeyPair();
+                                  var keyParams =
+                                      new pointy.RSAKeyGeneratorParameters(
+                                          new BigInt.from(65537), 2048, 5);
+                                  var secureRandom = new pointy.FortunaRandom();
+                                  var random = new Random.secure();
+                                  List<int> seeds = [];
+                                  for (int i = 0; i < 32; i++) {
+                                    seeds.add(random.nextInt(255));
+                                  }
+                                  secureRandom.seed(new pointy.KeyParameter(
+                                      new Uint8List.fromList(seeds)));
+
+                                  var rngParams =
+                                      new pointy.ParametersWithRandom(
+                                          keyParams, secureRandom);
+                                  var k = new pointy.RSAKeyGenerator();
+                                  k.init(rngParams);
+                                  var keyPair = k.generateKeyPair();
 
                                   RSAPublicKey publicKey =
                                       keyPair.publicKey as RSAPublicKey;
@@ -460,13 +477,16 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
                                   String publicKeyString = rsa.RsaKeyHelper()
                                       .encodePublicKeyToPemPKCS1(publicKey);
-                                  String privateKeyString = rsa.RsaKeyHelper().encodePrivateKeyToPemPKCS1(privateKey);
+                                  String privateKeyString = rsa.RsaKeyHelper()
+                                      .encodePrivateKeyToPemPKCS1(privateKey);
                                   // final mypublickey = rsa.RsaKeyHelper()
                                   //     .parsePublicKeyFromPem(publicKeyString);
 
-                                  FlutterSecureStorage storage = FlutterSecureStorage();
+                                  FlutterSecureStorage storage =
+                                      FlutterSecureStorage();
 
-                                  await storage.write(key: '$id', value: privateKeyString);
+                                  await storage.write(
+                                      key: '$id', value: privateKeyString);
 
                                   Users user = Users(
                                       id: id,
