@@ -22,13 +22,13 @@ class _SplashPageState extends State<SplashPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => StreamBuilder(
-                stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (context, snapshot) {
-                  debugPrint('${snapshot.hasData}');
-                  return (snapshot.hasData)? HomePage():const WelcomePage();
-                })),
-      );
+             builder: (context) => WelcomePage()//StreamBuilder(
+            //     stream: FirebaseAuth.instance.authStateChanges(),
+            //     builder: (context, snapshot) {
+            //       debugPrint('${snapshot.hasData}');
+            //       return (snapshot.hasData)? const WelcomePage():const WelcomePage();
+            //     })),
+      ));
     });
 
   }

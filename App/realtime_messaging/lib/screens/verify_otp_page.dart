@@ -317,7 +317,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 _controller.restart();
                                 try {
                                   FirebaseAuth.instance.verifyPhoneNumber(
-                                      phoneNumber: "91${widget.phoneNo}",
+                                      phoneNumber: "+91${widget.phoneNo}",
                                       verificationCompleted: (_) {},
                                       verificationFailed: (e) {
                                         canresend = true;
@@ -423,7 +423,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   pin4cont.text +
                                   pin5cont.text +
                                   pin6cont.text;
-                              try {
+                             // try {
                                 final credential = PhoneAuthProvider.credential(
                                     verificationId: veryid!, smsCode: p);
                                 await FirebaseAuth.instance
@@ -499,80 +499,80 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => UserInfoPage()));
-                              } on FirebaseAuthException catch (e) {
-                                setState(() {
-                                  isloading = false;
-                                });
-                                showDialog(
-                                    context: (context),
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        content: Text('${e.message}'),
-                                        actions: [
-                                          Builder(builder: (context) {
-                                            return ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context,
-                                                          rootNavigator: true)
-                                                      .pop();
-                                                },
-                                                child: const Text('OK'));
-                                          })
-                                        ],
-                                      );
-                                    });
-                              } on FirebaseException catch (e) {
-                                setState(() {
-                                  isloading = false;
-                                });
-                                showDialog(
-                                    context: (context),
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        content: Text('${e.message}'),
-                                        actions: [
-                                          Builder(builder: (context) {
-                                            return ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context,
-                                                          rootNavigator: true)
-                                                      .pop();
-                                                },
-                                                child: const Text('OK'));
-                                          })
-                                        ],
-                                      );
-                                    });
-                              } catch (e) {
-                                setState(() {
-                                  isloading = false;
-                                });
-                                showDialog(
-                                    context: (context),
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        content: Text('$e'),
-                                        actions: [
-                                          Builder(builder: (context) {
-                                            return ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context,
-                                                          rootNavigator: true)
-                                                      .pop();
-                                                },
-                                                child: const Text('OK'));
-                                          })
-                                        ],
-                                      );
-                                    });
-                              }
+                              // } on FirebaseAuthException catch (e) {
+                              //   setState(() {
+                              //     isloading = false;
+                              //   });
+                              //   showDialog(
+                              //       context: (context),
+                              //       builder: (context) {
+                              //         return AlertDialog(
+                              //           content: Text('${e.message}'),
+                              //           actions: [
+                              //             Builder(builder: (context) {
+                              //               return ElevatedButton(
+                              //                   onPressed: () {
+                              //                     Navigator.of(context,
+                              //                             rootNavigator: true)
+                              //                         .pop();
+                              //                   },
+                              //                   child: const Text('OK'));
+                              //             })
+                              //           ],
+                              //         );
+                              //       });
+                              // } on FirebaseException catch (e) {
+                              //   setState(() {
+                              //     isloading = false;
+                              //   });
+                              //   showDialog(
+                              //       context: (context),
+                              //       builder: (context) {
+                              //         return AlertDialog(
+                              //           content: Text('${e.message}'),
+                              //           actions: [
+                              //             Builder(builder: (context) {
+                              //               return ElevatedButton(
+                              //                   onPressed: () {
+                              //                     Navigator.of(context,
+                              //                             rootNavigator: true)
+                              //                         .pop();
+                              //                   },
+                              //                   child: const Text('OK'));
+                              //             })
+                              //           ],
+                              //         );
+                              //       });
+                              // } catch (e) {
+                              //   setState(() {
+                              //     isloading = false;
+                              //   });
+                              //   showDialog(
+                              //       context: (context),
+                              //       builder: (context) {
+                              //         return AlertDialog(
+                              //           content: Text('$e'),
+                              //           actions: [
+                              //             Builder(builder: (context) {
+                              //               return ElevatedButton(
+                              //                   onPressed: () {
+                              //                     Navigator.of(context,
+                              //                             rootNavigator: true)
+                              //                         .pop();
+                              //                   },
+                              //                   child: const Text('OK'));
+                              //             })
+                              //           ],
+                              //         );
+                              //       });
+                              // }
                             },
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.deepPurple,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12))),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
                               child: Text(
                                 'Verify',
                                 style: TextStyle(
