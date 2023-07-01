@@ -25,6 +25,8 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import '../constants.dart';
 class ImageBubble extends StatefulWidget {
   const ImageBubble({Key? key,
     required this.message,
@@ -592,7 +594,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
                                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
-                                      String message = encrypter.decrypt(encryptedMessage);
+                                      String message = encrypter.decrypt(encryptedMessage,iv: iv);
 
                                 return GestureDetector(
                                   child:MyBubble(
@@ -1272,7 +1274,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                            encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp);
+                            encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                             String encryptedMessageString = encryptedMessage.base64;
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,

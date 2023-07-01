@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/Services/chats_remote_services.dart';
+import 'package:realtime_messaging/constants.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
@@ -306,7 +307,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           Builder(
                             builder: (context) {
                               return FutureBuilder(
-                                future: FlutterSecureStorage().read(key: '$cid'),
+                                future: FlutterSecureStorage().read(key: cid),
                                 builder: (context, snapshot) {
                                   if(snapshot.hasData){
                                     privateKeyString = snapshot.data;
@@ -357,8 +358,9 @@ class _ChatsPageState extends State<ChatsPage> {
                                       symmKeyString = snapshot.data;
                                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
                                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+
                                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
-                                      String message = encrypter.decrypt(encryptedMessage);
+                                      String message = encrypter.decrypt(encryptedMessage,iv: iv);
                                       return ListTile(
                           leading: InkWell(
                             child: Stack(
