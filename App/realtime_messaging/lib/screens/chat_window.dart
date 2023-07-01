@@ -1,5 +1,5 @@
 
-import 'dart:ffi';
+//import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -27,8 +27,8 @@ import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../constants.dart';
 class DocBuble extends StatefulWidget {
-  const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded}) : super(key: key);
-  final String message, time,senderUrl,id,chatId,receiverUrl;
+  const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded, required this.contentType}) : super(key: key);
+  final String message, time,senderUrl,id,chatId,receiverUrl,contentType;
   final bool isUser, delivered, read,isSelected,uploaded,downloaded;
 
   @override
@@ -72,7 +72,7 @@ class _DocBubleState extends State<DocBuble> {
     try {
       firebase_storage.Reference ref =
       firebase_storage.FirebaseStorage.instance.ref(
-          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
+          '/chatdoc/${DateTime.fromMicrosecondsSinceEpoch}');
       _uploadTask = ref.putFile(doc);
       await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
 
@@ -90,8 +90,7 @@ class _DocBubleState extends State<DocBuble> {
 
       // Download the image to temporary device storage
       final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/${DateTime
-          .fromMicrosecondsSinceEpoch}.jpg';
+      final tempPath = '${tempDir.path}/${widget.contentType.substring(8)}';
 
       _downloadTask = ref.writeToFile(File(tempPath));
 
@@ -108,7 +107,98 @@ class _DocBubleState extends State<DocBuble> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return  Column(
+      crossAxisAlignment: align,
+      children: [
+        Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                blurRadius: .5,
+                spreadRadius: 1.0,
+                color: Colors.black.withOpacity(.12))
+          ],
+          color: bg,
+          borderRadius: radius,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+           Row(
+             children: [
+               Container(
+                   width: 80,
+                      height: 80,
+                    color: Colors.deepOrangeAccent,
+                   child: const Icon(CupertinoIcons.doc,color: Colors.white70,),
+               ),
+               Padding(
+                 padding: const EdgeInsets.all(8.0),
+                 child: Text(widget.contentType.substring(8),
+
+                 ),
+               ),
+               (widget.isUser) ? (!isUploading) ? IconButton(
+                   onPressed: () async {
+                     setState(() {
+                       isUploading = true;
+                     });
+                     final docUrl = await uploadDocument(
+                         File(widget.senderUrl));
+                     ChatsRemoteServices().updateChatMessage(widget.chatId, {
+                       'uploaded': true,
+                       'text': docUrl
+                     }, widget.id);
+                     setState(() {
+                       uploaded = true;
+                     });
+                   }, icon: const Icon(Icons.upload))
+                   : (!uploaded) ? progressIndicator(_uploadTask,null)
+                   : const SizedBox(width: 0,) :
+               (!downloading)?IconButton(
+                   onPressed: () async {
+                     setState(() {
+                       downloading=true;
+                     });
+                     final receiveUrl=await downloadImage(widget.message);
+                     ChatsRemoteServices().updateChatMessage(widget.chatId,
+                         {'receiverUrl':receiveUrl,
+                           'downloaded':true,
+                         }, widget.id);
+                     setState(() {
+                       downloaded=true;
+                     });
+
+
+                   }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+
+
+             ],
+           ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 55.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    widget.time,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  (widget.isUser) ? Icon(
+                    icon,
+                    size: 16,
+                  ) : const SizedBox(width: 0,)
+                ],
+              ),
+            ),
+          ],
+        ),),
+      ],
+    );
   }
 }
 
@@ -579,7 +669,7 @@ class _ChatWindowState extends State<ChatWindow> {
                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                           showDialog(context: (context), builder: (context)=>
                               AlertDialog(
-                                title: Text('Pick Image from'),
+                                title: const Text('Pick Image from'),
                                 actions: [
                                   ElevatedButton(onPressed: () async {
                                     final image = await ImagePicker().pickImage(source: ImageSource.camera);
@@ -629,7 +719,9 @@ class _ChatWindowState extends State<ChatWindow> {
                 image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
                   image:FileImage(File(backgroundImage)),
                   fit: BoxFit.cover,
-                ):DecorationImage(image: AssetImage(backgroundImage),),
+                ):DecorationImage(image: AssetImage(backgroundImage),
+                  fit: BoxFit.cover
+                ),
               ),
               child: Column(
                 children: [
@@ -674,7 +766,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
                                 String? symmKeyString;
                                 return FutureBuilder(
-                                  future: FlutterSecureStorage().read(key: chatid!),
+                                  future: const FlutterSecureStorage().read(key: chatid!),
                                   builder: (context, snapshot) {
                                     if(snapshot.hasData){
                                       symmKeyString = snapshot.data;
@@ -684,7 +776,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       String message = encrypter.decrypt(encryptedMessage,iv: iv);
 
                                 return GestureDetector(
-                                  child:MyBubble(
+                                  child:(chatmessage.contentType=='text')?MyBubble(
                                     message: message,
                                     time:
                                         ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
@@ -692,7 +784,51 @@ class _ChatWindowState extends State<ChatWindow> {
                                     isUser: (chatmessage.senderId == cid),
                                     read: chatmessage.read,
                                     isSelected: isSelected[index],
-                                    ),
+                                    ):
+                                  (chatmessage.contentType=='image')?(chatmessage.uploaded)?
+                                  ImageBubble(message:message,
+                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                      isUser: (cid==chatmessage.senderId),
+                                      delivered: chatmessage.delivered, read: chatmessage.read,
+                                      isSelected: isSelected[index],
+                                      uploaded: chatmessage.uploaded,
+                                      downloaded: chatmessage.downloaded,
+                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):
+                                  (cid==chatmessage.senderId)?ImageBubble(message:message,
+                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                      isUser: (cid==chatmessage.senderId),
+                                      delivered: chatmessage.delivered, read: chatmessage.read,
+                                      isSelected: isSelected[index],
+                                      uploaded: chatmessage.uploaded,
+                                      downloaded: chatmessage.downloaded,
+                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):const SizedBox(height: 0,):
+                                  (chatmessage.uploaded)?DocBuble(message: message,
+                                          time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                          , senderUrl: chatmessage.senderUrl??'',
+                                          id: chatmessage.id,
+                                          chatId: chatid!,
+                                          receiverUrl: chatmessage.receiverUrl??'',
+                                          isUser: (cid==chatmessage.senderId),
+                                          delivered: chatmessage.delivered,
+                                          read: chatmessage.read,
+                                          isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                          downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                      :(cid==chatmessage.senderId)?
+                                  DocBuble(message: message,
+                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                      , senderUrl: chatmessage.senderUrl??'',
+                                      id: chatmessage.id,
+                                      chatId: chatid!,
+                                      receiverUrl: chatmessage.receiverUrl??'',
+                                      isUser: (cid==chatmessage.senderId),
+                                      delivered: chatmessage.delivered,
+                                      read: chatmessage.read,
+                                      isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                      downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                      :const SizedBox(height: 0,)
+                                  ,
                                     onTap: () {
 
                                     if (trueCount != 0) {
@@ -735,8 +871,14 @@ class _ChatWindowState extends State<ChatWindow> {
                                   },);
 
                                     }
+                                    if(snapshot.hasError){
+                                      throw Exception('symmKey not found. or ${snapshot.error}');
+                                    }
                                     else{
-                                      throw Exception("symmKey not found.");
+                                      // throw Exception("symmKey not found.");
+                                      return const SizedBox(
+                                        height: 0,
+                                      );
                                     }
                                   },
                                   // (chatmessage) != null?(chatmessage.contentType=='image')?
@@ -1014,7 +1156,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: otheruser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1032,7 +1174,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
                               await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
@@ -1048,7 +1190,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
-                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                            backgroundImage: "assets/backgroundimage.png",
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -1060,7 +1202,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                     recipientPhoto: currentuser.photoUrl!,
                                     pinned: false,
                                     recipientPhoneNo: currentuser.phoneNo,
-                                    backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                    backgroundImage: "assets/backgroundimage.png",
                                     ));
 
 
