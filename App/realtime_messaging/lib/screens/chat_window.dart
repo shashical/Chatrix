@@ -25,6 +25,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import '../constants.dart';
 class DocBuble extends StatefulWidget {
   const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded}) : super(key: key);
   final String message, time,senderUrl,id,chatId,receiverUrl;
@@ -110,6 +111,8 @@ class _DocBubleState extends State<DocBuble> {
     return Container();
   }
 }
+
+
 
 class ImageBubble extends StatefulWidget {
   const ImageBubble({Key? key,
@@ -678,7 +681,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
                                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
-                                      String message = encrypter.decrypt(encryptedMessage);
+                                      String message = encrypter.decrypt(encryptedMessage,iv: iv);
 
                                 return GestureDetector(
                                   child:MyBubble(
@@ -1358,7 +1361,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                            encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp);
+                            encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                             String encryptedMessageString = encryptedMessage.base64;
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
