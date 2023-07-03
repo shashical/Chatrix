@@ -963,7 +963,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                   },);
 
                                     }
-                                    if(snapshot.hasError){
+                                    else if(snapshot.hasError){
                                       throw Exception('symmKey not found. or ${snapshot.error}');
                                     }
                                     else{

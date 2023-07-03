@@ -16,6 +16,7 @@ class UserGroup {
   DateTime? lastMessageTime;
   String? lastMessageType;
   bool muted;
+  String? containsSymmKey;
 
   UserGroup({
     required this.id,
@@ -26,10 +27,11 @@ class UserGroup {
     required this.name,
     required this.imageUrl,/* = "https://geodash.gov.bd/uploaded/people_group/default_group.png"*/
     this.unreadMessageCount,
-    this.lastMessage,
+    this.lastMessage = '',
     this.lastMessageTime,
     this.lastMessageType,
     this.muted = false,
+    this.containsSymmKey,
   });
 
   factory UserGroup.fromJson(Map<String, dynamic> json) {
@@ -46,6 +48,7 @@ class UserGroup {
       lastMessageTime: (json['lastMessageTime']!=null)?DateTime.parse(json['lastMessageTime']):null,
       lastMessageType: json['lastMessageType'],
       muted: json['muted'],
+      containsSymmKey: json['containsSymmKey']
     );
   }
 
@@ -62,7 +65,8 @@ class UserGroup {
       'lastMessage': lastMessage,
       'lastMessageTime': lastMessageTime?.toIso8601String(),
       'lastMessageType': lastMessageType,
-      'muted': muted
+      'muted': muted,
+      'containsSymmKey': containsSymmKey
     };
   }
 }

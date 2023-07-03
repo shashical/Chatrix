@@ -301,9 +301,8 @@ class _ChatsPageState extends State<ChatsPage> {
                         final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
 
                         if(userchat.containsSymmKey != null){
-                          String encrytedSymmKeyString = userchat.containsSymmKey!;
-                          debugPrint(encrytedSymmKeyString);
-                          encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encrytedSymmKeyString);
+                          String encryptedSymmKeyString = userchat.containsSymmKey!;
+                          encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encryptedSymmKeyString);
                           String? privateKeyString;
                           return FutureBuilder(
                             future:  const FlutterSecureStorage().read(key: cid),
@@ -311,7 +310,6 @@ class _ChatsPageState extends State<ChatsPage> {
                             builder: (context, snapshot) {
                               if(snapshot.hasData){
                                 privateKeyString = snapshot.data;
-                                debugPrint('print   $privateKeyString');
                                 RSAPrivateKey privateKey = rsa.RsaKeyHelper().parsePrivateKeyFromPem(privateKeyString);
                                 encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(privateKey: privateKey));
                                 String symmKeyString = encrypter.decrypt(encryptedSymmKey);
@@ -457,13 +455,13 @@ class _ChatsPageState extends State<ChatsPage> {
                                             }
                                             else{
                                               return const SizedBox(
-                                                child: Text('here is problem 1'),
+                                                height: 0,
                                               );
                                             }
                                           },
                                         );
                                       },
-                                    );;
+                                    );
                                   },
                                 );
                               }
@@ -472,7 +470,7 @@ class _ChatsPageState extends State<ChatsPage> {
                               }
                               else{
                                 return const SizedBox(
-                                  child: Text('not able to retrive private key '),
+                                  height: 0,
                                 );
                               }
 
