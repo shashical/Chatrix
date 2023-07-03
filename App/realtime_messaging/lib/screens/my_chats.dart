@@ -305,7 +305,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encrytedSymmKeyString);
                           String? privateKeyString;
                           FutureBuilder(
-                            future: FlutterSecureStorage().read(key: cid),
+                            future: const FlutterSecureStorage().read(key: cid),
 
                             builder: (context, snapshot) {
                               if(snapshot.hasData){
@@ -335,6 +335,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                               encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
                                               String message = encrypter.decrypt(encryptedMessage,iv: iv);
                                               return ListTile(
+                                                tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                                 leading: InkWell(
                                                   child: Stack(
                                                       children: [
@@ -499,6 +500,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                 encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
                                 String message = encrypter.decrypt(encryptedMessage,iv: iv);
                                 return ListTile(
+                                  tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                   leading: InkWell(
                                     child: Stack(
                                         children: [

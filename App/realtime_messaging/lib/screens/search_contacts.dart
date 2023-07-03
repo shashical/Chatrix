@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
@@ -19,6 +17,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
   List<String> searchedUser = [];
   List<String> searchedNumber = [];
   List<String> appUserNumber = [];
+  List<String> blockedBy=[];
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -92,17 +91,24 @@ class _SearchContactPageState extends State<SearchContactPage> {
               final users = snapshot.data!;
 
               appUserNumber = users.map((user) => user.phoneNo).toList();
+              for(int i=0;i<users.length;i++){
+                if(cid==users[i].id){
+                  blockedBy=users[i].blockedBy??[];
+                  break;
+                }
+              }
+
               //debugPrint('$appUserNumber');
 
               if (_searchController.text.isEmpty) {
                 return ListView(
                   children:
-                      MergeAppUserAndSendInvite(users, appUserNumber, context),
+                      MergeAppUserAndSendInvite(users, appUserNumber,blockedBy ,context),
                 );
               } else {
                 return ListView(
                     children: SearchMerge(users, appUserNumber, searchedNumber,
-                        searchedUser, context));
+                        searchedUser,blockedBy, context));
               }
             }
           },
@@ -113,7 +119,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
 }
 
 List<Widget> MergeAppUserAndSendInvite(
-    List<Users> users, List<String> appUserNumber, BuildContext context) {
+    List<Users> users, List<String> appUserNumber,List<String> blockedBy,BuildContext context) {
   List<Widget> returnablelist = [];
   List<Widget> inviteToApp = [];
   for (int i = 0; i < savedNumber.length; i++) {
@@ -163,7 +169,7 @@ List<Widget> MergeAppUserAndSendInvite(
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage(
-                '${users[index].photoUrl}',
+                (blockedBy.contains(users[index].id))?'${users[index].photoUrl}':'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg',
               ),
             ),
             onTap: () {
@@ -222,6 +228,7 @@ List<Widget> SearchMerge(
     List<String> appUserNumber,
     List<String> searchedNumber,
     List<String> searchedUsers,
+    List<String> blockedBy,
     BuildContext context) {
   List<Widget> returnablelist = [];
   List<Widget> inviteToApp = [];
@@ -232,7 +239,7 @@ List<Widget> SearchMerge(
         returnablelist.add(ListTile(
           leading: InkWell(
             child: CircleAvatar(
-              foregroundImage: NetworkImage('${users[index].photoUrl}'),
+              foregroundImage: NetworkImage((blockedBy.contains(users[index].id))?'${users[index].photoUrl}':'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
             ),
             onTap: () {
               Navigator.push(

@@ -252,6 +252,7 @@ class _GroupsPageState extends State<GroupsPage> {
                     itemBuilder: (context, index) {
                       final UserGroup usergroup = usergroups[index];
                       return ListTile(
+                        tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                             leading: InkWell(
                               child: Stack(
                                 children: [
@@ -291,7 +292,7 @@ class _GroupsPageState extends State<GroupsPage> {
                               ),
                             ),
                             onTap: () {
-                              debugPrint('${isSelected}');
+
                               if(trueCount!=0) {
                                 if (isSelected[index]) {
                                   setState(() {

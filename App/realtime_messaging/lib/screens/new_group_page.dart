@@ -143,7 +143,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                               )),
                     ),
                     Flexible(
-                      flex:8,
+                      flex:9,
                       child: ListView(
                           children: (_searchController.text.isEmpty)
                               ? usersPresentList(users, appUserNumber, context,
@@ -216,6 +216,7 @@ List<Widget> usersPresentList(List<Users> users, List<String> appUserNumber,
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
+          tileColor: participantIds.contains(users[index].id)?Colors.blue.withOpacity(0.5):null,
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage('${users[index].photoUrl}'),
@@ -254,6 +255,7 @@ List<Widget> SearchMerge(
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
+          tileColor: participantIds.contains(users[index].id)?Colors.blue.withOpacity(0.5):null,
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage('${users[index].photoUrl}'),

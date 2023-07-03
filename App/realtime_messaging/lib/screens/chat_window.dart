@@ -503,9 +503,6 @@ class _ChatWindowState extends State<ChatWindow> {
       _image = imageTemp;
     });
   }
- // Replace 'your_image_uri' with the actual URI of your image in Firebase Storage
-
-
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
     setState(() {
@@ -935,6 +932,9 @@ class _ChatWindowState extends State<ChatWindow> {
                       },
                     ),
                   ),
+                  (otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid))?const Center(
+                    child: Text('you have blocked this chat unblock to continue'),
+                  ):const SizedBox(height: 0,),
                   Container(
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.95),
