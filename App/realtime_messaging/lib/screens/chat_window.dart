@@ -491,6 +491,11 @@ class _ChatWindowState extends State<ChatWindow> {
   List<ChatMessage> chatmessages=[];
   String backgroundImage ='';
   int unreadMessageCount=0;
+  int cuumc=0;
+  int ouumc=0;
+  late int bgIndex;
+  late int fgIndex;
+  bool assigned=false;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -732,12 +737,33 @@ class _ChatWindowState extends State<ChatWindow> {
 
 
                            chatmessages = snapshot.data!;
+                           if(!assigned){
+                             bgIndex=chatmessages.length-1;
+                             fgIndex=chatmessages.length;
+                           }
                           if(myMessageLength!=chatmessages.length){
                             myMessageLength=chatmessages.length;
                             isSelected=List.filled(myMessageLength, false);
                             trueCount=0;
 
+
                           }
+                          while(bgIndex>=0 && !chatmessages[bgIndex].read){
+                            cuumc--;
+                            ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[bgIndex].id);
+                            bgIndex--;
+                          }
+                          while(fgIndex<chatmessages.length){
+                            if(chatmessages[fgIndex].senderId==cid){
+                              ouumc++;
+                            }
+                            else{
+                              cuumc--;
+                              ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[fgIndex].id);
+                            }
+                          }
+                          RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
+                          RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':ouumc} , '${otheruser.id}$cid');
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
@@ -1020,7 +1046,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
-                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                              await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                         setState(() {
                                         chatid = "$cid${otheruser.id}";
                                       });
