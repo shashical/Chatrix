@@ -1024,6 +1024,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                 SimpleDialogOption(
                                   onPressed: () async {
                                     final files=await ChatsRemoteServices().pickDocument();
+                                    Navigator.of(context,rootNavigator: true).pop();
                                     if(files!=null){
 
                                       if (chatid == null) {
@@ -1134,7 +1135,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       //   );
                                       //
                                       // }
-
+                                        debugPrint('${files}');
                                       RemoteServices().updateUserChat(
                                           cid,
                                           {
