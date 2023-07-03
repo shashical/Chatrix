@@ -72,7 +72,7 @@ class _DocBubleState extends State<DocBuble> {
     try {
       firebase_storage.Reference ref =
       firebase_storage.FirebaseStorage.instance.ref(
-          '/chatdoc/${DateTime.fromMicrosecondsSinceEpoch}');
+          '/chatdoc/${DateTime.now().microsecondsSinceEpoch}');
       _uploadTask = ref.putFile(doc);
       await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
 
@@ -265,7 +265,7 @@ class _ImageBubbleState extends State<ImageBubble> {
     try {
       firebase_storage.Reference ref =
       firebase_storage.FirebaseStorage.instance.ref(
-          '/chatimage/${DateTime.fromMicrosecondsSinceEpoch}');
+          '/chatimage/${DateTime.now().microsecondsSinceEpoch}');
       _uploadTask = ref.putFile(doc);
       await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
 
@@ -283,8 +283,8 @@ class _ImageBubbleState extends State<ImageBubble> {
 
       // Download the image to temporary device storage
       final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/${DateTime
-          .fromMicrosecondsSinceEpoch}.jpg';
+      final tempPath = '${tempDir.path}/${DateTime.now()
+          .microsecondsSinceEpoch}.jpg';
 
       _downloadTask = ref.writeToFile(File(tempPath));
 
@@ -1110,7 +1110,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       for (int i = 0; i < files.files.length; i++) {
                                         // firebase_storage.Reference ref =
                                         // firebase_storage.FirebaseStorage.instance.ref(
-                                        //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                        //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
                                         // uploadTask.add(ref.putFile(File(widget.result.files[i]
                                         //     .path!)));
                                         // await Future.value(uploadTask);
@@ -1268,7 +1268,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                     for (int i = 0; i < 1; i++) {
                                     // firebase_storage.Reference ref =
                                     // firebase_storage.FirebaseStorage.instance.ref(
-                                    //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                    //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
                                     // uploadTask.add(ref.putFile(File(widget.result.files[i]
                                     //     .path!)));
                                     // await Future.value(uploadTask);
@@ -1421,7 +1421,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       for (int i = 0; i < 1; i++) {
                                         // firebase_storage.Reference ref =
                                         // firebase_storage.FirebaseStorage.instance.ref(
-                                        //     '/documents/${DateTime.fromMicrosecondsSinceEpoch}');
+                                        //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
                                         // uploadTask.add(ref.putFile(File(widget.result.files[i]
                                         //     .path!)));
                                         // await Future.value(uploadTask);
