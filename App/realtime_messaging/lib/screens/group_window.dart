@@ -12,6 +12,11 @@ import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/groupMessages.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
+import '../constants.dart';
 
 class MyBubble extends StatelessWidget {
   MyBubble({
@@ -361,9 +366,22 @@ class _GroupWindowState extends State<GroupWindow> {
                         final GroupMessage groupmessage = groupmessages[index];
                         if (groupmessage.deletedForMe[cid] == null &&
                             groupmessage.deletedForEveryone == false) {
-                          return GestureDetector(
+                            
+                            String? symmKeyString;
+                            return FutureBuilder(
+                              future: const FlutterSecureStorage().read(key: widget.groupId),
+                              builder: (context, snapshot) {
+                                if(snapshot.hasData){
+
+                                  symmKeyString = snapshot.data;
+                                  encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                                  encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                  encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(groupmessage.text);
+                                  String message = encrypter.decrypt(encryptedMessage,iv: iv);
+
+                                  return GestureDetector(
                             child: MyBubble(
-                              message: groupmessage.text,
+                              message: message,
                               time:
                                   ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
                               delivered: false,
@@ -414,6 +432,20 @@ class _GroupWindowState extends State<GroupWindow> {
                               });
                             },
                           );
+                                }
+                                else if(snapshot.hasError){
+                                      throw Exception('symmKey not found. or ${snapshot.error}');
+                                    }
+                                    else{
+                                      // throw Exception("symmKey not found.");
+                                      return const SizedBox(
+                                        height: 0,
+                                      );
+                                    }
+                              },
+                            );
+
+                          
                         } else {
                           return const SizedBox(
                             height: 0,
@@ -694,12 +726,19 @@ class _GroupWindowState extends State<GroupWindow> {
                       messageController.clear();
                       final Users currentuser =
                           (await RemoteServices().getSingleUser(cid))!;
+                      
+                      String symmKeyString = (await FlutterSecureStorage().read(key: widget.groupId))!;
+                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                      encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
+                      String encryptedMessageString = encryptedMessage.base64;
+
                       await GroupsRemoteServices().setGroupMessage(
                           widget.groupId,
                           GroupMessage(
                             id: "${DateTime.now().microsecondsSinceEpoch}",
                             senderId: cid,
-                            text: temp,
+                            text: encryptedMessageString,
                             contentType: "text",
                             timestamp: DateTime.now(),
                             senderName: currentuser.name!,
@@ -714,10 +753,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         RemoteServices().updateUserGroup(
                             x,
                             {
-                              'lastMessage': (temp.length >
-                                      100
-                                  ? temp.substring(0, 100)
-                                  : temp),
+                              'lastMessage': encryptedMessageString,
                               'lastMessageType': "text",
                               'lastMessageTime': DateTime.now().toIso8601String()
                             },

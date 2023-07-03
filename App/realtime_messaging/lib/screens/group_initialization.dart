@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,10 @@ import '../Models/userGroups.dart';
 import '../Models/users.dart';
 import '../Services/groups_remote_services.dart';
 import '../Services/users_remote_services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 
 class GroupInitialization extends StatefulWidget {
   final List<String> participantIds;
@@ -202,8 +207,15 @@ final TextEditingController _groupNameController=TextEditingController();
                 creationTimestamp: DateTime.now(),
                 createdBy: widget.users[widget.index].phoneNo,
                 admins: [cid]));
+
+            encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+            String symmKeyString = symmKey.base64;
+
+            await FlutterSecureStorage().write(key: groupid, value: symmKeyString);
+
             for (var i in participantIds) {
-              RemoteServices().setUserGroup(
+              if(i==cid){
+                RemoteServices().setUserGroup(
                   i,
                   UserGroup(
                       id: groupid,
@@ -215,6 +227,28 @@ final TextEditingController _groupNameController=TextEditingController();
                       'https://geodash.gov.bd/uploaded/people_group/default_group.png',
                       backgroundImage:
                       "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
+              }
+              else{
+                DocumentSnapshot docSnap = await FirebaseFirestore.instance.collection('users').doc(i).get();
+                RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(docSnap.get('publicKey'));
+                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                String encrytedSymmKeyString = encryptedSymmKey.base64;
+
+                RemoteServices().setUserGroup(
+                  i,
+                  UserGroup(
+                      id: groupid,
+                      groupId: groupid,
+                      exited: false,
+                      pinned: false,
+                      containsSymmKey: encrytedSymmKeyString,
+                      name: _groupNameController.text,
+                      imageUrl:imageUrl??
+                      'https://geodash.gov.bd/uploaded/people_group/default_group.png',
+                      backgroundImage:
+                      "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
+              }
             }
          final    nav=Navigator.of(context);
             nav.pop();

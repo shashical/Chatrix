@@ -301,8 +301,8 @@ class _ChatsPageState extends State<ChatsPage> {
                         final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
 
                         if(userchat.containsSymmKey != null){
-                          String encrytedSymmKeyString = userchat.containsSymmKey!;
-                          encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encrytedSymmKeyString);
+                          String encryptedSymmKeyString = userchat.containsSymmKey!;
+                          encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encryptedSymmKeyString);
                           String? privateKeyString;
                           FutureBuilder(
                             future: const FlutterSecureStorage().read(key: cid),
@@ -459,7 +459,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                           },
                                         );
                                       },
-                                    );;
+                                    );
                                   },
                                 );
                               }
