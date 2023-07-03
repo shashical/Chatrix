@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
@@ -107,104 +108,132 @@ class _DocBubleState extends State<DocBuble> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
-      crossAxisAlignment: align,
-      children: [
-        Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                blurRadius: .5,
-                spreadRadius: 1.0,
-                color: Colors.black.withOpacity(.12))
-          ],
-          color: bg,
-          borderRadius: radius,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-           Row(
-             children: [
-               Container(
-                   width: 80,
-                      height: 80,
-                    color: Colors.deepOrangeAccent,
-                   child: const Icon(CupertinoIcons.doc,color: Colors.white70,),
-               ),
-               Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Text(widget.contentType.substring(8),
+    return  Container(
+      color:(widget.isSelected)? Colors.blue.withOpacity(0.5):null,
+      child: Column(
+        crossAxisAlignment: align,
+        children: [
+          Container(
+            constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+            margin: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: .5,
+                  spreadRadius: 1.0,
+                  color: Colors.black.withOpacity(.12))
+            ],
+            color: bg,
+            borderRadius: radius,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+             Container(
+               constraints:
+               (widget.isUser)?
+               (uploaded)?
+               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.62):
+               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72):
+               (downloaded)?
+               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.62):
+               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
 
+               child: InkWell(
+                 onTap: (){
+                   if(!widget.isSelected) {
+                     OpenFile.open(widget.isUser?widget.senderUrl:widget.receiverUrl);
+                   }
+                 },
+                 child: Row(
+                   children: [
+                     Padding(
+                       padding: const EdgeInsets.only(left: 8,top:8),
+                       child: Container(
+                           width: 40,
+                              height: 40,
+                            color: Colors.deepOrangeAccent,
+                           child: const Icon(CupertinoIcons.doc,color: Colors.white70,),
+                       ),
+                     ),
+                     Container(
+                       padding: const EdgeInsets.all(5),
+                       constraints:
+                       BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.48),
+                       child: Text(widget.contentType.substring(8),
+
+                       ),
+                     ),
+                     (widget.isUser) ? (!isUploading && !uploaded) ? IconButton(
+                         onPressed: () async {
+                           setState(() {
+                             isUploading = true;
+                           });
+                           final docUrl = await uploadDocument(
+                               File(widget.senderUrl));
+
+                           String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
+                           encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                           encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                           encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                           String encryptedDocUrlString = encryptedDocUrl.base64;
+
+                           ChatsRemoteServices().updateChatMessage(widget.chatId, {
+                             'uploaded': true,
+                             'text': encryptedDocUrlString
+                           }, widget.id);
+                           setState(() {
+                             uploaded = true;
+                           });
+                         }, icon: const Icon(Icons.upload))
+                         : (!uploaded) ? progressIndicator(_uploadTask,null)
+                         : const SizedBox(width: 0,) :
+                     (!downloading && !downloaded)?IconButton(
+                         onPressed: () async {
+                           setState(() {
+                             downloading=true;
+                           });
+                           final receiveUrl=await downloadImage(widget.message);
+                           ChatsRemoteServices().updateChatMessage(widget.chatId,
+                               {'receiverUrl':receiveUrl,
+                                 'downloaded':true,
+                               }, widget.id);
+                           setState(() {
+                             downloaded=true;
+                           });
+
+
+                         }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+
+
+                   ],
                  ),
                ),
-               (widget.isUser) ? (!isUploading) ? IconButton(
-                   onPressed: () async {
-                     setState(() {
-                       isUploading = true;
-                     });
-                     final docUrl = await uploadDocument(
-                         File(widget.senderUrl));
-
-                     String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
-                     encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
-                     encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                     encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
-                     String encryptedDocUrlString = encryptedDocUrl.base64;
-
-                     ChatsRemoteServices().updateChatMessage(widget.chatId, {
-                       'uploaded': true,
-                       'text': encryptedDocUrlString
-                     }, widget.id);
-                     setState(() {
-                       uploaded = true;
-                     });
-                   }, icon: const Icon(Icons.upload))
-                   : (!uploaded) ? progressIndicator(_uploadTask,null)
-                   : const SizedBox(width: 0,) :
-               (!downloading)?IconButton(
-                   onPressed: () async {
-                     setState(() {
-                       downloading=true;
-                     });
-                     final receiveUrl=await downloadImage(widget.message);
-                     ChatsRemoteServices().updateChatMessage(widget.chatId,
-                         {'receiverUrl':receiveUrl,
-                           'downloaded':true,
-                         }, widget.id);
-                     setState(() {
-                       downloaded=true;
-                     });
-
-
-                   }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
-
-
-             ],
-           ),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 55.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    widget.time,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  (widget.isUser) ? Icon(
-                    icon,
-                    size: 16,
-                  ) : const SizedBox(width: 0,)
-                ],
+             ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 55.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      widget.time,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    (widget.isUser) ? Icon(
+                      icon,
+                      size: 16,
+                    ) : const SizedBox(width: 0,)
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),),
-      ],
+            ],
+          ),),
+        ],
+      ),
     );
   }
 }
@@ -229,7 +258,7 @@ class ImageBubble extends StatefulWidget {
 }
 
 class _ImageBubbleState extends State<ImageBubble> {
-  late Color bg; // =widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Colors.white : Colors.greenAccent.shade100;
+  late Color bg;
   late CrossAxisAlignment align;
   late IconData icon;
   late BorderRadius radius;
@@ -301,90 +330,113 @@ class _ImageBubbleState extends State<ImageBubble> {
 
     @override
     Widget build(BuildContext context) {
-      return Column(
-        crossAxisAlignment: align,
-        children: [
-          Stack(
-              children: [ Container(
-                padding: const EdgeInsets.all(8),
-                alignment: Alignment.bottomRight,
-                decoration: BoxDecoration(
-                  image:(widget.isUser)? DecorationImage(
-                    image: FileImage(File(widget.senderUrl)),
-                  ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)))
-                      :const DecorationImage(image: AssetImage('assests/blurimg.png')),
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: .5,
-                        spreadRadius: 1.0,
-                        color: Colors.black.withOpacity(.12))
-                  ],
-                  color: bg,
-                  borderRadius: radius,
-                ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 55.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        widget.time,
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      (widget.isUser) ? Icon(
-                        icon,
-                        size: 16,
-                      ) : const SizedBox(width: 0,)
-                    ],
-                  ),
-                ),),
-                Center(child: (widget.isUser) ? (!isUploading) ? IconButton(
-                    onPressed: () async {
-                      setState(() {
-                        isUploading = true;
-                      });
-                      final docUrl = await uploadDocument(
-                          File(widget.senderUrl));
+      return Container(
+        color:(widget.isSelected)?Colors.blue.withOpacity(0.5):null,
+        child: Column(
+          crossAxisAlignment: align,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7,
+                  maxHeight: MediaQuery.of(context).size.height*0.4
+              ),
+              padding: const EdgeInsets.all(2),
+              margin: const EdgeInsets.all(3.0),
+              decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    blurRadius: .5,
+                    spreadRadius: 1.0,
+                    color: Colors.black.withOpacity(.12))
+              ],
 
-                      String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
-                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
-                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                      encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
-                      String encryptedDocUrlString = encryptedDocUrl.base64;
+              borderRadius: radius,
+              color: bg,
+        ),
+              child: Stack(
+                  children: [ Container(
+                      constraints:
+                      BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7,
+                              maxHeight: MediaQuery.of(context).size.height*0.4
+                      ),
 
-                      ChatsRemoteServices().updateChatMessage(widget.chatId, {
-                        'uploaded': true,
-                        'text': encryptedDocUrlString
-                      }, widget.id);
-                      setState(() {
-                        uploaded = true;
-                      });
-                    }, icon: const Icon(Icons.upload))
-                    : (!uploaded) ? progressIndicator(_uploadTask,null)
-                    : const SizedBox(width: 0,) :
-                    (!downloading)?IconButton(
-                    onPressed: () async {
-                      setState(() {
-                        downloading=true;
-                      });
-                      final receiveUrl=await downloadImage(widget.message);
-                      ChatsRemoteServices().updateChatMessage(widget.chatId,
-                          {'receiverUrl':receiveUrl,
-                            'downloaded':true,
+                    alignment: Alignment.bottomRight,
+                    decoration: BoxDecoration(
+                      image:(widget.isUser)? DecorationImage(
+                        image: FileImage(File(widget.senderUrl)),
+                        fit: BoxFit.cover
+                      ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)),fit: BoxFit.cover)
+                          :const DecorationImage(image: AssetImage('assests/blurimg.png')),
+
+                      borderRadius: radius,
+
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 55.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            widget.time,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          (widget.isUser) ? Icon(
+                            icon,
+                            size: 16,
+                          ) : const SizedBox(width: 0,)
+                        ],
+                      ),
+                    ),),
+                    Center(child: (widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
+                        onPressed: () async {
+                          setState(() {
+                            isUploading = true;
+                          });
+                          final docUrl = await uploadDocument(
+                              File(widget.senderUrl));
+
+                          String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
+                          encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                          encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                          encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                          String encryptedDocUrlString = encryptedDocUrl.base64;
+
+                          ChatsRemoteServices().updateChatMessage(widget.chatId, {
+                            'uploaded': true,
+                            'text': encryptedDocUrlString
                           }, widget.id);
-                      setState(() {
-                        downloaded=true;
-                      });
+                          setState(() {
+                            uploaded = true;
+                          });
+                        }, icon: const Icon(Icons.upload))
+                        : (!uploaded) ? progressIndicator(_uploadTask,null)
+                        : const SizedBox(width: 0,) :
+                        (!downloading && !downloaded)?IconButton(
+                        onPressed: () async {
+                          setState(() {
+                            downloading=true;
+                          });
+                          final receiveUrl=await downloadImage(widget.message);
+                          ChatsRemoteServices().updateChatMessage(widget.chatId,
+                              {'receiverUrl':receiveUrl,
+                                'downloaded':true,
+                              }, widget.id);
+                          setState(() {
+                            downloaded=true;
+                          });
 
 
-                    }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
-                )
-              ]
-          ),
-        ],
+                        }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                    )
+                  ]
+              ),
+            ),
+          ],
+        ),
       );
     }
   }
@@ -805,12 +857,15 @@ class _ChatWindowState extends State<ChatWindow> {
                                 return FutureBuilder(
                                   future: const FlutterSecureStorage().read(key: chatid!),
                                   builder: (context, snapshot) {
+                                    String message='';
                                     if(snapshot.hasData){
-                                      symmKeyString = snapshot.data;
+                                      if(chatmessage.text!='')
+                                      {symmKeyString = snapshot.data;
                                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
                                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
-                                      String message = encrypter.decrypt(encryptedMessage,iv: iv);
+                                      message = encrypter.decrypt(encryptedMessage,iv: iv);}
+
 
                                 return GestureDetector(
                                   child:(chatmessage.contentType=='text')?MyBubble(
@@ -1058,7 +1113,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
                               await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
@@ -1135,14 +1190,14 @@ class _ChatWindowState extends State<ChatWindow> {
                                       //   );
                                       //
                                       // }
-                                        debugPrint('${files}');
+                                        debugPrint(' printing filels ${files}');
                                       RemoteServices().updateUserChat(
                                           cid,
                                           {
                                             'lastMessage': (files.files[files.files.length-1].name.length >
-                                                100
+                                                100)
                                                 ?files.files[files.files.length-1].name.substring(0, 100)
-                                                : files.files[files.files.length-1]),
+                                                : files.files[files.files.length-1],
                                             'lastMessageType': "document",
                                             'lastMessageTime': DateTime.now().toIso8601String()
                                           },
@@ -1151,9 +1206,9 @@ class _ChatWindowState extends State<ChatWindow> {
                                           widget.otherUserId,
                                           {
                                             'lastMessage': (files.files[files.files.length-1].name.length >
-                                                100
+                                                100)
                                                 ?files.files[files.files.length-1].name.substring(0, 100)
-                                                : files.files[files.files.length-1]),
+                                                : files.files[files.files.length-1],
                                             'lastMessageType': "document",
                                             'lastMessageTime': DateTime.now().toIso8601String()
                                           },

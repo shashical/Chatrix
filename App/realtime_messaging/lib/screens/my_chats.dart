@@ -302,19 +302,21 @@ class _ChatsPageState extends State<ChatsPage> {
 
                         if(userchat.containsSymmKey != null){
                           String encrytedSymmKeyString = userchat.containsSymmKey!;
+                          debugPrint(encrytedSymmKeyString);
                           encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encrytedSymmKeyString);
                           String? privateKeyString;
-                          FutureBuilder(
-                            future: const FlutterSecureStorage().read(key: cid),
+                          return FutureBuilder(
+                            future:  const FlutterSecureStorage().read(key: cid),
 
                             builder: (context, snapshot) {
                               if(snapshot.hasData){
                                 privateKeyString = snapshot.data;
+                                debugPrint('print   $privateKeyString');
                                 RSAPrivateKey privateKey = rsa.RsaKeyHelper().parsePrivateKeyFromPem(privateKeyString);
                                 encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(privateKey: privateKey));
                                 String symmKeyString = encrypter.decrypt(encryptedSymmKey);
                                 return FutureBuilder(
-                                  future: const FlutterSecureStorage().write(key: userchat.chatId, value: symmKeyString),
+                                  future:  const FlutterSecureStorage().write(key: userchat.chatId, value: symmKeyString),
                                   builder: (context, snapshot) {
                                     return FutureBuilder(
                                       future: RemoteServices().updateUserChat(cid,
@@ -328,12 +330,14 @@ class _ChatsPageState extends State<ChatsPage> {
                                           future: const FlutterSecureStorage().read(key: userchat.chatId),
                                           builder: (context, snapshot) {
                                             if(snapshot.hasData){
+                                              String message=userchat.lastMessage!;
+                                              if(userchat.lastMessageType=='text'){
                                               symmKeyString = snapshot.data;
                                               encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
                                               encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
 
                                               encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
-                                              String message = encrypter.decrypt(encryptedMessage,iv: iv);
+                                              message = encrypter.decrypt(encryptedMessage,iv: iv);}
                                               return ListTile(
                                                 tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                                 leading: InkWell(
@@ -453,7 +457,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                             }
                                             else{
                                               return const SizedBox(
-                                                height: 0,
+                                                child: Text('here is problem 1'),
                                               );
                                             }
                                           },
@@ -468,7 +472,7 @@ class _ChatsPageState extends State<ChatsPage> {
                               }
                               else{
                                 return const SizedBox(
-                                  height: 0,
+                                  child: Text('not able to retrive private key '),
                                 );
                               }
 
@@ -493,12 +497,20 @@ class _ChatsPageState extends State<ChatsPage> {
                             future: const FlutterSecureStorage().read(key: userchat.chatId),
                             builder: (context, snapshot) {
                               if(snapshot.hasData){
-                                symmKeyString = snapshot.data;
-                                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                  String message=userchat.lastMessage!;
+                                  if(userchat.lastMessageType=='text') {
+                                    symmKeyString = snapshot.data;
+                                    encrypt.Key symmKey = encrypt.Key
+                                        .fromBase64(symmKeyString!);
+                                    encrypt.Encrypter encrypter = encrypt
+                                        .Encrypter(encrypt.AES(symmKey));
 
-                                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
-                                String message = encrypter.decrypt(encryptedMessage,iv: iv);
+                                    encrypt.Encrypted encryptedMessage = encrypt
+                                        .Encrypted.fromBase64(
+                                        userchat.lastMessage!);
+                                    message = encrypter.decrypt(
+                                        encryptedMessage, iv: iv);
+                                  }
                                 return ListTile(
                                   tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                   leading: InkWell(
@@ -624,7 +636,7 @@ class _ChatsPageState extends State<ChatsPage> {
                             },
                           );
                         }
-                        return const SizedBox(height: 0,);
+
 
 
                         // return

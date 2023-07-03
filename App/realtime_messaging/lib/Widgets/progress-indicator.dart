@@ -13,13 +13,15 @@ Widget progressIndicator(UploadTask? uploadTask,DownloadTask? downloadTask)=>Str
     final data=snapshot.data;
     double progress=data!.bytesTransferred/data.totalBytes;
     return Stack(
-      children: [CircularProgressIndicator(
-        value: progress,
-        backgroundColor: Colors.grey,
-        color: Colors.greenAccent,
+      children: [Center(
+        child: CircularProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey[300],
+          color: Colors.orangeAccent,
 
+        ),
       ),
-        Center(child: Text('${progress*100}%'))
+        Center(child: Text('${(progress*100).toInt()}%',style: const TextStyle(color: Colors.blue),))
       ]
     );
   }

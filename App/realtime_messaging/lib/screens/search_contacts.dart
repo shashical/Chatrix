@@ -129,8 +129,7 @@ List<Widget> MergeAppUserAndSendInvite(
         returnablelist.add(ListTile(
           onTap: () async {
             DocumentSnapshot docsnap = await FirebaseFirestore.instance
-                .collection('chats')
-                .doc('$cid${users[index].id}')
+                .collection('users').doc(cid).collection('userChats').doc('$cid${users[index].id}')
                 .get();
             if (docsnap.exists) {
               Navigator.pushReplacement(context, MaterialPageRoute(
@@ -144,15 +143,14 @@ List<Widget> MergeAppUserAndSendInvite(
               ));
             } else {
               docsnap = await FirebaseFirestore.instance
-                  .collection('chats')
-                  .doc('${users[index].id}$cid')
+                  .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
                   .get();
               if (docsnap.exists) {
                 Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
                     return ChatWindow(
                       otherUserId: users[index].id,
-                      chatId: docsnap.get('chatId'),
+                      chatId: docsnap.get('ChatId'),
                       backgroundImage: docsnap.get('backgroundImage'),
                     );
                   },
