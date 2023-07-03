@@ -146,9 +146,16 @@ class _DocBubleState extends State<DocBuble> {
                      });
                      final docUrl = await uploadDocument(
                          File(widget.senderUrl));
+
+                     String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
+                     encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                     encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                     encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                     String encryptedDocUrlString = encryptedDocUrl.base64;
+
                      ChatsRemoteServices().updateChatMessage(widget.chatId, {
                        'uploaded': true,
-                       'text': docUrl
+                       'text': encryptedDocUrlString
                      }, widget.id);
                      setState(() {
                        uploaded = true;
@@ -341,9 +348,16 @@ class _ImageBubbleState extends State<ImageBubble> {
                       });
                       final docUrl = await uploadDocument(
                           File(widget.senderUrl));
+
+                      String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
+                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                      encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                      String encryptedDocUrlString = encryptedDocUrl.base64;
+
                       ChatsRemoteServices().updateChatMessage(widget.chatId, {
                         'uploaded': true,
-                        'text': docUrl
+                        'text': encryptedDocUrlString
                       }, widget.id);
                       setState(() {
                         uploaded = true;
