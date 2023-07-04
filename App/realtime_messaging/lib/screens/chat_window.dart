@@ -868,7 +868,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             myMessageLength=chatmessages.length;
                             isSelected=List.filled(myMessageLength, false);
                             trueCount=0;
-
+                            bgIndex =0;
 
                           }
                           while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
@@ -884,7 +884,7 @@ class _ChatWindowState extends State<ChatWindow> {
 
                               ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
                             }
-
+                            bgIndex--;
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
                           // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
@@ -941,6 +941,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                 }
                                 ouumc=0;
                                 debugPrint('$ouumc');
+                                // bgIndex = 0;
                               }
                               Widget listBuilder=ListView.builder(
                                 controller: scrollController,
@@ -1704,6 +1705,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                 chatid = "$cid${widget.otherUserId}";
                               });
                             }
+                            debugPrint(chatid);
                             String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
