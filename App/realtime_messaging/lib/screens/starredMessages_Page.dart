@@ -78,21 +78,34 @@ class _StarredMessagePageState extends State<StarredMessagePage> {
                       child: Column(
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  foregroundImage: NetworkImage(starredmessages![index].senderPhoto),
+                              Container(
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width*0.7,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CircleAvatar(
+                                        foregroundImage: NetworkImage(starredmessages![index].senderPhoto),
+                                      ),
+                                    ),
+                                    Text(starredmessages[index].senderPhoneNo),
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(CupertinoIcons.play_arrow_solid),
+                                    ),
+                                    Text((starredmessages[index].isGroup)?starredmessages[index].groupName!:starredmessages[index].recipientPhoneNo!),
+
+                                  ],
                                 ),
                               ),
-                              Text(starredmessages[index].senderPhoneNo),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(CupertinoIcons.play_arrow_solid),
-                              ),
-
+                              Text('${starredmessages[index].timestamp.day}/${starredmessages[index].timestamp.month}/${starredmessages[index].timestamp.year}'),
                             ],
                           )
+                          
                         ],
                       ),
                     ));

@@ -19,6 +19,7 @@ import 'package:realtime_messaging/Services/starred_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/Widgets/progress-indicator.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/userChats.dart';
@@ -58,7 +59,7 @@ class _DocBubleState extends State<DocBuble> {
         ? Colors.white
         : Colors.greenAccent.shade100;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    icon = widget.delivered ? Icons.done_all : Icons.done;
+    icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser ? const BorderRadius.only(
       topRight: Radius.circular(5.0),
       bottomLeft: Radius.circular(10.0),
@@ -279,7 +280,7 @@ class _ImageBubbleState extends State<ImageBubble> {
         ? Colors.white
         : Colors.greenAccent.shade100;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    icon = widget.delivered ? Icons.done_all : Icons.done;
+    icon = widget.read  ? Icons.done_all : Icons.done;
     radius = widget.isUser ? const BorderRadius.only(
       topRight: Radius.circular(5.0),
       bottomLeft: Radius.circular(10.0),
@@ -461,7 +462,7 @@ class MyBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg =isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? Colors.white : Colors.greenAccent.shade100;
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    final icon = delivered ? Icons.done_all : Icons.done;
+    final icon = read ? Icons.done_all : Icons.done;
     final radius = !isUser
         ? const BorderRadius.only(
             topRight: Radius.circular(5.0),
@@ -544,7 +545,7 @@ class ChatWindow extends StatefulWidget {
 
 class _ChatWindowState extends State<ChatWindow> {
   TextEditingController messageController = TextEditingController();
-  ScrollController scrollController = ScrollController();
+   ScrollController scrollController= ScrollController();
   late Users otheruser;
   bool isTheOtherUserLoaded = false;
   String? chatid;
@@ -562,8 +563,8 @@ class _ChatWindowState extends State<ChatWindow> {
   String backgroundImage ='';
   int unreadMessageCount=0;
   int ouumc=0;
-  late int bgIndex;
-  late int fgIndex;
+   int bgIndex=0;
+  int fgIndex=1;
   bool assigned=false;
   UserChat? otherUserChat;
   late Users currentUser;
@@ -598,6 +599,8 @@ class _ChatWindowState extends State<ChatWindow> {
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
     backgroundImage=widget.backgroundImage;
+
+
     super.initState();
 
   }
@@ -714,13 +717,42 @@ class _ChatWindowState extends State<ChatWindow> {
               ) :Row(
                 children: [
                   InkWell(
-                    child: CircleAvatar(
-                      foregroundImage: NetworkImage(otheruser.photoUrl!),
+                    child: Stack(
+                      children: [
+                        const SizedBox(
+                         width: 42.5,
+                         height: 40,
+                        ),
+                        CircleAvatar(
+                        foregroundImage: NetworkImage(otheruser.photoUrl!),
+                      ),
+                        Positioned(
+                          bottom: 1.5,
+                            right: 0,
+                            child: Container(
+                              height: 15,
+                          width: 15,
+                          decoration: BoxDecoration(
+                            color: (otheruser.isOnline!)?const Color.fromARGB(
+                                255, 0, 228, 31):Colors.white70,
+                            shape: BoxShape.circle
+                          ),
+                        ))
+                    ]
                     ),
-
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(userId: widget.otherUserId,)));
+                    },
                   ),
                   const SizedBox(width: 10,),
-                  Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
+                      Text((otheruser.isOnline!)?'Online Now':'Last seen at ${otheruser.lastOnline?.hour}:${otheruser.lastOnline!.minute~/10}${otheruser.lastOnline!.minute%10} on ${otheruser.lastOnline!.day}/${otheruser.lastOnline!.month}/${otheruser.lastOnline!.year}'
+                      ,style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w300),)
+                    ],
+                  ),
                   const Spacer(),
                   PopupMenuButton(itemBuilder: (context)=>
                   [
@@ -830,12 +862,8 @@ class _ChatWindowState extends State<ChatWindow> {
                         if (snapshot.hasData) {
 
 
-                           chatmessages = snapshot.data!;
-                           if(!assigned){
-                             bgIndex=chatmessages.length-1;
-                             fgIndex=chatmessages.length;
-                             assigned=true;
-                           }
+                           chatmessages = snapshot.data!.reversed.toList();
+
                           if(myMessageLength!=chatmessages.length){
                             myMessageLength=chatmessages.length;
                             isSelected=List.filled(myMessageLength, false);
@@ -843,25 +871,24 @@ class _ChatWindowState extends State<ChatWindow> {
 
 
                           }
-                          while(bgIndex>=0 && !chatmessages[bgIndex].read){
-                            ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[bgIndex].id);
-                            bgIndex--;
+                          while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
+                            ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                            fgIndex++;
                           }
-                          debugPrint('${chatmessages.length}  and index $fgIndex');
-                          while(fgIndex<chatmessages.length){
-                            if(chatmessages[fgIndex].senderId==cid){
+                          while(bgIndex>=0){
+                            if(chatmessages[bgIndex].senderId==cid){
                               ouumc++;
 
                             }
                             else{
 
-                              ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[fgIndex].id);
+                              ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
                             }
-                            fgIndex++;
+
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
-                          RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
-                          debugPrint('unread${unreadMessageCount+ouumc}');
+                          // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
+                          // debugPrint('unread${unreadMessageCount+ouumc}');
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
@@ -879,177 +906,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           //   },
                           // );
 
-                          Widget listBuilder=ListView.builder(
-                            controller: scrollController,
-                            itemCount: chatmessages.length,
-                            itemBuilder: (context, index) {
-                              final ChatMessage chatmessage = chatmessages[index];
-                              if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
-                                String? symmKeyString;
-                                return FutureBuilder(
-                                  future: const FlutterSecureStorage().read(key: chatid!),
-                                  builder: (context, snapshot) {
-                                    String message='';
-                                    if(snapshot.hasData){
-                                      if(chatmessage.text!='')
-                                      {symmKeyString = snapshot.data;
-                                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                                      encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
-                                      message = encrypter.decrypt(encryptedMessage,iv: iv);}
 
-
-                                return GestureDetector(
-                                  child:(chatmessage.contentType=='text')?MyBubble(
-                                    message: message,
-                                    time:
-                                        ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                    delivered: chatmessage.delivered,
-                                    isUser: (chatmessage.senderId == cid),
-                                    read: chatmessage.read,
-                                    isSelected: isSelected[index],
-                                    ):
-                                  (chatmessage.contentType=='image')?(chatmessage.uploaded)?
-                                  ImageBubble(message:message,
-                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                      isUser: (cid==chatmessage.senderId),
-                                      delivered: chatmessage.delivered, read: chatmessage.read,
-                                      isSelected: isSelected[index],
-                                      uploaded: chatmessage.uploaded,
-                                      downloaded: chatmessage.downloaded,
-                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
-                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):
-                                  (cid==chatmessage.senderId)?ImageBubble(message:message,
-                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                      isUser: (cid==chatmessage.senderId),
-                                      delivered: chatmessage.delivered, read: chatmessage.read,
-                                      isSelected: isSelected[index],
-                                      uploaded: chatmessage.uploaded,
-                                      downloaded: chatmessage.downloaded,
-                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
-                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):const SizedBox(height: 0,):
-                                  (chatmessage.uploaded)?DocBuble(message: message,
-                                          time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
-                                          , senderUrl: chatmessage.senderUrl??'',
-                                          id: chatmessage.id,
-                                          chatId: chatid!,
-                                          receiverUrl: chatmessage.receiverUrl??'',
-                                          isUser: (cid==chatmessage.senderId),
-                                          delivered: chatmessage.delivered,
-                                          read: chatmessage.read,
-                                          isSelected: isSelected[index], uploaded: chatmessage.uploaded,
-                                          downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
-                                      :(cid==chatmessage.senderId)?
-                                  DocBuble(message: message,
-                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
-                                      , senderUrl: chatmessage.senderUrl??'',
-                                      id: chatmessage.id,
-                                      chatId: chatid!,
-                                      receiverUrl: chatmessage.receiverUrl??'',
-                                      isUser: (cid==chatmessage.senderId),
-                                      delivered: chatmessage.delivered,
-                                      read: chatmessage.read,
-                                      isSelected: isSelected[index], uploaded: chatmessage.uploaded,
-                                      downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
-                                      :const SizedBox(height: 0,)
-                                  ,
-                                    onTap: () {
-
-                                    if (trueCount != 0) {
-                                      setState(() {
-
-
-                                      if (isSelected[index]) {
-                                        isSelected[index] = false;
-                                        trueCount--;
-                                        if(chatmessage.senderId!=cid){
-                                          otherUserChatSelected.remove(index);
-                                        }
-                                        if(chatmessage.contentType!='text'){
-                                          if(chatmessage.senderId!=cid){
-                                            if(!chatmessage.downloaded){
-                                              unStarableSelected.remove(index);
-                                            }
-                                          }
-                                        }
-                                      }
-                                      else {
-                                        trueCount++;
-                                        isSelected[index] = true;
-                                        if(chatmessage.senderId!=cid){
-                                          otherUserChatSelected.add(index);
-                                        }
-                                        if(chatmessage.contentType!='text'){
-                                          if(chatmessage.senderId!=cid){
-                                            if(!chatmessage.downloaded){
-                                              unStarableSelected.add(index);
-                                            }
-                                          }
-                                        }
-                                      } });
-                                    }
-                                  },
-                                  onLongPress: (){
-                                    setState(() {
-                                    if(isSelected[index]){
-                                      isSelected[index]=false;
-                                      trueCount--;
-                                      if(chatmessage.senderId!=cid){
-                                        otherUserChatSelected.remove(index);
-                                      }
-                                      if(chatmessage.contentType!='text'){
-                                        if(chatmessage.senderId!=cid){
-                                          if(!chatmessage.downloaded){
-                                            unStarableSelected.remove(index);
-                                          }
-                                        }
-                                      }
-                                    }
-                                    else{
-                                      trueCount++;
-                                      isSelected[index]=true;
-                                      if(chatmessage.senderId!=cid){
-                                        otherUserChatSelected.add(index);
-                                      }
-                                      if(chatmessage.contentType!='text'){
-                                        if(chatmessage.senderId!=cid){
-                                          if(!chatmessage.downloaded){
-                                            unStarableSelected.add(index);
-                                          }
-                                        }
-                                      }
-                                    }
-                                    });
-                                  },);
-
-                                    }
-                                    else if(snapshot.hasError){
-                                      throw Exception('symmKey not found. or ${snapshot.error}');
-                                    }
-                                    else{
-                                      // throw Exception("symmKey not found.");
-                                      return const SizedBox(
-                                        height: 0,
-                                      );
-                                    }
-                                  },
-                                  // (chatmessage) != null?(chatmessage.contentType=='image')?
-                                  // ImageBubble(message: chatmessage.text,
-                                  //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                  //     isUser: cid==chatmessage.senderId,
-                                  //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
-                                  //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
-                                  //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
-                                  //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
-
-                                );
-                              } else {
-                                return const SizedBox(
-                                  height: 0,
-                                );
-                              }
-                            },
-                          );
 
                           //   Widget listBuilder=ListView.builder(
                           //   controller: scrollController,
@@ -1071,23 +928,202 @@ class _ChatWindowState extends State<ChatWindow> {
                           //     }
                           //   },
                           // );
-                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                             scrollController.animateTo(
-                             scrollController.position.maxScrollExtent + 60,
-                             duration: const Duration(milliseconds: 300),
-                             curve: Curves.easeOut,
-                           );
-                         }) ;
-                          return FutureBuilder(
-                            future: RemoteServices().getSingleUserChat(widget.otherUserId, '${otheruser.id}$cid'),
+
+                          return StreamBuilder(
+                            stream: RemoteServices().getUserChatStream(otheruser.id, '${otheruser.id}$cid'),
                               builder: (context,snapshot){
                               if(snapshot.hasData){
                                 otherUserChat=snapshot.data;
                                 unreadMessageCount=otherUserChat?.unreadMessageCount??0;
-                                RemoteServices().updateUserChat(widget.otherUserId,
+                                if(ouumc!=0) {
+                                  RemoteServices().updateUserChat(widget.otherUserId,
                                     {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
+                                }
                                 ouumc=0;
+                                debugPrint('$ouumc');
                               }
+                              Widget listBuilder=ListView.builder(
+                                controller: scrollController,
+                                reverse: true,
+                                itemCount: chatmessages.length,
+                                itemBuilder: (context, index) {
+                                  final ChatMessage chatmessage = chatmessages[index];
+                                  if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                                    String? symmKeyString;
+                                    return FutureBuilder(
+                                      future: const FlutterSecureStorage().read(key: chatid!),
+                                      builder: (context, snapshot) {
+                                        String message='';
+                                        if(snapshot.hasData){
+                                          if(chatmessage.text!='')
+                                          {symmKeyString = snapshot.data;
+                                          encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                                          encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                          encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
+                                          message = encrypter.decrypt(encryptedMessage,iv: iv);}
+                                          // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                                          //   scrollController.animateTo(
+                                          //     scrollController.position.maxScrollExtent + 60,
+                                          //     duration: const Duration(milliseconds: 300),
+                                          //     curve: Curves.easeOut,
+                                          //   );
+                                          //   debugPrint('done dona-done');
+                                          // }) ;
+
+
+
+                                          return GestureDetector(
+                                            child:(chatmessage.contentType=='text')?MyBubble(
+                                              message: message,
+                                              time:
+                                              ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                              delivered: chatmessage.delivered,
+                                              isUser: (chatmessage.senderId == cid),
+                                              read: chatmessage.read,
+                                              isSelected: isSelected[index],
+                                            ):
+                                            (chatmessage.contentType=='image')?(chatmessage.uploaded)?
+                                            ImageBubble(message:message,
+                                                time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                                isUser: (cid==chatmessage.senderId),
+                                                delivered: chatmessage.delivered, read: chatmessage.read,
+                                                isSelected: isSelected[index],
+                                                uploaded: chatmessage.uploaded,
+                                                downloaded: chatmessage.downloaded,
+                                                senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                                chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):
+                                            (cid==chatmessage.senderId)?ImageBubble(message:message,
+                                                time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                                isUser: (cid==chatmessage.senderId),
+                                                delivered: chatmessage.delivered, read: chatmessage.read,
+                                                isSelected: isSelected[index],
+                                                uploaded: chatmessage.uploaded,
+                                                downloaded: chatmessage.downloaded,
+                                                senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                                chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):const SizedBox(height: 0,):
+                                            (chatmessage.uploaded)?DocBuble(message: message,
+                                                time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                                , senderUrl: chatmessage.senderUrl??'',
+                                                id: chatmessage.id,
+                                                chatId: chatid!,
+                                                receiverUrl: chatmessage.receiverUrl??'',
+                                                isUser: (cid==chatmessage.senderId),
+                                                delivered: chatmessage.delivered,
+                                                read: chatmessage.read,
+                                                isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                                downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                                :(cid==chatmessage.senderId)?
+                                            DocBuble(message: message,
+                                                time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                                , senderUrl: chatmessage.senderUrl??'',
+                                                id: chatmessage.id,
+                                                chatId: chatid!,
+                                                receiverUrl: chatmessage.receiverUrl??'',
+                                                isUser: (cid==chatmessage.senderId),
+                                                delivered: chatmessage.delivered,
+                                                read: chatmessage.read,
+                                                isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                                downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                                :const SizedBox(height: 0,)
+                                            ,
+                                            onTap: () {
+
+                                              if (trueCount != 0) {
+                                                setState(() {
+
+
+                                                  if (isSelected[index]) {
+                                                    isSelected[index] = false;
+                                                    trueCount--;
+                                                    if(chatmessage.senderId!=cid){
+                                                      otherUserChatSelected.remove(index);
+                                                    }
+                                                    if(chatmessage.contentType!='text'){
+                                                      if(chatmessage.senderId!=cid){
+                                                        if(!chatmessage.downloaded){
+                                                          unStarableSelected.remove(index);
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                  else {
+                                                    trueCount++;
+                                                    isSelected[index] = true;
+                                                    if(chatmessage.senderId!=cid){
+                                                      otherUserChatSelected.add(index);
+                                                    }
+                                                    if(chatmessage.contentType!='text'){
+                                                      if(chatmessage.senderId!=cid){
+                                                        if(!chatmessage.downloaded){
+                                                          unStarableSelected.add(index);
+                                                        }
+                                                      }
+                                                    }
+                                                  } });
+                                              }
+                                            },
+                                            onLongPress: (){
+                                              setState(() {
+                                                if(isSelected[index]){
+                                                  isSelected[index]=false;
+                                                  trueCount--;
+                                                  if(chatmessage.senderId!=cid){
+                                                    otherUserChatSelected.remove(index);
+                                                  }
+                                                  if(chatmessage.contentType!='text'){
+                                                    if(chatmessage.senderId!=cid){
+                                                      if(!chatmessage.downloaded){
+                                                        unStarableSelected.remove(index);
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                                else{
+                                                  trueCount++;
+                                                  isSelected[index]=true;
+                                                  if(chatmessage.senderId!=cid){
+                                                    otherUserChatSelected.add(index);
+                                                  }
+                                                  if(chatmessage.contentType!='text'){
+                                                    if(chatmessage.senderId!=cid){
+                                                      if(!chatmessage.downloaded){
+                                                        unStarableSelected.add(index);
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              });
+                                            },);
+
+                                        }
+                                        else if(snapshot.hasError){
+                                          throw Exception('symmKey not found. or ${snapshot.error}');
+                                        }
+                                        else{
+                                          // throw Exception("symmKey not found.");
+                                          return const SizedBox(
+                                            height: 0,
+                                          );
+                                        }
+                                      },
+                                      // (chatmessage) != null?(chatmessage.contentType=='image')?
+                                      // ImageBubble(message: chatmessage.text,
+                                      //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                      //     isUser: cid==chatmessage.senderId,
+                                      //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
+                                      //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
+                                      //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
+                                      //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
+
+                                    );
+                                  } else {
+                                    return const SizedBox(
+                                      height: 0,
+                                    );
+                                  }
+                                },
+                              );
+
                               return listBuilder;
                               }
                           );
@@ -1498,7 +1534,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
-                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                              await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                         setState(() {
                                         chatid = "$cid${otheruser.id}";
                                       });
@@ -1663,7 +1699,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
-                              await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                              await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                               setState(() {
                                 chatid = "$cid${widget.otherUserId}";
                               });

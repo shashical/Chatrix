@@ -10,12 +10,15 @@ import '../Models/users.dart';
 import 'my_chats.dart';
 import 'my_groups.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget  {
   @override
   _HomePageState createState() => _HomePageState();
+
+
+
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
   Users? curUser;
@@ -29,9 +32,19 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     cid=FirebaseAuth.instance.currentUser!.uid;
     getCurUser();
 
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      RemoteServices().updateUser(cid, {'isOnline':true});
+    }
+    else {
+      RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
+    }
   }
   void getCurUser()async{
     curUser=await RemoteServices().getSingleUser(cid);
