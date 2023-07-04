@@ -558,7 +558,6 @@ class _ChatWindowState extends State<ChatWindow> {
   List<ChatMessage> chatmessages=[];
   String backgroundImage ='';
   int unreadMessageCount=0;
-  int cuumc=0;
   int ouumc=0;
   late int bgIndex;
   late int fgIndex;
@@ -578,8 +577,9 @@ class _ChatWindowState extends State<ChatWindow> {
   }
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
-    otherUserChat=(await RemoteServices().getSingleUserChat(otheruser.id, '${otheruser.id}$cid'));
-    unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+    // otherUserChat=(await RemoteServices().getSingleUserChat(otheruser.id, '${otheruser.id}$cid'));
+    // unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+
 
     setState(() {
       isTheOtherUserLoaded = true;
@@ -828,7 +828,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           while(fgIndex<chatmessages.length){
                             if(chatmessages[fgIndex].senderId==cid){
                               ouumc++;
-                             
+
                             }
                             else{
 
@@ -1027,8 +1027,20 @@ class _ChatWindowState extends State<ChatWindow> {
                              curve: Curves.easeOut,
                            );
                          }) ;
+                          return FutureBuilder(
+                            future: RemoteServices().getSingleUserChat(widget.otherUserId, '${otheruser.id}$cid'),
+                              builder: (context,snapshot){
+                              if(snapshot.hasData){
+                                otherUserChat=snapshot.data;
+                                unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+                                RemoteServices().updateUserChat(widget.otherUserId,
+                                    {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
+                                ouumc=0;
+                              }
+                              return listBuilder;
+                              }
+                          );
 
-                          return listBuilder;
 
                         } else {
                           return const Center(child: Text("No conversations yet."));
