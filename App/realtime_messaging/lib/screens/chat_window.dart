@@ -12,8 +12,10 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:realtime_messaging/Models/chatMessages.dart';
 import 'package:realtime_messaging/Models/chats.dart';
+import 'package:realtime_messaging/Models/starredMessages.dart';
 
 import 'package:realtime_messaging/Models/users.dart';
+import 'package:realtime_messaging/Services/starred_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/Widgets/progress-indicator.dart';
 import 'package:realtime_messaging/main.dart';
@@ -400,7 +402,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                           final docUrl = await uploadDocument(
                               File(widget.senderUrl));
 
-                          String symmKeyString = (await FlutterSecureStorage().read(key: widget.chatId))!;
+                          String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                           encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                           encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                           encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
@@ -555,6 +557,7 @@ class _ChatWindowState extends State<ChatWindow> {
   List<int> otherUserChatSelected=[];
   int myMessageLength=0;
   int trueCount=0;
+  List<int> unStarableSelected=[];
   List<ChatMessage> chatmessages=[];
   String backgroundImage ='';
   int unreadMessageCount=0;
@@ -563,6 +566,7 @@ class _ChatWindowState extends State<ChatWindow> {
   late int fgIndex;
   bool assigned=false;
   UserChat? otherUserChat;
+  late Users currentUser;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -577,6 +581,7 @@ class _ChatWindowState extends State<ChatWindow> {
   }
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
+    currentUser=(await RemoteServices().getSingleUser(cid))!;
     // otherUserChat=(await RemoteServices().getSingleUserChat(otheruser.id, '${otheruser.id}$cid'));
     // unreadMessageCount=otherUserChat?.unreadMessageCount??0;
 
@@ -604,14 +609,15 @@ class _ChatWindowState extends State<ChatWindow> {
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
-            leading: (trueCount!=0)? IconButton(onPressed: (){
+             leading: (trueCount!=0)? IconButton(onPressed: (){
               setState(() {
 
                 isSelected=List.filled(chatmessages.length, false);
                 trueCount=0;
                 otherUserChatSelected=[];
+                unStarableSelected=[];
               });
-            }, icon: const Icon(Icons.arrow_back)):const BackButton(),
+              }, icon: const Icon(Icons.arrow_back)):const BackButton(),
               title:(trueCount!=0)?Row(
                 children: [
 
@@ -620,6 +626,19 @@ class _ChatWindowState extends State<ChatWindow> {
                     child: Text('$trueCount',),
                   ),
                   const Spacer(),
+                  (unStarableSelected.isEmpty)?IconButton(onPressed: (){
+                    for(int i=0;i<chatmessages.length;i++){
+                      if(isSelected[i]){
+                        StarredMessageRemoteServices().setStarredMessage(StarredMessage(id: chatmessages[i].id, messageId: chatmessages[i].id,
+                            collectionId:chatid!, isGroup: false, senderPhoneNo: (chatmessages[i].senderId==cid)?currentUser.phoneNo:otheruser.phoneNo,
+                            senderPhoto: (chatmessages[i].senderId==cid)?currentUser.photoUrl!:otheruser.photoUrl!
+                            , text: chatmessages[i].text, contentType: chatmessages[i].contentType, timestamp: chatmessages[i].timestamp,
+                          docUrl: (chatmessages[i].contentType!='text')?(chatmessages[i].senderId==cid)?chatmessages[i].senderUrl:chatmessages[i].receiverUrl:''
+                        ));
+                      }
+                    }
+                  },
+                      icon: const Icon(CupertinoIcons.star_fill)):const SizedBox(height: 0,width: 0,),
                   IconButton(onPressed: (){
                     showDialog(context: context, builder: (context)=>AlertDialog(
                       title: const Text('Delete message?',style: TextStyle(color: Colors.grey),),
@@ -636,6 +655,8 @@ class _ChatWindowState extends State<ChatWindow> {
                               setState(() {
                                isSelected=List.filled(myMessageLength, false);
                                trueCount=0;
+                               unStarableSelected=[];
+                               otherUserChatSelected=[];
                               });
                               Navigator.of(context,rootNavigator: true).pop();
 
@@ -663,6 +684,8 @@ class _ChatWindowState extends State<ChatWindow> {
                             setState(() {
                               isSelected=List.filled(myMessageLength, false);
                               trueCount=0;
+                              unStarableSelected=[];
+                              otherUserChatSelected=[];
                             });
                             Navigator.of(context,rootNavigator: true).pop();
                           }, child: const Text('Delete for Me',style: TextStyle(color: Colors.green),)),
@@ -942,12 +965,26 @@ class _ChatWindowState extends State<ChatWindow> {
                                         if(chatmessage.senderId!=cid){
                                           otherUserChatSelected.remove(index);
                                         }
+                                        if(chatmessage.contentType!='text'){
+                                          if(chatmessage.senderId!=cid){
+                                            if(!chatmessage.downloaded){
+                                              unStarableSelected.remove(index);
+                                            }
+                                          }
+                                        }
                                       }
                                       else {
                                         trueCount++;
                                         isSelected[index] = true;
                                         if(chatmessage.senderId!=cid){
                                           otherUserChatSelected.add(index);
+                                        }
+                                        if(chatmessage.contentType!='text'){
+                                          if(chatmessage.senderId!=cid){
+                                            if(!chatmessage.downloaded){
+                                              unStarableSelected.add(index);
+                                            }
+                                          }
                                         }
                                       } });
                                     }
@@ -960,12 +997,26 @@ class _ChatWindowState extends State<ChatWindow> {
                                       if(chatmessage.senderId!=cid){
                                         otherUserChatSelected.remove(index);
                                       }
+                                      if(chatmessage.contentType!='text'){
+                                        if(chatmessage.senderId!=cid){
+                                          if(!chatmessage.downloaded){
+                                            unStarableSelected.remove(index);
+                                          }
+                                        }
+                                      }
                                     }
                                     else{
                                       trueCount++;
                                       isSelected[index]=true;
                                       if(chatmessage.senderId!=cid){
                                         otherUserChatSelected.add(index);
+                                      }
+                                      if(chatmessage.contentType!='text'){
+                                        if(chatmessage.senderId!=cid){
+                                          if(!chatmessage.downloaded){
+                                            unStarableSelected.add(index);
+                                          }
+                                        }
                                       }
                                     }
                                     });
@@ -1116,7 +1167,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: otheruser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1211,14 +1262,14 @@ class _ChatWindowState extends State<ChatWindow> {
                                       //   );
                                       //
                                       // }
-                                        debugPrint(' printing filels ${files}');
+                                        debugPrint(' printing filels   ${files}');
                                       RemoteServices().updateUserChat(
                                           cid,
                                           {
                                             'lastMessage': (files.files[files.files.length-1].name.length >
                                                 100)
                                                 ?files.files[files.files.length-1].name.substring(0, 100)
-                                                : files.files[files.files.length-1],
+                                                : files.files[files.files.length-1].name,
                                             'lastMessageType': "document",
                                             'lastMessageTime': DateTime.now().toIso8601String()
                                           },
@@ -1229,7 +1280,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             'lastMessage': (files.files[files.files.length-1].name.length >
                                                 100)
                                                 ?files.files[files.files.length-1].name.substring(0, 100)
-                                                : files.files[files.files.length-1],
+                                                : files.files[files.files.length-1].name,
                                             'lastMessageType': "document",
                                             'lastMessageTime': DateTime.now().toIso8601String()
                                           },
@@ -1426,7 +1477,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: otheruser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1444,7 +1495,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
                               await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
@@ -1460,7 +1511,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             recipientPhoto: otheruser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
-                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                            backgroundImage: "assets/backgroundimage.png",
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -1472,7 +1523,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             recipientPhoto: currentuser.photoUrl!,
                                             pinned: false,
                                             recipientPhoneNo: currentuser.phoneNo,
-                                            backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                            backgroundImage: "assets/backgroundimage.png",
                                           ));
 
 
@@ -1591,7 +1642,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: otheruser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1609,7 +1660,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoto: currentuser.photoUrl!,
                                       pinned: false,
                                       recipientPhoneNo: currentuser.phoneNo,
-                                      backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg",
+                                      backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
                                       ));
                               await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
