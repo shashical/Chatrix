@@ -15,6 +15,7 @@ class StarredMessage{
   String text;
   String contentType;
   DateTime timestamp;
+  String? docUrl;
 
   StarredMessage({
     required this.id,
@@ -28,6 +29,7 @@ class StarredMessage{
     required this.text,
     required this.contentType,
     required this.timestamp,
+    this.docUrl,
 
   });
   factory StarredMessage.fromJson(Map<String,dynamic>json){
@@ -42,9 +44,10 @@ class StarredMessage{
         senderPhoto: json['senderPhoto'],
         text:json['text'],
         contentType: json['contentType'],
-        timestamp:DateTime.parse(json['timestamp'],
+        timestamp:DateTime.parse(json['timestamp']),
+        docUrl:json['docUrl'],
 
-        )
+
     );
   }
   Map<String,dynamic> toJson(){
@@ -60,6 +63,7 @@ class StarredMessage{
       'text':text,
       'contentType':contentType,
       'timestamp':timestamp.toIso8601String(),
+      'docUrl':docUrl
 
     };
   }

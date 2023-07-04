@@ -811,6 +811,7 @@ class _ChatWindowState extends State<ChatWindow> {
                            if(!assigned){
                              bgIndex=chatmessages.length-1;
                              fgIndex=chatmessages.length;
+                             assigned=true;
                            }
                           if(myMessageLength!=chatmessages.length){
                             myMessageLength=chatmessages.length;
@@ -823,17 +824,21 @@ class _ChatWindowState extends State<ChatWindow> {
                             ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[bgIndex].id);
                             bgIndex--;
                           }
+                          debugPrint('${chatmessages.length}  and index $fgIndex');
                           while(fgIndex<chatmessages.length){
                             if(chatmessages[fgIndex].senderId==cid){
                               ouumc++;
+                             
                             }
                             else{
 
                               ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[fgIndex].id);
                             }
+                            fgIndex++;
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
                           RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
+                          debugPrint('unread${unreadMessageCount+ouumc}');
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
