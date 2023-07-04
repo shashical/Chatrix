@@ -261,7 +261,7 @@ class _GroupsPageState extends State<GroupsPage> {
                         String encryptedSymmKeyString = usergroup.containsSymmKey!;
                         encrypt.Encrypted encryptedSymmKey = encrypt.Encrypted.fromBase64(encryptedSymmKeyString);
                         String? privateKeyString;
-                        FutureBuilder(
+                        return FutureBuilder(
                           future: const FlutterSecureStorage().read(key: cid),
                           builder: (context, snapshot) {
                             if(snapshot.hasData){

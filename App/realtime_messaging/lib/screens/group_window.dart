@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
@@ -14,9 +17,498 @@ import 'dart:math'as math;
 import '../Models/groupMessages.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:pointycastle/asymmetric/api.dart';
-import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
+//import 'package:pointycastle/asymmetric/api.dart';
+//import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
+import '../Widgets/progress-indicator.dart';
 import '../constants.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+class DocBubble extends StatefulWidget {
+  const DocBubble({Key? key,
+    required this.message,
+    required this.time,
+    required this.senderUrl,
+    required this.id,
+    required this.receiverUrls,
+    required this.contentType,
+    required this.isUser,
+    required this.delivered,
+    required this.read,
+    required this.isSelected,
+    required this.uploaded,
+    required this.downloaded,
+    required this.groupId,
+    this.displayName,
+    this.phoneNo,
+    this.isAcontact}) : super(key: key);
+
+
+  final String message, time,senderUrl,id,groupId,contentType;
+  final bool isUser, delivered, read,isSelected,uploaded;
+  final String? displayName, phoneNo;
+  final bool? isAcontact;
+  final Map<String,String> receiverUrls;
+  final Map<String,bool> downloaded;
+  @override
+  State<DocBubble> createState() => _DocBubbleState();
+}
+
+class _DocBubbleState extends State<DocBubble> {
+  late Color bg;
+  late CrossAxisAlignment align;
+  late IconData icon;
+  late BorderRadius radius;
+  late bool uploaded;
+  late Map<String,bool> downloaded;
+  UploadTask? _uploadTask;
+  DownloadTask? _downloadTask;
+  late Map<String,String> receiverUrls;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    uploaded = widget.uploaded;
+    downloaded=widget.downloaded;
+    receiverUrls=widget.receiverUrls;
+    bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
+        ? Colors.white
+        : Colors.greenAccent.shade100;
+    align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    icon = widget.delivered ? Icons.done_all : Icons.done;
+    radius = widget.isUser ? const BorderRadius.only(
+      topRight: Radius.circular(5.0),
+      bottomLeft: Radius.circular(10.0),
+      bottomRight: Radius.circular(5.0),
+    )
+        : const BorderRadius.only(
+      topLeft: Radius.circular(5.0),
+      bottomLeft: Radius.circular(5.0),
+      bottomRight: Radius.circular(10.0),
+    );
+  }
+
+  Future<String> uploadDocument(File doc) async {
+    try {
+      firebase_storage.Reference ref =
+      firebase_storage.FirebaseStorage.instance.ref(
+          '/groupdoc/${DateTime.now().microsecondsSinceEpoch}');
+      _uploadTask = ref.putFile(doc);
+      await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> downloadImage(String imageUrl) async {
+    try {
+
+      final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
+          imageUrl);
+
+
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/${widget.contentType.substring(8)}';
+
+      _downloadTask = ref.writeToFile(File(tempPath));
+
+      await Future.value(_downloadTask).catchError((e) =>
+      throw Exception('$e'));
+      //ref.delete();
+      return tempPath;
+    } catch (e) {
+      rethrow;
+    }
+
+  }
+  bool downloading = false;
+  bool isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: (widget.isSelected)? Colors.blue.withOpacity(0.5):null,
+      child: Column(
+        crossAxisAlignment: align,
+        children: [
+          Container(
+            constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+            margin: const EdgeInsets.all(3.0),
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    blurRadius: .5,
+                    spreadRadius: 1.0,
+                    color: Colors.black.withOpacity(.12))
+              ],
+              color: bg,
+              borderRadius: radius,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                (widget.isUser
+                    ? const SizedBox()
+                    : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(((widget.isAcontact!) ? '' : '~') + (widget.displayName!)),
+                    Text(((widget.isAcontact!) ? '' : (widget.phoneNo!))),
+                  ],
+                )),
+                Container(
+                  constraints:
+                  (widget.isUser)?
+                  (uploaded)?
+                  BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.62):
+                  BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72):
+                  (downloaded[cid]??false)?
+                  BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.62):
+                  BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+
+                  child: InkWell(
+                    onTap: (){
+                      if(!widget.isSelected) {
+                        OpenFile.open(widget.isUser?widget.senderUrl:widget.receiverUrls[cid]);
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8,top:8),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            color: Colors.deepOrangeAccent,
+                            child: const Icon(CupertinoIcons.doc,color: Colors.white70,),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          constraints:
+                          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.48),
+                          child: Text(widget.contentType.substring(8),
+
+                          ),
+                        ),
+                        (widget.isUser) ? (!isUploading && !uploaded) ? IconButton(
+                            onPressed: () async {
+                              setState(() {
+                                isUploading = true;
+                              });
+                              final docUrl = await uploadDocument(
+                                  File(widget.senderUrl));
+
+                              String symmKeyString = (await const FlutterSecureStorage().read(key: widget.groupId))!;
+                              encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                              encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                              encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                              String encryptedDocUrlString = encryptedDocUrl.base64;
+
+                              GroupsRemoteServices().updateGroupMessage(widget.groupId, {
+                                'isUploaded': true,
+                                'text': encryptedDocUrlString
+                              }, widget.id);
+                              setState(() {
+                                uploaded = true;
+                              });
+                            }, icon: const Icon(Icons.upload))
+                            : (!uploaded) ? progressIndicator(_uploadTask,null)
+                            : const SizedBox(width: 0,) :
+                        (!downloading && !(downloaded[cid]??false))?IconButton(
+                            onPressed: () async {
+                              setState(() {
+                                downloading=true;
+                              });
+                              final receiveUrl=await downloadImage(widget.message);
+                              setState(() {
+                                downloaded[cid]=true;
+                              });
+
+                              GroupsRemoteServices().updateGroupMessage(widget.groupId,
+                                  {'receiverUrls${[cid]}':receiveUrl,
+                                    'downloaded':true,
+                                  }, widget.id);
+
+
+                            }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+
+
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 1,
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 55.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        widget.time,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      (!widget.isUser
+                          ? const SizedBox()
+                          : Icon(
+                        icon,
+                        size: 16,
+                      ))
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class ImgBubble extends StatefulWidget {
+  const ImgBubble({Key? key, required this.message,
+    required this.time,
+    required this.senderUrl,
+    required this.id, required this.chatId, required this.receiverUrls, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded, this.displayName, this.phoneNo, this.isAcontact}) : super(key: key);
+  final String message, time,senderUrl,id,chatId;
+  final bool isUser, delivered, read,isSelected,uploaded;
+  final String? displayName, phoneNo;
+  final bool? isAcontact;
+  final Map<String,String> receiverUrls;
+  final Map<String,bool> downloaded;
+  @override
+  State<ImgBubble> createState() => _ImgBubbleState();
+}
+
+class _ImgBubbleState extends State<ImgBubble> {
+  late Color bg;
+  late CrossAxisAlignment align;
+  late IconData icon;
+  late BorderRadius radius;
+  late bool uploaded;
+
+  UploadTask? _uploadTask;
+  DownloadTask? _downloadTask;
+  late Map<String,String>receiverUrls;
+  late Map<String,bool> downloaded;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    receiverUrls=widget.receiverUrls;
+    uploaded = widget.uploaded;
+    downloaded=widget.downloaded;
+    bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
+        ? Colors.white
+        : Colors.greenAccent.shade100;
+    align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    icon = widget.delivered ? Icons.done_all : Icons.done;
+    radius = widget.isUser ? const BorderRadius.only(
+      topRight: Radius.circular(5.0),
+      bottomLeft: Radius.circular(10.0),
+      bottomRight: Radius.circular(5.0),
+    )
+        : const BorderRadius.only(
+      topLeft: Radius.circular(5.0),
+      bottomLeft: Radius.circular(5.0),
+      bottomRight: Radius.circular(10.0),
+    );
+  }
+
+  Future<String> uploadDocument(File doc) async {
+    try {
+      firebase_storage.Reference ref =
+      firebase_storage.FirebaseStorage.instance.ref(
+          '/groupimage/${DateTime.now().microsecondsSinceEpoch}');
+      _uploadTask = ref.putFile(doc);
+      await Future.value(_uploadTask).catchError((e) => throw Exception('$e'));
+
+      return ref.getDownloadURL().catchError((e) => throw Exception('$e'));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> downloadImage(String imageUrl) async {
+    try {
+      // Create a Firebase Storage reference
+      final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
+          imageUrl);
+
+      // Download the image to temporary device storage
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/${DateTime.now()
+          .microsecondsSinceEpoch}.jpg';
+
+      _downloadTask = ref.writeToFile(File(tempPath));
+
+      await Future.value(_downloadTask).catchError((e) =>
+      throw Exception('$e'));
+     // ref.delete();
+      return tempPath;
+    } catch (e) {
+      rethrow;
+    }
+
+  }
+  bool downloading = false;
+  bool isUploading = false;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: align,
+      children: [
+        Container(
+          constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+          margin: const EdgeInsets.all(3.0),
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: .5,
+                  spreadRadius: 1.0,
+                  color: Colors.black.withOpacity(.12))
+            ],
+            color: bg,
+            borderRadius: radius,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              (widget.isUser
+                  ? const SizedBox()
+                  : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(((widget.isAcontact!) ? '' : '~') + (widget.displayName!)),
+                  Text(((widget.isAcontact!) ? '' : (widget.phoneNo!))),
+                ],
+              )),
+              Stack(
+                  children: [ Container(
+                    constraints:
+                    BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7,
+                        maxHeight: MediaQuery.of(context).size.height*0.4
+                    ),
+
+                    alignment: Alignment.bottomRight,
+                    decoration: BoxDecoration(
+                      image:(widget.isUser)? DecorationImage(
+                          image: FileImage(File(widget.senderUrl)),
+                          fit: BoxFit.cover
+                      ):(downloaded[cid]??false)?DecorationImage(image: FileImage(File(widget.receiverUrls[cid]!)),fit: BoxFit.cover)
+                          :const DecorationImage(image: AssetImage('assests/blurimg.png')),
+
+                      borderRadius: radius,
+
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 55.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            widget.time,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          (widget.isUser) ? Icon(
+                            icon,
+                            size: 16,
+                          ) : const SizedBox(width: 0,)
+                        ],
+                      ),
+                    ),),
+                    Center(child: (widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
+                        onPressed: () async {
+                          setState(() {
+                            isUploading = true;
+                          });
+                          final docUrl = await uploadDocument(
+                              File(widget.senderUrl));
+
+                          String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
+                          encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                          encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                          encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                          String encryptedDocUrlString = encryptedDocUrl.base64;
+
+                          GroupsRemoteServices().updateGroupMessage(widget.chatId, {
+                            'isUploaded': true,
+                            'text': encryptedDocUrlString
+                          }, widget.id);
+                          setState(() {
+                            uploaded = true;
+                          });
+                        }, icon: const Icon(Icons.upload))
+                        : (!uploaded) ? progressIndicator(_uploadTask,null)
+                        : const SizedBox(width: 0,) :
+                    (!downloading && !(downloaded[cid]??false))?IconButton(
+                        onPressed: () async {
+                          setState(() {
+                            downloading=true;
+                          });
+                          final receiveUrl=await downloadImage(widget.message);
+                          receiverUrls[cid]=receiveUrl;
+                          setState(() {
+                            downloaded[cid]=true;
+                          });
+                          GroupsRemoteServices().updateGroupMessage(widget.chatId,
+                              {'receiverUrls':receiverUrls,
+                                'downloaded':downloaded,
+                              }, widget.id);
+
+
+
+                        }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                    )
+                  ]
+              ),
+              const SizedBox(
+                height: 1,
+              ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 55.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      widget.time,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    (!widget.isUser
+                        ? const SizedBox()
+                        : Icon(
+                      icon,
+                      size: 16,
+                    ))
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
 
 class MyBubble extends StatelessWidget {
   MyBubble({
@@ -252,7 +744,7 @@ class _GroupWindowState extends State<GroupWindow> {
             ),
             const SizedBox(width: 10,),
             Text(widget.groupName),
-            Spacer(),
+            const Spacer(),
             PopupMenuButton(itemBuilder: (context)=>
             [
               PopupMenuItem(
@@ -371,77 +863,170 @@ class _GroupWindowState extends State<GroupWindow> {
                             return FutureBuilder(
                               future: const FlutterSecureStorage().read(key: widget.groupId),
                               builder: (context, snapshot) {
-                                if(snapshot.hasData){
-
+                                if (snapshot.hasData) {
                                   symmKeyString = snapshot.data;
-                                  encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                  encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                                  encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(groupmessage.text);
-                                  String message = encrypter.decrypt(encryptedMessage,iv: iv);
+                                  encrypt.Key symmKey = encrypt.Key.fromBase64(
+                                      symmKeyString!);
+                                  encrypt.Encrypter encrypter = encrypt
+                                      .Encrypter(encrypt.AES(symmKey));
+                                  encrypt.Encrypted encryptedMessage = encrypt
+                                      .Encrypted.fromBase64(groupmessage.text);
+                                  String message = encrypter.decrypt(
+                                      encryptedMessage, iv: iv);
 
                                   return GestureDetector(
-                            child: MyBubble(
-                              message: message,
-                              time:
-                                  ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
-                              delivered: false,
-                              isUser: (groupmessage.senderId == cid),
-                              read: false,
-                              displayName: (!savedNumber.contains(groupmessage.senderPhoneNo)?groupmessage.senderName:savedUsers[savedNumber.indexOf(groupmessage.senderPhoneNo)]),
-                              isAcontact: false,
-                              phoneNo: groupmessage.senderPhoneNo, isSelected: isSelected[index],
-                            ),
-                            onTap: () {
+                                    child: (groupmessage.contentType == 'text')
+                                        ? MyBubble(
+                                      message: message,
+                                      time:
+                                      ("${groupmessage.timestamp
+                                          .hour}:${groupmessage.timestamp
+                                          .minute}"),
+                                      delivered: false,
+                                      isUser: (groupmessage.senderId == cid),
+                                      read: false,
+                                      displayName: (!savedNumber.contains(
+                                          groupmessage.senderPhoneNo)
+                                          ? groupmessage.senderName
+                                          : savedUsers[savedNumber.indexOf(
+                                          groupmessage.senderPhoneNo)]),
+                                      isAcontact: false,
+                                      phoneNo: groupmessage.senderPhoneNo,
+                                      isSelected: isSelected[index],
+                                    )
+                                        :
+                                    (groupmessage.contentType == 'image')
+                                        ? (groupmessage.isUploaded) ?
+                                    ImgBubble(message: message,
+                                        time: ("${groupmessage.timestamp
+                                            .hour}:${groupmessage.timestamp
+                                            .minute ~/ 10}${groupmessage
+                                            .timestamp.minute % 10}"),
+                                        isUser: (cid == groupmessage.senderId),
+                                        delivered: false,
+                                        read: false,
+                                        isSelected: isSelected[index],
+                                        uploaded: groupmessage.isUploaded,
+                                        downloaded: groupmessage.downloaded??{},
 
-                              if (trueCount != 0) {
-                                setState(() {
+                                        senderUrl: groupmessage.senderUrl ?? '',
+                                        id: groupmessage.id,
+                                        chatId: widget.groupId,
+                                        receiverUrls: groupmessage
+                                            .receiverUrls ?? {},) :
+                                    (cid == groupmessage.senderId)
+                                        ? ImgBubble(message: message,
+                                        time: ("${groupmessage.timestamp
+                                            .hour}:${groupmessage.timestamp
+                                            .minute ~/ 10}${groupmessage
+                                            .timestamp.minute % 10}"),
+                                        isUser: (cid == groupmessage.senderId),
+                                        delivered: groupmessage
+                                            .deliveredTo[cid] ?? false,
+                                        read: false,
+                                        isSelected: isSelected[index],
+                                        uploaded: groupmessage.isUploaded,
+                                        downloaded: groupmessage
+                                            .downloaded ??{},
+                                        senderUrl: groupmessage.senderUrl ?? '',
+                                        id: groupmessage.id,
+                                        chatId: widget.groupId,
+                                        receiverUrls: groupmessage
+                                            .receiverUrls ??{})
+                                        : const SizedBox(height: 0,)
+                                        :
+                                    (groupmessage.isUploaded) ? DocBubble(
+                                      message: message,
+                                      time: ("${groupmessage.timestamp
+                                          .hour}:${groupmessage.timestamp
+                                          .minute ~/ 10}${groupmessage.timestamp
+                                          .minute % 10}")
+                                      ,
+                                      senderUrl: groupmessage.senderUrl ?? '',
+                                      id: groupmessage.id,
+                                      groupId: widget.groupId,
 
-
-                                  if (isSelected[index]) {
-                                    isSelected[index] = false;
-                                    trueCount--;
-                                    if(groupmessage.senderId!=cid){
-                                      otherUserChatSelected.remove(index);
-                                    }
-                                  }
-                                  else {
-                                    trueCount++;
-                                    isSelected[index] = true;
-                                    if(groupmessage.senderId!=cid){
-                                      otherUserChatSelected.add(index);
-                                    }
-                                  } });
-                              }
-                            },
-                            onLongPress: (){
-                              setState(() {
-                                if(isSelected[index]){
-                                  isSelected[index]=false;
-                                  trueCount--;
-                                  if(groupmessage.senderId!=cid){
-                                    otherUserChatSelected.remove(index);
-                                  }
+                                      isUser: (cid == groupmessage.senderId),
+                                      delivered: groupmessage
+                                          .deliveredTo[cid] ?? false,
+                                      read: groupmessage.readBy[cid] ?? false,
+                                      isSelected: isSelected[index],
+                                      uploaded: groupmessage.isUploaded,
+                                      downloaded: groupmessage
+                                          .downloaded ?? {},
+                                      contentType: groupmessage.contentType, receiverUrls: groupmessage.receiverUrls??{},)
+                                        : (cid == groupmessage.senderId) ?
+                                    DocBubble(message: message,
+                                      time: ("${groupmessage.timestamp
+                                          .hour}:${groupmessage.timestamp
+                                          .minute ~/ 10}${groupmessage.timestamp
+                                          .minute % 10}")
+                                      ,
+                                      senderUrl: groupmessage.senderUrl ?? '',
+                                      id: groupmessage.id,
+                                      groupId: widget.groupId,
+                                      isUser: (cid == groupmessage.senderId),
+                                      delivered: groupmessage
+                                          .deliveredTo[cid] ?? false,
+                                      read: groupmessage.readBy[cid] ?? false,
+                                      isSelected: isSelected[index],
+                                      uploaded: groupmessage.isUploaded,
+                                      downloaded: groupmessage
+                                          .downloaded ?? {},
+                                      contentType: groupmessage.contentType, receiverUrls: groupmessage.receiverUrls??{},)
+                                        : const SizedBox(height: 0,),
+                                    onTap: () {
+                                      if (trueCount != 0) {
+                                        setState(() {
+                                          if (isSelected[index]) {
+                                            isSelected[index] = false;
+                                            trueCount--;
+                                            if (groupmessage.senderId != cid) {
+                                              otherUserChatSelected.remove(
+                                                  index);
+                                            }
+                                          }
+                                          else {
+                                            trueCount++;
+                                            isSelected[index] = true;
+                                            if (groupmessage.senderId != cid) {
+                                              otherUserChatSelected.add(index);
+                                            }
+                                          }
+                                        });
+                                      }
+                                    },
+                                    onLongPress: () {
+                                      setState(() {
+                                        if (isSelected[index]) {
+                                          isSelected[index] = false;
+                                          trueCount--;
+                                          if (groupmessage.senderId != cid) {
+                                            otherUserChatSelected.remove(index);
+                                          }
+                                        }
+                                        else {
+                                          trueCount++;
+                                          isSelected[index] = true;
+                                          if (groupmessage.senderId != cid) {
+                                            otherUserChatSelected.add(index);
+                                          }
+                                        }
+                                      });
+                                    },
+                                  );
                                 }
-                                else{
-                                  trueCount++;
-                                  isSelected[index]=true;
-                                  if(groupmessage.senderId!=cid){
-                                    otherUserChatSelected.add(index);
-                                  }
+                                else if (snapshot.hasError) {
+                                  throw Exception(
+                                      'symmKey not found. or ${snapshot
+                                          .error}');
                                 }
-                              });
-                            },
-                          );
+                                else {
+                                  // throw Exception("symmKey not found.");
+                                  return const SizedBox(
+                                    height: 0,
+                                  );
                                 }
-                                else if(snapshot.hasError){
-                                      throw Exception('symmKey not found. or ${snapshot.error}');
-                                    }
-                                    else{
-                                      // throw Exception("symmKey not found.");
-                                      return const SizedBox(
-                                        height: 0,
-                                      );
-                                    }
                               },
                             );
 
@@ -530,7 +1115,8 @@ class _GroupWindowState extends State<GroupWindow> {
                                         senderName: currentuser.name!,
                                         senderPhoneNo: currentuser.phoneNo,
                                         senderPhotoUrl: currentuser.photoUrl!,
-                                        senderUrl: files.files[i].path!
+                                        senderUrl: files.files[i].path!,
+                                        isUploaded: false,
                                       ));
                                 }
 
@@ -600,6 +1186,8 @@ class _GroupWindowState extends State<GroupWindow> {
                                           senderPhoneNo: currentuser.phoneNo,
                                           senderPhotoUrl: currentuser.photoUrl!,
                                           senderUrl: _image!.path
+                                          ,
+                                        isUploaded: false
                                       ));
                                 }
 
@@ -727,7 +1315,7 @@ class _GroupWindowState extends State<GroupWindow> {
                       final Users currentuser =
                           (await RemoteServices().getSingleUser(cid))!;
                       
-                      String symmKeyString = (await FlutterSecureStorage().read(key: widget.groupId))!;
+                      String symmKeyString = (await const FlutterSecureStorage().read(key: widget.groupId))!;
                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                       encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                       encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);

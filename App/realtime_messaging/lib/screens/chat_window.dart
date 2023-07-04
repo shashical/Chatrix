@@ -85,11 +85,11 @@ class _DocBubleState extends State<DocBuble> {
 
   Future<String> downloadImage(String imageUrl) async {
     try {
-      // Create a Firebase Storage reference
+
       final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
           imageUrl);
 
-      // Download the image to temporary device storage
+
       final tempDir = await getTemporaryDirectory();
       final tempPath = '${tempDir.path}/${widget.contentType.substring(8)}';
 
@@ -306,11 +306,11 @@ class _ImageBubbleState extends State<ImageBubble> {
 
   Future<String> downloadImage(String imageUrl) async {
     try {
-      // Create a Firebase Storage reference
+
       final ref = firebase_storage.FirebaseStorage.instance.refFromURL(
           imageUrl);
 
-      // Download the image to temporary device storage
+
       final tempDir = await getTemporaryDirectory();
       final tempPath = '${tempDir.path}/${DateTime.now()
           .microsecondsSinceEpoch}.jpg';
@@ -319,6 +319,7 @@ class _ImageBubbleState extends State<ImageBubble> {
 
       await Future.value(_downloadTask).catchError((e) =>
       throw Exception('$e'));
+      ref.delete();
       return tempPath;
     } catch (e) {
       rethrow;
@@ -525,14 +526,14 @@ class MyBubble extends StatelessWidget {
 class ChatWindow extends StatefulWidget {
   final String backgroundImage, otherUserId;
   final String? chatId;
-  final int? unReadMeassageCount;
+
 
   const ChatWindow({
     required this.otherUserId,
     this.backgroundImage =
         "assets/backgroundimage.png",
     this.chatId,
-    Key? key, this.unReadMeassageCount=0,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -562,6 +563,7 @@ class _ChatWindowState extends State<ChatWindow> {
   late int bgIndex;
   late int fgIndex;
   bool assigned=false;
+  UserChat? otherUserChat;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -576,18 +578,21 @@ class _ChatWindowState extends State<ChatWindow> {
   }
   void getTheOtherUser(String id) async {
     otheruser = (await RemoteServices().getSingleUser(id))!;
+    otherUserChat=(await RemoteServices().getSingleUserChat(otheruser.id, '${otheruser.id}$cid'));
+    unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+
     setState(() {
       isTheOtherUserLoaded = true;
       indexInContact=savedNumber.indexOf(otheruser.phoneNo);
     });
   }
 
+
   @override
   void initState() {
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
     backgroundImage=widget.backgroundImage;
-    unreadMessageCount=widget.unReadMeassageCount!;
     super.initState();
 
   }
@@ -815,7 +820,6 @@ class _ChatWindowState extends State<ChatWindow> {
 
                           }
                           while(bgIndex>=0 && !chatmessages[bgIndex].read){
-                            cuumc--;
                             ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[bgIndex].id);
                             bgIndex--;
                           }
@@ -824,12 +828,12 @@ class _ChatWindowState extends State<ChatWindow> {
                               ouumc++;
                             }
                             else{
-                              cuumc--;
+
                               ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[fgIndex].id);
                             }
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
-                          RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':ouumc} , '${otheruser.id}$cid');
+                          RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
