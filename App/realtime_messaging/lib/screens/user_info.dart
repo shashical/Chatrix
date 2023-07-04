@@ -17,7 +17,7 @@ class UserInfoPage extends StatefulWidget {
   State<UserInfoPage> createState() => _UserInfoPageState();
 }
 
-class _UserInfoPageState extends State<UserInfoPage> {
+class _UserInfoPageState extends State<UserInfoPage> with WidgetsBindingObserver {
   File? _image;
   String? imageUrl;
   Users? currentUser;
@@ -52,6 +52,17 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ..showSnackBar(SnackBar(content: Text('$e')));
     }
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+
+      RemoteServices().updateUser(cid, {'isOnline':true});
+    }
+    else {
+      RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
+    }
   }
 
   getCurrentUser() async {

@@ -6,13 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:realtime_messaging/Models/users.dart';
-import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 import '../Widgets/BottomWaveClipper.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:encrypt/encrypt_io.dart';
+//import 'package:encrypt/encrypt.dart' as encrypt;
+//import 'package:encrypt/encrypt_io.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:pointycastle/export.dart' as pointy;
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
@@ -57,7 +56,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
         width: double.infinity,
         height: double.infinity,
         child: Stack(children: [
-          Column(
+          const Column(
             children: [
               Spacer(),
               Image(image: AssetImage('assets/otpverify_bgnd.png'))
@@ -73,7 +72,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
           ),
           ClipPath(
               clipper: BottomWaveClipper(),
-              child: Image(
+              child: const Image(
                 image: AssetImage('assets/otpverify_bgnd.png'),
               )),
           Positioned(
@@ -85,19 +84,19 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                 elevation: 6,
                 height: 500,
                 width: 350,
-                padding: EdgeInsets.all(25),
+                padding: const EdgeInsets.all(25),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'VERIFY OTP ',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 40,
                           color: Colors.greenAccent),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 50,
                     ),
                     Text(
@@ -105,17 +104,17 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                       style:
                           TextStyle(fontWeight: FontWeight.w400, fontSize: 25),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 18,
                     ),
-                    Text(
+                    const Text(
                       "Enter OTP ",
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 30,
                           color: Colors.white),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Form(
@@ -155,7 +154,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               onChanged: (value) {
                                 if (value.length == 1) {
                                   FocusScope.of(context).nextFocus();
-                                } else if (value.length == 0) {
+                                } else if (value.isEmpty) {
                                   FocusScope.of(context).previousFocus();
                                 }
                               },
@@ -182,7 +181,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               onChanged: (value) {
                                 if (value.length == 1) {
                                   FocusScope.of(context).nextFocus();
-                                } else if (value.length == 0) {
+                                } else if (value.isEmpty) {
                                   FocusScope.of(context).previousFocus();
                                 }
                               },
@@ -209,7 +208,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               onChanged: (value) {
                                 if (value.length == 1) {
                                   FocusScope.of(context).nextFocus();
-                                } else if (value.length == 0) {
+                                } else if (value.isEmpty) {
                                   FocusScope.of(context).previousFocus();
                                 }
                               },
@@ -236,7 +235,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               onChanged: (value) {
                                 if (value.length == 1) {
                                   FocusScope.of(context).nextFocus();
-                                } else if (value.length == 0) {
+                                } else if (value.isEmpty) {
                                   FocusScope.of(context).previousFocus();
                                 }
                               },
@@ -263,7 +262,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               onChanged: (value) {
                                 if (value.length == 1) {
                                   FocusScope.of(context).nextFocus();
-                                } else if (value.length == 0) {
+                                } else if (value.isEmpty) {
                                   FocusScope.of(context).previousFocus();
                                 }
                               },
@@ -285,7 +284,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Row(
@@ -295,18 +294,18 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           seconds: 30,
                           build: (_, double time) => Text(
                             time.toString().substring(0, 2),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 35,
                             ),
                           ),
-                          interval: Duration(milliseconds: 10),
+                          interval: const Duration(milliseconds: 10),
                           onFinished: () {
                             setState(() {
                               canresend = true;
                             });
                           },
                         ),
-                        Spacer(),
+                        const Spacer(),
                         TextButton(
                             onPressed: () {
                               if (canresend) {
@@ -404,7 +403,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             ))
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Center(
@@ -483,10 +482,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   //     .parsePublicKeyFromPem(publicKeyString);
 
                                   FlutterSecureStorage storage =
-                                      FlutterSecureStorage();
+                                      const FlutterSecureStorage();
 
                                   await storage.write(
-                                      key: '$id', value: privateKeyString);
+                                      key: id, value: privateKeyString);
 
                                   Users user = Users(
                                       id: id,

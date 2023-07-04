@@ -21,7 +21,7 @@ Widget progressIndicator(UploadTask? uploadTask,DownloadTask? downloadTask)=>Str
 
         ),
       ),
-        Center(child: Text('${(progress*100).toInt()}%',style: const TextStyle(color: Colors.blue),))
+        Center(child: Text('${(progress*100).toInt()}%',style: const TextStyle(color: Colors.blue),textAlign: TextAlign.center,))
       ]
     );
   }
