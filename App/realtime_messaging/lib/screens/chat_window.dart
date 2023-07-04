@@ -837,8 +837,8 @@ class _ChatWindowState extends State<ChatWindow> {
                             fgIndex++;
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
-                          RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
-                          debugPrint('unread${unreadMessageCount+ouumc}');
+                          // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
+                          // debugPrint('unread${unreadMessageCount+ouumc}');
                           // return ListView.builder(
                           //   itemCount: chatmessages.length,
                           //   itemBuilder: (context, index) {
