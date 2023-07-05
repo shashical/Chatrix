@@ -322,67 +322,80 @@ class _GroupsPageState extends State<GroupsPage> {
                                   Text((usergroup.lastMessageTime == null
                                       ? ""
                                       : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                  Row(
-                                    children: [
-                                      usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                          child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                      usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                    ],
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                            child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                        usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                        usergroup.unreadMessageCount!=0? Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration:
+                                          const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                          child:Text('${usergroup.unreadMessageCount}',
+                                            style: const TextStyle(color: Colors.white70),) ,):
+                                        const SizedBox(width: 0,height: 0,)
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
                             ),
                             onTap: () {
-
-                              if(trueCount!=0) {
+                              if (trueCount != 0) {
                                 if (isSelected[index]) {
                                   setState(() {
-                                    if(!usergroups[index].muted){
+                                    if (!usergroups[index].muted) {
                                       unMutedSelected.remove(index);
-
                                     }
-                                    if(!usergroups[index].pinned){
+                                    if (!usergroups[index].pinned) {
                                       unPinnedSelected.remove(index);
                                     }
                                     isSelected[index] = false;
                                     trueCount--;
                                   });
                                 }
-                                else{
+                                else {
                                   setState(() {
-                                    if(!usergroups[index].muted){
+                                    if (!usergroups[index].muted) {
                                       unMutedSelected.add(index);
                                     }
-                                    if(!usergroups[index].pinned){
+                                    if (!usergroups[index].pinned) {
                                       unPinnedSelected.add(index);
                                     }
 
-                                    isSelected[index]=true;
+                                    isSelected[index] = true;
                                     trueCount++;
                                   });
                                 }
-
                               }
-                              else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
-                                },));
+                              else {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return GroupWindow(
+                                          groupName: usergroup.name,
+                                          groupPhoto: usergroup.imageUrl,
+                                          backgroundImage: usergroup
+                                              .backgroundImage,
+                                          groupId: usergroup.groupId);
+                                    },));
                               }
                             },
                             onLongPress: (){
-                                  if(isSelected[index]){
+                                  if(isSelected[index]) {
                                     setState(() {
-                                      if(!usergroups[index].muted){
+                                      if (!usergroups[index].muted) {
                                         unMutedSelected.remove(index);
-
                                       }
-                                      if(!usergroups[index].pinned){
+                                      if (!usergroups[index].pinned) {
                                         unPinnedSelected.remove(index);
                                       }
-                                      isSelected[index]=false;
+                                      isSelected[index] = false;
                                       trueCount--;
                                     });
-
                                   }
                                   else{
                                     setState(() {
@@ -443,12 +456,24 @@ class _GroupsPageState extends State<GroupsPage> {
                                   Text((usergroup.lastMessageTime == null
                                       ? ""
                                       : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                  Row(
-                                    children: [
-                                      usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                          child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                      usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                    ],
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                            child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                        usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                        usergroup.unreadMessageCount!=0? Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration:
+                                          const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                          child:Text('${usergroup.unreadMessageCount}',
+                                            style: const TextStyle(color: Colors.white70),) ,):
+                                        const SizedBox(width: 0,height: 0,)
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
@@ -581,12 +606,24 @@ class _GroupsPageState extends State<GroupsPage> {
                                   Text((usergroup.lastMessageTime == null
                                       ? ""
                                       : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                  Row(
-                                    children: [
-                                      usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                          child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                      usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                    ],
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                            child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                        usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                        usergroup.unreadMessageCount!=0? Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration:
+                                          const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                          child:Text('${usergroup.unreadMessageCount}',
+                                            style: const TextStyle(color: Colors.white70),) ,):
+                                        const SizedBox(width: 0,height: 0,)
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
@@ -702,12 +739,24 @@ class _GroupsPageState extends State<GroupsPage> {
                                   Text((usergroup.lastMessageTime == null
                                       ? ""
                                       : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                  Row(
-                                    children: [
-                                      usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                          child: const Icon(CupertinoIcons.pin_fill,)):const SizedBox(width: 0,),
-                                      usergroup.muted? const Icon(CupertinoIcons.volume_off) :const SizedBox(width: 0,),
-                                    ],
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                            child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                        usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                        usergroup.unreadMessageCount!=0? Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration:
+                                          const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                          child:Text('${usergroup.unreadMessageCount}',
+                                            style: const TextStyle(color: Colors.white70),) ,):
+                                        const SizedBox(width: 0,height: 0,)
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
