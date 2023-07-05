@@ -864,16 +864,19 @@ class _GroupWindowState extends State<GroupWindow> {
                               future: const FlutterSecureStorage().read(key: widget.groupId),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  symmKeyString = snapshot.data;
-                                  encrypt.Key symmKey = encrypt.Key.fromBase64(
-                                      symmKeyString!);
-                                  encrypt.Encrypter encrypter = encrypt
-                                      .Encrypter(encrypt.AES(symmKey));
-                                  encrypt.Encrypted encryptedMessage = encrypt
-                                      .Encrypted.fromBase64(groupmessage.text);
-                                  String message = encrypter.decrypt(
-                                      encryptedMessage, iv: iv);
-
+                                  String message = '';
+                                  if(groupmessage.text != ''){
+                                    symmKeyString = snapshot.data;
+                                    encrypt.Key symmKey = encrypt.Key.fromBase64(
+                                        symmKeyString!);
+                                    encrypt.Encrypter encrypter = encrypt
+                                        .Encrypter(encrypt.AES(symmKey));
+                                    encrypt.Encrypted encryptedMessage = encrypt
+                                        .Encrypted.fromBase64(groupmessage.text);
+                                    message = encrypter.decrypt(
+                                        encryptedMessage, iv: iv);
+                                  }
+                                  
                                   return GestureDetector(
                                     child: (groupmessage.contentType == 'text')
                                         ? MyBubble(
@@ -890,7 +893,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                           ? groupmessage.senderName
                                           : savedUsers[savedNumber.indexOf(
                                           groupmessage.senderPhoneNo)]),
-                                      isAcontact: false,
+                                      isAcontact: savedNumber.contains(groupmessage.senderPhoneNo),
                                       phoneNo: groupmessage.senderPhoneNo,
                                       isSelected: isSelected[index],
                                     )

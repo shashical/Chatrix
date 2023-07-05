@@ -942,7 +942,6 @@ class _ChatWindowState extends State<ChatWindow> {
                                     {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
                                 }
                                 ouumc=0;
-                                //bgIndex=0;
                                 debugPrint('$ouumc');
                               }
                               Widget listBuilder=ListView.builder(
