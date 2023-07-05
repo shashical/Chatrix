@@ -2,6 +2,7 @@
 //import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -1711,6 +1712,11 @@ class _ChatWindowState extends State<ChatWindow> {
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                             encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                             String encryptedMessageString = encryptedMessage.base64;
+
+                            if(otheruser.token != null){
+                              FirebaseMessaging.instance.sendMessage();
+                            }
+
                             await ChatsRemoteServices().setChatMessage(
                                 chatid!,
                                 ChatMessage(
