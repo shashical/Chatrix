@@ -82,6 +82,7 @@ class RemoteServices {
   Stream<UserChat>getUserChatStream(String id,String userChatId){
     return reference.collection('users').doc(id).collection('userChats').doc(userChatId).snapshots().map((event) => UserChat.fromJson(event.data()!));
   }
+
   Future<void> setUserChat(String userid, UserChat userchat) async {
     final DocumentSnapshot docSnap =
         await reference.collection("users").doc(userid).collection('userChats').doc(userchat.id).get();
@@ -137,6 +138,9 @@ class RemoteServices {
   }
 
 //UserGroups
+  Stream<UserGroup> getUserGroupStream(String id,String userGroupId){
+    return reference.collection('users').doc(id).collection('userGroups').doc(userGroupId).snapshots().map((event) => UserGroup.fromJson(event.data()!));
+  }
   Future<void> setUserGroup(String userid, UserGroup usergroup,) async {
     final DocumentSnapshot docSnap =
     await reference.collection("users").doc(userid).collection('userGroups').doc(usergroup.id).get();

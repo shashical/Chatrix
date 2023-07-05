@@ -563,8 +563,9 @@ class _ChatWindowState extends State<ChatWindow> {
   String backgroundImage ='';
   int unreadMessageCount=0;
   int ouumc=0;
-   int bgIndex=0;
-  int fgIndex=1;
+   int bgIndex=-1;
+  int fgIndex=0;
+
   bool assigned=false;
   UserChat? otherUserChat;
   late Users currentUser;
@@ -608,7 +609,7 @@ class _ChatWindowState extends State<ChatWindow> {
   @override
   Widget build(BuildContext context) {
     return (isTheOtherUserLoaded == false
-        ? const CircularProgressIndicator()
+        ? const Scaffold(body: Center(child: CircularProgressIndicator()))
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
@@ -869,13 +870,20 @@ class _ChatWindowState extends State<ChatWindow> {
                             isSelected=List.filled(myMessageLength, false);
                             trueCount=0;
                             bgIndex=0;
+                            if(!assigned){
+                              assigned=true;
+                              bgIndex=-1;
+                            }
 
 
                           }
                           while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
-                            ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                            if(chatmessages[bgIndex].senderId!=cid) {
+                              ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                            }
                             fgIndex++;
                           }
+                          fgIndex=chatmessages.length;
                           while(bgIndex>=0){
                             if(chatmessages[bgIndex].senderId==cid){
                               ouumc++;
@@ -942,7 +950,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                     {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
                                 }
                                 ouumc=0;
-                                debugPrint('$ouumc');
+                                //debugPrint('$ouumc');
                               }
                               Widget listBuilder=ListView.builder(
                                 //controller: scrollController,
