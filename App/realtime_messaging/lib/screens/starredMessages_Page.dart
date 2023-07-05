@@ -105,7 +105,7 @@ class _StarredMessagePageState extends State<StarredMessagePage> {
                               Text('${starredmessages[index].timestamp.day}/${starredmessages[index].timestamp.month}/${starredmessages[index].timestamp.year}'),
                             ],
                           )
-                          
+
                         ],
                       ),
                     ));

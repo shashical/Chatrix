@@ -150,6 +150,7 @@ List<Widget> MergeAppUserAndSendInvite(
                   builder: (context) {
                     return ChatWindow(
                       otherUserId: users[index].id,
+
                       chatId: docsnap.get('ChatId'),
                       backgroundImage: docsnap.get('backgroundImage'),
                     );
