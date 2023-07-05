@@ -98,6 +98,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             PopupMenuItem(value: 3,
             onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) async{
+
+                RemoteServices().updateUser(cid, 
+                {'token': null},
+                );
+
              await FirebaseAuth.instance.signOut();
              Navigator.pushAndRemoveUntil(context,
                  MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
