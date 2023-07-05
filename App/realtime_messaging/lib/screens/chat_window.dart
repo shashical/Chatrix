@@ -878,12 +878,13 @@ class _ChatWindowState extends State<ChatWindow> {
 
                           }
                           while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
-                            if(chatmessages[bgIndex].senderId!=cid) {
+                            if(chatmessages[fgIndex].senderId!=cid) {
                               ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
                             }
                             fgIndex++;
+                            debugPrint('printiny you ');
                           }
-                          fgIndex=chatmessages.length;
+                          //fgIndex=chatmessages.length;
                           while(bgIndex>=0){
                             if(chatmessages[bgIndex].senderId==cid){
                               ouumc++;
