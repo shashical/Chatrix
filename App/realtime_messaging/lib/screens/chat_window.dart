@@ -372,7 +372,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                         image: FileImage(File(widget.senderUrl)),
                         fit: BoxFit.cover
                       ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)),fit: BoxFit.cover)
-                          :const DecorationImage(image: AssetImage('assests/blurimg.png')),
+                          :const DecorationImage(image: AssetImage('assets/blurimg.png')),
 
                       borderRadius: radius,
 
@@ -879,12 +879,12 @@ class _ChatWindowState extends State<ChatWindow> {
 
                           }
                           while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
-                            if(chatmessages[bgIndex].senderId!=cid) {
+                            if(chatmessages[fgIndex].senderId!=cid) {
                               ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
                             }
                             fgIndex++;
                           }
-                          fgIndex=chatmessages.length;
+                          // fgIndex=chatmessages.length;
                           while(bgIndex>=0){
                             if(chatmessages[bgIndex].senderId==cid){
                               ouumc++;

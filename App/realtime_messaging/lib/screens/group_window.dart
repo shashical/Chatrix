@@ -373,7 +373,7 @@ class _ImgBubbleState extends State<ImgBubble> {
         Container(
           constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65,
-            maxHeight: (widget.isUser)?MediaQuery.of(context).size.height*.41:MediaQuery.of(context).size.width*.89),
+            maxHeight: (widget.isUser)?MediaQuery.of(context).size.height*.41:MediaQuery.of(context).size.height*.45),
           margin: const EdgeInsets.all(3.0),
           padding: const EdgeInsets.all(4.0),
           decoration: BoxDecoration(
@@ -412,7 +412,7 @@ class _ImgBubbleState extends State<ImgBubble> {
                           fit: BoxFit.cover
                       ):(downloaded[cid]??false)?
                       DecorationImage(image: FileImage(File(widget.receiverUrls[cid]!)),fit: BoxFit.cover)
-                          : const DecorationImage(image: AssetImage('assests/blurimg.png'),fit: BoxFit.cover),
+                          : const DecorationImage(image: AssetImage('assets/blurimg.png'),fit: BoxFit.cover),
 
                       borderRadius: radius,
 
@@ -614,7 +614,7 @@ class _GroupWindowState extends State<GroupWindow> {
   bool isSending=false;
   List<bool> isSelected=[];
   List<int> otherUserChatSelected=[];
-  int myMessageLength=0;
+  int myMessageLength=-1;
   int trueCount=0;
   File? _image;
   String? backgroundImage;
@@ -856,7 +856,7 @@ class _GroupWindowState extends State<GroupWindow> {
                       }
                       fgIndex++;
                     }
-                    fgIndex=groupmessages.length;
+                    // fgIndex=groupmessages.length;
                     while(bgIndex>=0){
                       if(groupmessages[bgIndex].senderId==cid){
                         increment++;
