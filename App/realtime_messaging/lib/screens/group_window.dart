@@ -75,7 +75,7 @@ class _DocBubbleState extends State<DocBubble> {
         ? Colors.white
         : Colors.greenAccent.shade100;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    icon = widget.delivered ? Icons.done_all : Icons.done;
+    icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser ? const BorderRadius.only(
       topRight: Radius.circular(5.0),
       bottomLeft: Radius.circular(10.0),
@@ -314,7 +314,7 @@ class _ImgBubbleState extends State<ImgBubble> {
         ? Colors.white
         : Colors.greenAccent.shade100;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    icon = widget.delivered ? Icons.done_all : Icons.done;
+    icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser ? const BorderRadius.only(
       topRight: Radius.circular(5.0),
       bottomLeft: Radius.circular(10.0),
@@ -515,7 +515,7 @@ class MyBubble extends StatelessWidget {
     final bg =isSelected?Colors.lightBlue.withOpacity(.5):
         !isUser ? Colors.white : const Color.fromARGB(255, 126, 226, 155);
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    final icon = delivered ? Icons.done_all : Icons.done;
+    final icon = read ? Icons.done_all : Icons.done;
     final radius = !isUser
         ? const BorderRadius.only(
             topRight: Radius.circular(5.0),
@@ -845,7 +845,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         bgIndex=-1;
                         assigned=true;
                       }
-                      debugPrint( 'bg $bgIndex');
+
 
 
                     }
@@ -910,6 +910,11 @@ class _GroupWindowState extends State<GroupWindow> {
                       reverse: true,
                       itemBuilder: (context, index) {
                         final GroupMessage groupmessage = groupmessages[index];
+                        int trc=0;
+                        groupmessage.readBy.forEach((key, value) {if(value==true){trc++;} });
+
+                        bool read=(trc==participants.length-1);
+
                         if (groupmessage.deletedForMe[cid] == null &&
                             groupmessage.deletedForEveryone == false) {
 
@@ -941,7 +946,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                         .minute}"),
                                     delivered: false,
                                     isUser: (groupmessage.senderId == cid),
-                                    read: false,
+                                    read: read,
                                     displayName: (!savedNumber.contains(
                                         groupmessage.senderPhoneNo)
                                         ? groupmessage.senderName
@@ -964,7 +969,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                     savedUsers[savedNumber.indexOf(groupmessage.senderPhoneNo)]:groupmessage.senderName,
                                     isUser: (cid == groupmessage.senderId),
                                     delivered: false,
-                                    read: false,
+                                    read: read,
                                     isSelected: isSelected[index],
                                     uploaded: groupmessage.isUploaded,
                                     downloaded: groupmessage.downloaded??{},
@@ -986,7 +991,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                       isUser: (cid == groupmessage.senderId),
                                       delivered: groupmessage
                                           .deliveredTo[cid] ?? false,
-                                      read: false,
+                                      read: read,
                                       isSelected: isSelected[index],
                                       uploaded: groupmessage.isUploaded,
                                       downloaded: groupmessage
@@ -1037,7 +1042,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                     isUser: (cid == groupmessage.senderId),
                                     delivered: groupmessage
                                         .deliveredTo[cid] ?? false,
-                                    read: groupmessage.readBy[cid] ?? false,
+                                    read: read,
                                     isSelected: isSelected[index],
                                     uploaded: groupmessage.isUploaded,
                                     downloaded: groupmessage
