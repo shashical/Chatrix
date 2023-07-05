@@ -40,8 +40,8 @@ class GroupMessage {
     this.edited = false,
     this.senderUrl,
     this.isUploaded=false,
-    this.downloaded,
-    this.receiverUrls,
+    this.downloaded=const {},
+    this.receiverUrls=const {},
 
   });
 
@@ -63,8 +63,8 @@ class GroupMessage {
       edited: json['edited'] ?? false,
       senderUrl: json['senderUrl'],
       isUploaded: json['isUploaded'],
-      downloaded: json['downloaded'],
-      receiverUrls: json['receiverUrls'],
+      downloaded: Map<String,bool>.from(json['downloaded']??{}),
+      receiverUrls: Map<String,String>.from(json['receiverUrls']),
     );
   }
 

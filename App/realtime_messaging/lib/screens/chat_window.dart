@@ -546,7 +546,7 @@ class ChatWindow extends StatefulWidget {
 
 class _ChatWindowState extends State<ChatWindow> {
   TextEditingController messageController = TextEditingController();
-   ScrollController scrollController= ScrollController();
+   //ScrollController scrollController= ScrollController();
   late Users otheruser;
   bool isTheOtherUserLoaded = false;
   String? chatid;
@@ -564,8 +564,9 @@ class _ChatWindowState extends State<ChatWindow> {
   String backgroundImage ='';
   int unreadMessageCount=0;
   int ouumc=0;
-   int bgIndex=0;
-  int fgIndex=1;
+   int bgIndex=-1;
+  int fgIndex=0;
+
   bool assigned=false;
   UserChat? otherUserChat;
   late Users currentUser;
@@ -609,7 +610,7 @@ class _ChatWindowState extends State<ChatWindow> {
   @override
   Widget build(BuildContext context) {
     return (isTheOtherUserLoaded == false
-        ? const CircularProgressIndicator()
+        ? const Scaffold(body: Center(child: CircularProgressIndicator()))
         : Scaffold(
             appBar: AppBar(
               elevation: .9,
@@ -869,13 +870,21 @@ class _ChatWindowState extends State<ChatWindow> {
                             myMessageLength=chatmessages.length;
                             isSelected=List.filled(myMessageLength, false);
                             trueCount=0;
-                            bgIndex =0;
+                            bgIndex=0;
+                            if(!assigned){
+                              assigned=true;
+                              bgIndex=-1;
+                            }
+
 
                           }
                           while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
-                            ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                            if(chatmessages[bgIndex].senderId!=cid) {
+                              ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                            }
                             fgIndex++;
                           }
+                          fgIndex=chatmessages.length;
                           while(bgIndex>=0){
                             if(chatmessages[bgIndex].senderId==cid){
                               ouumc++;
@@ -886,6 +895,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
                             }
                             bgIndex--;
+
                           }
                           RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
                           // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
@@ -941,11 +951,10 @@ class _ChatWindowState extends State<ChatWindow> {
                                     {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
                                 }
                                 ouumc=0;
-                                debugPrint('$ouumc');
-                                // bgIndex = 0;
+                                //debugPrint('$ouumc');
                               }
                               Widget listBuilder=ListView.builder(
-                                controller: scrollController,
+                                //controller: scrollController,
                                 reverse: true,
                                 itemCount: chatmessages.length,
                                 itemBuilder: (context, index) {
@@ -1165,11 +1174,14 @@ class _ChatWindowState extends State<ChatWindow> {
                                 maxLines: null,
                                 controller: messageController,
                                 onChanged: (e){
-                                  if(messageController.text.length ==1 || messageController.text.isEmpty){
-                                    setState(() {
+                                  setState(() {
 
-                                    });
-                                  }
+                                  });
+                                  // if(messageController.text.length ==1||messageController.text.length==2 || messageController.text.isEmpty){
+                                  //   setState(() {
+                                  //
+                                  //   });
+                                  // }
                                 },
                                 decoration: const InputDecoration(
                                   hintText: "Type here...",
@@ -1206,6 +1218,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
+                                      lastMessageTime: DateTime.now(),
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1225,6 +1238,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoneNo: currentuser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
+                                    lastMessageTime: DateTime.now(),
                                       ));
                               await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                         setState(() {
@@ -1240,6 +1254,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
                                             backgroundImage: "assets/backgroundimage.png",
+                                            lastMessageTime: DateTime.now(),
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -1252,6 +1267,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             pinned: false,
                                             recipientPhoneNo: currentuser.phoneNo,
                                             backgroundImage: "assets/backgroundimage.png",
+                                            lastMessageTime: DateTime.now()
                                           ));
 
 
@@ -1363,6 +1379,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
+                                    lastMessageTime: DateTime.now()
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1382,6 +1399,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoneNo: currentuser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
+                                    lastMessageTime:DateTime.now(),
                                       ));
                               await FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                         setState(() {
@@ -1397,6 +1415,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
                                             backgroundImage: "assets/backgroundimage.png",
+                                            lastMessageTime: DateTime.now()
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -1409,6 +1428,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                     pinned: false,
                                     recipientPhoneNo: currentuser.phoneNo,
                                     backgroundImage: "assets/backgroundimage.png",
+                                      lastMessageTime: DateTime.now()
                                     ));
 
 
@@ -1516,6 +1536,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       pinned: false,
                                       recipientPhoneNo: otheruser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
+                                    lastMessageTime: DateTime.now()
                                       ));
                               encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
                               String symmKeyString = symmKey.base64;
@@ -1535,6 +1556,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                       recipientPhoneNo: currentuser.phoneNo,
                                       backgroundImage: "assets/backgroundimage.png",
                                       containsSymmKey: encrytedSymmKeyString,
+                                    lastMessageTime: DateTime.now(),
                                       ));
                               await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                         setState(() {
@@ -1550,6 +1572,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                             pinned: false,
                                             recipientPhoneNo:otheruser.phoneNo,
                                             backgroundImage: "assets/backgroundimage.png",
+                                            lastMessageTime: DateTime.now()
                                           ));
                                       final Users currentuser =
                                       (await RemoteServices().getSingleUser(cid))!;
@@ -1706,7 +1729,6 @@ class _ChatWindowState extends State<ChatWindow> {
                                 chatid = "$cid${widget.otherUserId}";
                               });
                             }
-                            debugPrint(chatid);
                             String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
@@ -1730,7 +1752,7 @@ class _ChatWindowState extends State<ChatWindow> {
                             .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otherUserId}").get();
                             if(!docsnap.exists){
                               await RemoteServices().setUserChat(cid,
-                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo, backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg")
+                              UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo, backgroundImage: "assets/backgroundimage.png",lastMessageTime: DateTime.now())
                               );
                             }
 
@@ -1747,7 +1769,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               if(!docsnap.exists){
                                 final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
                                 await RemoteServices().setUserChat(widget.otherUserId,
-                                UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo, backgroundImage: "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg")
+                                UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo, backgroundImage: "assets/backgroundimage.png",lastMessageTime: DateTime.now())
                                 );
                               }
 
