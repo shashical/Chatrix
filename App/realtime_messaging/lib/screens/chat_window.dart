@@ -371,7 +371,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                         image: FileImage(File(widget.senderUrl)),
                         fit: BoxFit.cover
                       ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)),fit: BoxFit.cover)
-                          :const DecorationImage(image: AssetImage('assests/blurimg.png')),
+                          :const DecorationImage(image: AssetImage('assets/blurimg.png')),
 
                       borderRadius: radius,
 
