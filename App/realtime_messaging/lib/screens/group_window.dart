@@ -665,6 +665,8 @@ class _GroupWindowState extends State<GroupWindow> {
   int fgIndex=0;
   int bgIndex=-1;
   bool assigned=false;
+  bool isEditing=false;
+  String editingId='';
   List<dynamic> participants=[];
   List<String> tokens=[];
   bool isLoaded=false;
@@ -1149,6 +1151,36 @@ class _GroupWindowState extends State<GroupWindow> {
                                           }
                                         });
                                       }
+                                      else if(cid==groupmessage.senderId  && groupmessage.contentType=='text'){
+                                        SimpleDialog alert=SimpleDialog(
+                                          children: [
+                                            SimpleDialogOption(
+                                              child: const Row(
+                                                children: [
+                                                  Icon(Icons.edit),
+                                                  Text('edit message'),
+                                                ],
+                                              ),
+                                              onPressed: (){
+
+                                                setState(() {
+                                                  isEditing=true;
+                                                  messageController.text=message;
+                                                  editingId=groupmessage.id;
+                                                });
+                                                Navigator.of(context,rootNavigator: true).pop();
+                                              },
+                                            )
+
+
+                                          ],
+                                        ) ;
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => alert,
+                                          barrierDismissible: true,
+                                        );
+                                      }
                                     },
                                     onLongPress: () {
                                       setState(() {
@@ -1518,6 +1550,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         });
                         String temp = messageController.text;
                         messageController.clear();
+
                         final Users currentuser =
                             (await RemoteServices().getSingleUser(cid))!;
 
@@ -1526,7 +1559,7 @@ class _GroupWindowState extends State<GroupWindow> {
                         encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                         encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                         String encryptedMessageString = encryptedMessage.base64;
-
+                      if(!isEditing){
                       await GroupsRemoteServices().setGroupMessage(
                           widget.groupId,
                           GroupMessage(
@@ -1555,6 +1588,10 @@ class _GroupWindowState extends State<GroupWindow> {
                               'lastMessageTime': DateTime.now().toIso8601String()
                             },
                             widget.groupId);
+                      }}
+                      else if(isEditing){
+                        GroupsRemoteServices().updateGroupMessage(widget.groupId, {'text':encryptedMessageString,
+                        'edited':true}, editingId);
                       }
                       setState(() {
                         debugPrint('$isSending');

@@ -123,7 +123,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                     Spacer(),
                     (!user!.isOnline!)
                         ? Text(
-                            'last seen: ${user!.lastOnline!.hour}:${(user!.lastOnline!.minute) / 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}')
+                            'last seen: ${user!.lastOnline!.hour}:${(user!.lastOnline!.minute) ~/ 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}')
                         : const SizedBox(
                             height: 0,
                             width: 0,

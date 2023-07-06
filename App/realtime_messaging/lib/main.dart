@@ -27,7 +27,7 @@ Future<void> backgroundHandler(RemoteMessage message)async{
 List<String> savedNumber = [];
 List<String> savedUsers = [];
 Future<void> main() async {
-  await dotenv.load();
+  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
