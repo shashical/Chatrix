@@ -17,6 +17,7 @@ class UserChat {
   bool muted;
   bool blocked;
   String? containsSymmKey;
+  String displayName;
 
   UserChat({
     required this.id,
@@ -32,6 +33,7 @@ class UserChat {
     this.muted = false,
     this.blocked = false,
     this.containsSymmKey,
+    required this.displayName,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {
@@ -48,7 +50,8 @@ class UserChat {
       lastMessageTime:(json['lastMessageTime']!=null)? DateTime.parse(json['lastMessageTime']):null,
       muted: json['muted'],
       blocked: json['blocked'],
-      containsSymmKey: json['containsSymmKey']
+      containsSymmKey: json['containsSymmKey'],
+      displayName:json['displayName']??'',
     );
   }
 
@@ -66,7 +69,8 @@ class UserChat {
       'lastMessageTime': lastMessageTime?.toIso8601String(),
       'muted': muted,
       'blocked': blocked,
-      'containsSymmKey': containsSymmKey
+      'containsSymmKey': containsSymmKey,
+      'displayName':displayName,
     };
   }
 }

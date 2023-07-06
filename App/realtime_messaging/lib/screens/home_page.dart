@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               WidgetsBinding.instance.addPostFrameCallback((_) async{
 
                 RemoteServices().updateUser(cid, 
-                {'token': null},
+                {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
                 );
 
              await FirebaseAuth.instance.signOut();

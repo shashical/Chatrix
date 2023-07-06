@@ -338,6 +338,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                         future: RemoteServices().updateUserChat(cid,
                                             {
                                               'containsSymmKey': null,
+                                              'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo,
                                             }
                                             , userchat.id),
                                         builder: (context, snapshot) {
