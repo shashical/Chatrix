@@ -1558,6 +1558,6 @@ class _GroupWindowState extends State<GroupWindow> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

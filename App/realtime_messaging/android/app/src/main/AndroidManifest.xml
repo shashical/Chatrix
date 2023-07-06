@@ -36,4 +36,13 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <!-- Place inside the <queries> element. -->
+    <queries>
+        <!-- Place inside the <queries> element. -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="sms" android:host="*" />
+        </intent>
+    </queries>
+
 </manifest>

@@ -116,11 +116,11 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                       right: 4,
                       child: ClipOval(
                         child: Container(
-                          padding: EdgeInsets.all(7),
+                          padding: const EdgeInsets.all(7),
                           color: Colors.white,
                           child: ClipOval(
                             child: Container(
-                              padding: const EdgeInsets.all(15),
+                              padding: const EdgeInsets.all(10),
                               color: Colors.lightBlue,
                               child: IconButton(
                                 onPressed: () {
@@ -361,6 +361,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                         ),
                                         controller: nameController,
                                         maxLines: 1,
+                                        autofocus: true,
                                         decoration: InputDecoration(
                                           hintText: 'Enter your name ',
                                           border: OutlineInputBorder(
@@ -510,6 +511,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                         ),
                                         controller: aboutController,
                                         maxLines: null,
+                                        autofocus: true,
                                         decoration: InputDecoration(
                                           hintText: 'Enter about yourself ',
                                           border: OutlineInputBorder(

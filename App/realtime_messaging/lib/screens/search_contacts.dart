@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import '../main.dart';
+
+
 
 class SearchContactPage extends StatefulWidget {
   const SearchContactPage({super.key});
@@ -20,6 +23,7 @@ class _SearchContactPageState extends State<SearchContactPage> {
   List<String> blockedBy=[];
 
   final TextEditingController _searchController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +126,26 @@ List<Widget> MergeAppUserAndSendInvite(
     List<Users> users, List<String> appUserNumber,List<String> blockedBy,BuildContext context) {
   List<Widget> returnablelist = [];
   List<Widget> inviteToApp = [];
+  void openMessagingApp(String phoneNumber )async {
+    String encodedMessage=Uri.encodeComponent('Hey join me on this amazing realtime encrypted messaging app!\n Chatrix \n you can get it from \n https://github.com/shashical/realtime_messaging.git');
+    Uri uri=Uri.parse('sms:$phoneNumber?body=$encodedMessage');
+    if(await canLaunchUrl(uri)){
+      //android
+      await launchUrl(uri);
+    }
+    else{
+      //ios
+      uri=Uri.parse('sms:00${phoneNumber.substring(3)}?body=$encodedMessage');
+      if(await canLaunchUrl(uri)){
+        await launchUrl(uri);
+      }
+      else{
+        throw Exception('could not launch uri');
+      }
+
+
+    }
+  }
   for (int i = 0; i < savedNumber.length; i++) {
     int index = appUserNumber.indexOf(savedNumber[i]);
     if (index != -1) {
@@ -197,7 +221,9 @@ List<Widget> MergeAppUserAndSendInvite(
         ),
         title: Text(savedUsers[i]),
         trailing: TextButton(
-          onPressed: () {},
+          onPressed: ()  {
+             openMessagingApp(savedNumber[i]);
+          },
           child: const Text(
             'invite',
             style: TextStyle(color: Colors.purple, fontSize: 20),
@@ -228,7 +254,28 @@ List<Widget> SearchMerge(
     List<String> searchedNumber,
     List<String> searchedUsers,
     List<String> blockedBy,
-    BuildContext context) {
+    BuildContext context,
+   ) {
+  void openMessagingApp(String phoneNumber )async {
+    String encodedMessage=Uri.encodeComponent('Hey join me on this amazing realtime encrypted messaging app!\n Chatrix \n you can get it from \n https://github.com/shashical/realtime_messaging.git');
+     Uri uri=Uri.parse('sms:$phoneNumber?body=$encodedMessage');
+    if(await canLaunchUrl(uri)){
+      //android
+      await launchUrl(uri);
+    }
+    else{
+      //ios
+      uri=Uri.parse('sms:00${phoneNumber.substring(3)}?body=$encodedMessage');
+      if(await canLaunchUrl(uri)){
+        await launchUrl(uri);
+      }
+      else{
+        throw Exception('could not launch uri');
+      }
+
+
+    }
+  }
   List<Widget> returnablelist = [];
   List<Widget> inviteToApp = [];
   for (int i = 0; i < searchedNumber.length; i++) {
@@ -265,7 +312,9 @@ List<Widget> SearchMerge(
         ),
         title: Text(searchedUsers[i]),
         trailing: TextButton(
-          onPressed: () {},
+          onPressed: ()  {
+            openMessagingApp(searchedNumber[i]);
+          },
           child: const Text(
             'invite',
             style: TextStyle(color: Colors.purple, fontSize: 20),

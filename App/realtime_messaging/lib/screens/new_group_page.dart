@@ -96,7 +96,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               } else if (snapshot.data == null) {
                 return Center(
                     child: Container(
-                  padding: EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
                   child: const Text(
                       'App Users from Your contact will appear here'),
                 ));
@@ -108,6 +108,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 cui = appUserIds.indexOf(cid);
 
                 return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     (participantIds.isEmpty)?const SizedBox(height: 0,):
                     Flexible(
@@ -118,9 +119,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
                           itemBuilder: (context, index) => InkWell(
                                 child: Stack(
                                   children: [
-                                    const SizedBox(width: 60,height: 60,),
+                                    const SizedBox(width: 60,height: 30,),
                                     Positioned(
-                                      top: 10,
+                                      top: 7,
                                       left: 10,
                                       child: CircleAvatar(
                                         foregroundImage: NetworkImage(users[
@@ -130,8 +131,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
                                       ),
                                     ),
                                     const Positioned(
-                                        bottom:30,
-                                        right: 10,
+                                        bottom:10,
+                                        right: 1,
                                         child: Icon(Icons.cancel,size: 15,color: Colors.grey,))
                                   ],
                                 ),
@@ -143,7 +144,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
                               )),
                     ),
                     Flexible(
-                      flex:9,
+                      flex:13,
+                      fit:FlexFit.tight,
                       child: ListView(
                           children: (_searchController.text.isEmpty)
                               ? usersPresentList(users, appUserNumber, context,
