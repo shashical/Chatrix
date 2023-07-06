@@ -139,7 +139,7 @@ class _DocBubbleState extends State<DocBubble> {
         height:25 ,
         width: 25,
         child: CircleAvatar(
-          foregroundImage: NetworkImage(widget.photoUrl!),
+          foregroundImage: NetworkImage(widget.photoUrl),
         ),
       ):SizedBox(),
 
@@ -803,7 +803,18 @@ class _GroupWindowState extends State<GroupWindow> {
               }, icon: const Icon(Icons.star)),
               const SizedBox(width: 18,),
               (trueCount==1 &&groupmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: groupmessages[isSelected.indexOf(true)].text));
+                String?  symmKeyString = await const FlutterSecureStorage().read(key: widget.groupId);
+                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(groupmessages[isSelected.indexOf(true)].text);
+                final message = encrypter.decrypt(encryptedMessage,iv: iv);
+                await Clipboard.setData(ClipboardData(text: message));
+                setState(() {
+                  isSelected=List.filled(groupmessages.length, false);
+                  trueCount=0;
+
+                  otherUserChatSelected=[];
+                });
               }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
 
             ],

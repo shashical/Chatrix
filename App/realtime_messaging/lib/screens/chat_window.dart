@@ -556,6 +556,7 @@ class _ChatWindowState extends State<ChatWindow> {
   bool isSending=false;
   bool blocked=false;
   bool done = false;
+  bool isEditing=false;
   File? _image;
   List<bool> isSelected=[];
   List<int> otherUserChatSelected=[];
@@ -572,6 +573,8 @@ class _ChatWindowState extends State<ChatWindow> {
   bool assigned=false;
   UserChat? otherUserChat;
   late Users currentUser;
+  bool youBlocked=false;
+  bool otherBlocked=false;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -591,12 +594,23 @@ class _ChatWindowState extends State<ChatWindow> {
     // unreadMessageCount=otherUserChat?.unreadMessageCount??0;
 
 
+
     setState(() {
       isTheOtherUserLoaded = true;
       indexInContact=savedNumber.indexOf(otheruser.phoneNo);
+      if(currentUser.blockedBy!=null && currentUser.blockedBy!.contains(widget.otherUserId) ){
+        otherBlocked=true;
+        hintText='You are blocked ';
+
+      }
+      if(otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid)){
+        youBlocked=true;
+        hintText='you have blocked';
+      }
     });
   }
-
+  String editingId='';
+  String hintText='Type here ';
 
   @override
   void initState() {
@@ -727,7 +741,18 @@ class _ChatWindowState extends State<ChatWindow> {
 
                     const SizedBox(width: 18,),
                     (trueCount==1 &&chatmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
-                      await Clipboard.setData(ClipboardData(text: chatmessages[isSelected.indexOf(true)].text));
+                     String?  symmKeyString = await const FlutterSecureStorage().read(key: chatid!);
+                      encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                      encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessages[isSelected.indexOf(true)].text);
+                      final message = encrypter.decrypt(encryptedMessage,iv: iv);
+                      await Clipboard.setData(ClipboardData(text: message));
+                      setState(() {
+                        isSelected=List.filled(chatmessages.length, false);
+                        trueCount=0;
+                        unStarableSelected=[];
+                        otherUserChatSelected=[];
+                      });
                     }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
 
                   ],
@@ -799,13 +824,20 @@ class _ChatWindowState extends State<ChatWindow> {
                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                           if((otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid))){
                             otheruser.blockedBy!.remove(cid);
+                            youBlocked=false;
+                            hintText='Type here ';
                           }
                           else{
+                            youBlocked=true;
+                            hintText='You have blocked ';
                        if(otheruser.blockedBy!=null){ otheruser.blockedBy!.add(cid);}
                        else{
                         otheruser.blockedBy=[cid];
                         }}
                        RemoteServices().updateUser(widget.otherUserId, {'blockedBy':otheruser.blockedBy});
+                         setState(() {
+
+                         });
                         });
                       },
                       ),
@@ -1088,6 +1120,36 @@ class _ChatWindowState extends State<ChatWindow> {
                                                       }
                                                     } });
                                                 }
+                                                else if(cid==chatmessage.senderId  && chatmessage.contentType=='text'){
+                                                      SimpleDialog alert=SimpleDialog(
+                                                        children: [
+                                                          SimpleDialogOption(
+                                                            child: const Row(
+                                                              children: [
+                                                                Icon(Icons.edit),
+                                                                Text('edit message'),
+                                                              ],
+                                                            ),
+                                                            onPressed: (){
+
+                                                              setState(() {
+                                                                isEditing=true;
+                                                                messageController.text=message;
+                                                                editingId=chatmessage.id;
+                                                              });
+                                                              Navigator.of(context,rootNavigator: true).pop();
+                                                            },
+                                                          )
+
+
+                                                        ],
+                                                      ) ;
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) => alert,
+                                                        barrierDismissible: true,
+                                                      );
+                                                }
                                               },
                                               onLongPress: (){
                                                 setState(() {
@@ -1162,9 +1224,9 @@ class _ChatWindowState extends State<ChatWindow> {
                         },
                       ),
                     ),
-                    (otheruser.blockedBy!=null && otheruser.blockedBy!.contains(cid))?const Center(
-                      child: Text('you have blocked this chat unblock to continue'),
-                    ):const SizedBox(height: 0,),
+                    (youBlocked)?const Center(
+                      child: Text('you have blocked this chat unblock to continue !'),
+                    ):(otherBlocked)?Center(child: Text('${savedUsers[savedNumber.indexOf(otheruser.phoneNo)]} has blocked you !'),):const SizedBox(height: 0,),
                     Container(
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.95),
@@ -1188,6 +1250,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                 child: TextField(
                                   style: const TextStyle(fontSize: 19),
                                   maxLines: null,
+                                  readOnly: (youBlocked ||otherBlocked),
                                   controller: messageController,
                                   onChanged: (e){
                                     setState(() {
@@ -1199,8 +1262,9 @@ class _ChatWindowState extends State<ChatWindow> {
                                     //   });
                                     // }
                                   },
+
                                   decoration: const InputDecoration(
-                                    hintText: "Type here...",
+                                    hintText: 'Type here',
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -1706,6 +1770,7 @@ class _ChatWindowState extends State<ChatWindow> {
                               });
                               String temp = messageController.text;
                               messageController.clear();
+                              if(!isEditing){
                               if (chatid == null) {
                                 await ChatsRemoteServices().setChat(Chat(
                                   id: "$cid${widget.otherUserId}",
@@ -1744,31 +1809,44 @@ class _ChatWindowState extends State<ChatWindow> {
                                 setState(() {
                                   chatid = "$cid${widget.otherUserId}";
                                 });
-                              }
+                              }}
                               String symmKeyString = (await FlutterSecureStorage().read(key: chatid!))!;
                               encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                               encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                               encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                               String encryptedMessageString = encryptedMessage.base64;
 
-                            if(otheruser.token != null){
+                            if(otheruser.token != null && !isEditing){
                               SendNotificationService().sendFCMChatMessage(otheruser.token!, {'title': curUser!.phoneNo, 'body': temp}, {});
                             }
-
+                            if(!isEditing) {
                               await ChatsRemoteServices().setChatMessage(
                                   chatid!,
                                   ChatMessage(
-                                      id: "${DateTime.now().microsecondsSinceEpoch}",
+                                      id: "${DateTime
+                                          .now()
+                                          .microsecondsSinceEpoch}",
                                       senderId: cid,
                                       text: encryptedMessageString,
                                       contentType: "text",
                                       timestamp: DateTime.now()));
 
-                              DocumentSnapshot docsnap = await FirebaseFirestore.instance
-                              .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otherUserId}").get();
-                              if(!docsnap.exists){
+
+                              DocumentSnapshot docsnap = await FirebaseFirestore
+                                  .instance
+                                  .collection('users').doc(cid).collection(
+                                  'userChats')
+                                  .doc("$cid${widget.otherUserId}")
+                                  .get();
+                              if (!docsnap.exists) {
                                 await RemoteServices().setUserChat(cid,
-                                UserChat(id: "$cid${widget.otherUserId}", chatId: chatid!, recipientPhoto: otheruser.photoUrl!, pinned: false, recipientPhoneNo: otheruser.phoneNo, backgroundImage: "assets/backgroundimage.png",lastMessageTime: DateTime.now())
+                                    UserChat(id: "$cid${widget.otherUserId}",
+                                        chatId: chatid!,
+                                        recipientPhoto: otheruser.photoUrl!,
+                                        pinned: false,
+                                        recipientPhoneNo: otheruser.phoneNo,
+                                        backgroundImage: "assets/backgroundimage.png",
+                                        lastMessageTime: DateTime.now())
                                 );
                               }
 
@@ -1777,17 +1855,31 @@ class _ChatWindowState extends State<ChatWindow> {
                                   {
                                     'lastMessage': encryptedMessageString,
                                     'lastMessageType': "text",
-                                    'lastMessageTime': DateTime.now().toIso8601String()
+                                    'lastMessageTime': DateTime.now()
+                                        .toIso8601String()
                                   },
                                   "$cid${widget.otherUserId}");
 
-                                docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otherUserId).collection('userChats').doc("${widget.otherUserId}$cid").get();
-                                if(!docsnap.exists){
-                                  final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
-                                  await RemoteServices().setUserChat(widget.otherUserId,
-                                  UserChat(id: "${widget.otherUserId}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo, backgroundImage: "assets/backgroundimage.png",lastMessageTime: DateTime.now())
-                                  );
-                                }
+                              docsnap =
+                              await FirebaseFirestore.instance.collection(
+                                  'users').doc(widget.otherUserId).collection(
+                                  'userChats')
+                                  .doc("${widget.otherUserId}$cid")
+                                  .get();
+                              if (!docsnap.exists) {
+                                final Users currentuser = (await RemoteServices()
+                                    .getSingleUser(cid))!;
+                                await RemoteServices().setUserChat(
+                                    widget.otherUserId,
+                                    UserChat(id: "${widget.otherUserId}$cid",
+                                        chatId: chatid!,
+                                        recipientPhoto: currentuser.photoUrl!,
+                                        pinned: false,
+                                        recipientPhoneNo: currentuser.phoneNo,
+                                        backgroundImage: "assets/backgroundimage.png",
+                                        lastMessageTime: DateTime.now())
+                                );
+                              }
 
 
                               RemoteServices().updateUserChat(
@@ -1795,9 +1887,19 @@ class _ChatWindowState extends State<ChatWindow> {
                                   {
                                     'lastMessage': encryptedMessageString,
                                     'lastMessageType': "text",
-                                    'lastMessageTime': DateTime.now().toIso8601String()
+                                    'lastMessageTime': DateTime.now()
+                                        .toIso8601String()
                                   },
                                   "${widget.otherUserId}$cid");
+                            }
+                            if(isEditing){
+                              ChatsRemoteServices().updateChatMessage(chatid!,
+                                  {'text':encryptedMessageString,
+                                  'edited':true}, editingId);
+                              setState(() {
+                                isEditing=false;
+                              });
+                            }
                               setState(() {
                                 isSending=false;
                               });
