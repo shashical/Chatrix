@@ -34,30 +34,30 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 
   bool openedFromNotification = false;
-  String backgroundImage = '';
-  String otherUserId = '';
-  String id = '';
-  bool isGroup = false;
-  String groupPhoto = '';
-  String groupName = '';
-  bool containsSymmKey = false;
+  // String backgroundImage = '';
+  // String otherUserId = '';
+  // String id = '';
+  // bool isGroup = false;
+  // String groupPhoto = '';
+  // String groupName = '';
+  // bool containsSymmKey = false;
 
 
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) {
       if (message != null) {
-        openedFromNotification = true;
-        backgroundImage = message.data['backgroundImage'];
-        id = message.data['chatId'];
-        isGroup = message.data['isGroup'];
-        containsSymmKey = message.data['containsSymmKey'];
-        if(isGroup){
-          groupPhoto = message.data['groupPhoto'];
-          groupName = message.data['groupName'];
-        }
-        else{
-          otherUserId = message.data['otherUserId'];
-        }
+        // openedFromNotification = true;
+        // backgroundImage = message.data['backgroundImage'];
+        // id = message.data['chatId'];
+        // isGroup = message.data['isGroup'];
+        // containsSymmKey = message.data['containsSymmKey'];
+        // if(isGroup){
+        //   groupPhoto = message.data['groupPhoto'];
+        //   groupName = message.data['groupName'];
+        // }
+        // else{
+        //   otherUserId = message.data['otherUserId'];
+        // }
       }
     },
   );
@@ -65,18 +65,18 @@ void main() async {
   FirebaseMessaging.onMessageOpenedApp.listen(
     (RemoteMessage? message) {
       if (message != null) {
-        openedFromNotification = true;
-        backgroundImage = message.data['backgroundImage'];
-        id = message.data['chatId'];
-        isGroup = message.data['isGroup'];
-        containsSymmKey = message.data['containsSymmKey'];
-        if(isGroup){
-          groupPhoto = message.data['groupPhoto'];
-          groupName = message.data['groupName'];
-        }
-        else{
-          otherUserId = message.data['otherUserId'];
-        }
+        // openedFromNotification = true;
+        // backgroundImage = message.data['backgroundImage'];
+        // id = message.data['chatId'];
+        // isGroup = message.data['isGroup'];
+        // containsSymmKey = message.data['containsSymmKey'];
+        // if(isGroup){
+        //   groupPhoto = message.data['groupPhoto'];
+        //   groupName = message.data['groupName'];
+        // }
+        // else{
+        //   otherUserId = message.data['otherUserId'];
+        // }
       }
     },
   );
@@ -85,52 +85,52 @@ void main() async {
     if(message!=null){
       LocalNotificationService.showNotificationOnForeground(message);
       openedFromNotification = true;
-      backgroundImage = message.data['backgroundImage'];
-      id = message.data['chatId'];
-      isGroup = message.data['isGroup'];
-      containsSymmKey = message.data['containsSymmKey'];
-      if(isGroup){
-        groupPhoto = message.data['groupPhoto'];
-        groupName = message.data['groupName'];
-      }
-      else{
-        otherUserId = message.data['otherUserId'];
-      }
+      // backgroundImage = message.data['backgroundImage'];
+      // id = message.data['chatId'];
+      // isGroup = message.data['isGroup'];
+      // containsSymmKey = message.data['containsSymmKey'];
+      // if(isGroup){
+      //   groupPhoto = message.data['groupPhoto'];
+      //   groupName = message.data['groupName'];
+      // }
+      // else{
+      //   otherUserId = message.data['otherUserId'];
+      // }
     }
   },);
 
   runApp(MyApp(
-    backgroundImage: backgroundImage,
-    id: id,
+    // backgroundImage: backgroundImage,
+    // id: id,
     openedFromNotification: openedFromNotification,
-    otherUserId: otherUserId,
-    groupName: groupName,
-    groupPhoto: groupPhoto,
-    isGroup: isGroup,
-    containsSymmKey: containsSymmKey,
+    // otherUserId: otherUserId,
+    // groupName: groupName,
+    // groupPhoto: groupPhoto,
+    // isGroup: isGroup,
+    // containsSymmKey: containsSymmKey,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final bool openedFromNotification;
-  final String backgroundImage;
-  final String id;
-  final String otherUserId;
-  final bool isGroup;
-  final String groupPhoto;
-  final String groupName;
-  final bool containsSymmKey;
+  // final String backgroundImage;
+  // final String id;
+  // final String otherUserId;
+  // final bool isGroup;
+  // final String groupPhoto;
+  // final String groupName;
+  // final bool containsSymmKey;
 
   const MyApp(
       {Key? key,
-      required this.containsSymmKey,
-      required this.groupPhoto,
-      required this.groupName,
-      required this.isGroup,
-      required this.openedFromNotification,
-      required this.backgroundImage,
-      required this.id,
-      required this.otherUserId})
+      // required this.containsSymmKey,
+      // required this.groupPhoto,
+      // required this.groupName,
+      // required this.isGroup,
+      required this.openedFromNotification,})
+      // required this.backgroundImage,
+      // required this.id,
+      // required this.otherUserId})
       : super(key: key);
 
   @override
@@ -141,7 +141,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: (openedFromNotification?(containsSymmKey?HomePage():(isGroup?GroupWindow(backgroundImage: backgroundImage, groupId: id, groupName: groupName, groupPhoto: groupPhoto,):ChatWindow(otherUserId: otherUserId, backgroundImage: backgroundImage, chatId: id,))):SplashPage()),
+      home: (openedFromNotification?HomePage():SplashPage())
+      // home: (openedFromNotification?(containsSymmKey?HomePage():(isGroup?GroupWindow(backgroundImage: backgroundImage, groupId: id, groupName: groupName, groupPhoto: groupPhoto,):ChatWindow(otherUserId: otherUserId, backgroundImage: backgroundImage, chatId: id,))):SplashPage()),
     );
   }
 }
