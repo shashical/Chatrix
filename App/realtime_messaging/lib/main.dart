@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:realtime_messaging/Services/local_notifications.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
@@ -25,7 +26,8 @@ Future<void> backgroundHandler(RemoteMessage message)async{
 
 List<String> savedNumber = [];
 List<String> savedUsers = [];
-void main() async {
+Future<void> main() async {
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 

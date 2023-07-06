@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class SendNotificationService{
   void sendFCMChatMessage(String token, Map<String,dynamic> notification, Map<String,dynamic> data) async {
-  final serverKey = '';
   final url = 'https://fcm.googleapis.com/fcm/send';
 
   final headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'key=$serverKey',
+    'Authorization': 'key=${dotenv.env['SERVER_KEY']}',
   };
 
   final body = {
@@ -40,12 +40,11 @@ class SendNotificationService{
 }
 
 void sendFCMGroupMessage(List<String> tokens, Map<String,dynamic> notification, Map<String,dynamic> data) async {
-  final serverKey = 'AAAAEsCHAK8:APA91bEteWHVo6bO4H6MF4AljWHLWMOhdnIRKTP5I-b9t99jU-Y8sJK2tsbQ2CDK9oAxhDiY0ZY5wXXy0apz21BEsBU0MWB6DnHuVeUNNSxNIqH5gd8N6QsjKqhmW1114qldBH6aX5wF';
   final url = 'https://fcm.googleapis.com/fcm/send';
 
   final headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'key=$serverKey',
+    'Authorization': 'key=${dotenv.env['SERVER_KEY']}',
   };
 
   final body = {
