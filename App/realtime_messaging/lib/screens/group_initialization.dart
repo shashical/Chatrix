@@ -226,7 +226,7 @@ final TextEditingController _groupNameController=TextEditingController();
                       imageUrl:imageUrl??
                       'https://geodash.gov.bd/uploaded/people_group/default_group.png',
                       backgroundImage:
-                      "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
+                      "assets/backgroundimage.png"));
               }
               else{
                 DocumentSnapshot docSnap = await FirebaseFirestore.instance.collection('users').doc(i).get();
@@ -247,7 +247,7 @@ final TextEditingController _groupNameController=TextEditingController();
                       imageUrl:imageUrl??
                       'https://geodash.gov.bd/uploaded/people_group/default_group.png',
                       backgroundImage:
-                      "https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg"));
+                      "assets/backgroundimage.png"));
               }
             }
          final    nav=Navigator.of(context);
@@ -258,7 +258,7 @@ final TextEditingController _groupNameController=TextEditingController();
                 GroupWindow(groupName: _groupNameController.text,
                     groupPhoto:
                 imageUrl??'https://geodash.gov.bd/uploaded/people_group/default_group.png',
-                    backgroundImage: 'https://wallup.net/wp-content/uploads/2018/03/19/580162-pattern-vertical-portrait_display-digital_art.jpg',
+                    backgroundImage: "assets/backgroundimage.png",
                     groupId: groupid)));
           }
 
