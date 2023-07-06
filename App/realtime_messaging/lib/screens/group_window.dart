@@ -11,8 +11,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
+import 'package:realtime_messaging/Services/send_notifications.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
 import '../Models/groupMessages.dart';
@@ -664,6 +666,7 @@ class _GroupWindowState extends State<GroupWindow> {
   int bgIndex=-1;
   bool assigned=false;
   List<dynamic> participants=[];
+  List<String> tokens=[];
   bool isLoaded=false;
   List<bool >isUpdated=[];
   @override
@@ -683,6 +686,12 @@ class _GroupWindowState extends State<GroupWindow> {
      setState(() {
        isLoaded=true;
      });
+     for(var x in participants){
+        DocumentSnapshot docsnap = await FirebaseFirestore.instance.collection('users').doc(x).get();
+        if(docsnap.get('token') != null){
+          tokens.add(docsnap.get('token'));
+        }
+      }
   }
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -1507,44 +1516,46 @@ class _GroupWindowState extends State<GroupWindow> {
                         encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                         String encryptedMessageString = encryptedMessage.base64;
 
-                        await GroupsRemoteServices().setGroupMessage(
-                            widget.groupId,
-                            GroupMessage(
-                              id: "${DateTime.now().microsecondsSinceEpoch}",
-                              senderId: cid,
-                              text: encryptedMessageString,
-                              contentType: "text",
-                              timestamp: DateTime.now(),
-                              senderName: currentuser.name!,
-                              senderPhoneNo: currentuser.phoneNo,
-                              senderPhotoUrl: currentuser.photoUrl!,
-                            ));
-                        // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
-                        // List<dynamic> participants = docSnap.get('participantIds');
-                            // .getDocumentField(
-                            //     "groups/${widget.groupId}", 'participantIds');
-                        for (var x in participants) {
-                          RemoteServices().updateUserGroup(
-                              x,
-                              {
-                                'lastMessage': encryptedMessageString,
-                                'lastMessageType': "text",
-                                'lastMessageTime': DateTime.now().toIso8601String()
-                              },
-                              widget.groupId);
-                        }
-                        setState(() {
-                          debugPrint('$isSending');
-                          isSending = false;
-                        });
-                      },
-                      icon: const Icon(Icons.send_rounded, color: Colors.blue),
-                    )),
-                  ],
-                ),
+                      await GroupsRemoteServices().setGroupMessage(
+                          widget.groupId,
+                          GroupMessage(
+                            id: "${DateTime.now().microsecondsSinceEpoch}",
+                            senderId: cid,
+                            text: encryptedMessageString,
+                            contentType: "text",
+                            timestamp: DateTime.now(),
+                            senderName: currentuser.name!,
+                            senderPhoneNo: currentuser.phoneNo,
+                            senderPhotoUrl: currentuser.photoUrl!,
+                          ));
+
+                      SendNotificationService().sendFCMGroupMessage(tokens, {'title': curUser!.phoneNo, 'body':temp}, {});
+                      // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
+                      // List<dynamic> participants = docSnap.get('participantIds');
+                          // .getDocumentField(
+                          //     "groups/${widget.groupId}", 'participantIds');
+
+                      for (var x in participants) {
+                        RemoteServices().updateUserGroup(
+                            x,
+                            {
+                              'lastMessage': encryptedMessageString,
+                              'lastMessageType': "text",
+                              'lastMessageTime': DateTime.now().toIso8601String()
+                            },
+                            widget.groupId);
+                      }
+                      setState(() {
+                        debugPrint('$isSending');
+                        isSending = false;
+                      });
+                    },
+                    icon: const Icon(Icons.send_rounded, color: Colors.blue),
+                  )),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

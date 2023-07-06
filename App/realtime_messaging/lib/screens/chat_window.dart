@@ -16,10 +16,12 @@ import 'package:realtime_messaging/Models/chats.dart';
 import 'package:realtime_messaging/Models/starredMessages.dart';
 
 import 'package:realtime_messaging/Models/users.dart';
+import 'package:realtime_messaging/Services/send_notifications.dart';
 import 'package:realtime_messaging/Services/starred_remote_services.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/Widgets/progress-indicator.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
@@ -1749,9 +1751,9 @@ class _ChatWindowState extends State<ChatWindow> {
                               encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                               String encryptedMessageString = encryptedMessage.base64;
 
-                              if(otheruser.token != null){
-                                FirebaseMessaging.instance.sendMessage();
-                              }
+                            if(otheruser.token != null){
+                              SendNotificationService().sendFCMChatMessage(otheruser.token!, {'title': curUser!.phoneNo, 'body': temp}, {});
+                            }
 
                               await ChatsRemoteServices().setChatMessage(
                                   chatid!,

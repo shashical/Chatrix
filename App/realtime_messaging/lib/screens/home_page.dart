@@ -18,10 +18,11 @@ class HomePage extends StatefulWidget  {
 
 }
 
+Users? curUser;
+
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
-  Users? curUser;
   bool isLoaded=false;
 
   final List<Widget> _pages = [
@@ -34,7 +35,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     cid=FirebaseAuth.instance.currentUser!.uid;
-    getCurUser();
 
   }
   @override
