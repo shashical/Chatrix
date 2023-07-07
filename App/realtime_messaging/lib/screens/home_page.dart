@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('printingcid $cid');
+   // debugPrint('printingcid $cid');
     return Scaffold(
       appBar: AppBar(
         title: const Text(

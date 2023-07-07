@@ -14,6 +14,7 @@ import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/send_notifications.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
@@ -138,10 +139,9 @@ class _DocBubbleState extends State<DocBubble> {
           (!widget.isUser)?SizedBox(
         height:25 ,
         width: 25,
-        child: CircleAvatar(
-          foregroundImage: NetworkImage(widget.photoUrl),
-        ),
-      ):SizedBox(),
+            child: CircleAvatar(
+              foregroundImage: NetworkImage(widget.photoUrl),
+            ),):const SizedBox(),
 
           Column(
             crossAxisAlignment: align,
@@ -463,8 +463,16 @@ class _ImgBubbleState extends State<ImgBubble> {
                             ],
                           ),
                         ),),
-                        Center(child: (widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
-                            onPressed: () async {
+                        Center(child:
+                            Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:(widget.isUser)?(uploaded)?null:Colors.white.withOpacity(0.5):(downloaded[cid]??false)?null:Colors.white.withOpacity(0.5),
+                              ),
+                              child:(widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
+                              onPressed: () async {
                               setState(() {
                                 isUploading = true;
                               });
@@ -504,7 +512,7 @@ class _ImgBubbleState extends State<ImgBubble> {
 
 
 
-                            }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                            }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),)
                         )
                       ]
                   ),
@@ -566,7 +574,7 @@ class MyBubble extends StatelessWidget {
           child: CircleAvatar(
             foregroundImage: NetworkImage(photoUrl!),
           ),
-        ):SizedBox(),
+        ):const SizedBox(),
         Column(
           crossAxisAlignment: align,
           children: [
@@ -822,12 +830,24 @@ class _GroupWindowState extends State<GroupWindow> {
             ],
           ) : Row(
             children: [
+              InkWell(
+                child:SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width*0.65,
+                  child: Row(
+                    children:[
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.groupPhoto),
+                  backgroundImage: NetworkImage(widget.groupPhoto),
               ),
               const SizedBox(width: 10,),
               Text(widget.groupName),
-              const Spacer(),
+              const Spacer(),]),
+                ),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                      GroupInfoPage(groupId: widget.groupId, userGroupId: widget.groupId)));
+                },
+              ),
               PopupMenuButton(itemBuilder: (context)=>
               [
                 PopupMenuItem(
@@ -1448,6 +1468,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                         },
                                         widget.groupId);
                                   }
+                                  _image=null;
 
                                 }
 
@@ -1513,6 +1534,7 @@ class _GroupWindowState extends State<GroupWindow> {
                                         },
                                         widget.groupId);
                                   }
+                                  _image=null;
                                 }
 
                               },

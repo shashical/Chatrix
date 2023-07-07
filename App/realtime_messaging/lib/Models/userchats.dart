@@ -17,7 +17,7 @@ class UserChat {
   bool muted;
   bool blocked;
   String? containsSymmKey;
-  String displayName;
+  String? displayName;
 
   UserChat({
     required this.id,
@@ -33,7 +33,7 @@ class UserChat {
     this.muted = false,
     this.blocked = false,
     this.containsSymmKey,
-    required this.displayName,
+    this.displayName,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {

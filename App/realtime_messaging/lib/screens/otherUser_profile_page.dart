@@ -63,106 +63,162 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.amber,
+      appBar: AppBar(
+        backgroundColor: Colors.amber,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
         body: (userLoaded)
-            ? Container(
-                height: double.infinity,
-                color: Colors.cyan,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 18,
-                    ),
-                    Row(
+            ? Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical:20 ,horizontal: 35),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent,
+                  boxShadow: [
+                    BoxShadow(
+                        offset: Offset.fromDirection(2,3),
+                        blurRadius: 0.5,
+                        spreadRadius: 3.0,
+                        color: Colors.black),
+                    BoxShadow(
+                        offset: Offset.fromDirection(1,2),
+                        blurRadius: 0.5,
+                        spreadRadius: 3.0,
+                        color: Colors.white),
+                    BoxShadow(
+                        offset: Offset.fromDirection(3,2),
+                        blurRadius: 0.5,
+                        spreadRadius: 3.0,
+                        color: Colors.black),
+
+                  ],
+                  borderRadius: BorderRadius.circular(30)
+                ),
+
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: 5,
-                        ),
-                        BackButton(),
-                      ],
-                    ),
-                    Spacer(),
-                    Stack(children: [
-                      ClipOval(
-                        child: Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: ClipOval(
-                              child: Material(
-                                child: Image(
-                                  image: NetworkImage(user!.photoUrl!),
-                                  fit: BoxFit.cover,
-                                  width: 200,
-                                  height: 200,
+
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color:  const Color.fromARGB(255, 253, 0, 70),
+                            boxShadow: [
+                              BoxShadow(
+                                offset: Offset.fromDirection(4,2),
+                                  blurRadius: 0.5,
+                                  spreadRadius: 3.0,
+                                  color: Colors.black),
+                              BoxShadow(
+                                  offset: Offset.fromDirection(2,2),
+                                  blurRadius: 0.5,
+                                  spreadRadius: 3.0,
+                                  color: Colors.white)
+                            ],
+                            borderRadius: BorderRadius.circular(10)
+                              
+                          ),
+                          child: Stack(children: [
+                            ClipOval(
+                              child: Container(
+                                color: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: ClipOval(
+                                    child: Material(
+                                      child: Image(
+                                        image: NetworkImage(user!.photoUrl!),
+                                        fit: BoxFit.cover,
+                                        width: 200,
+                                        height: 200,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
+                            Positioned(
+                              bottom: 10,
+                              right: 10,
+                              child: ClipOval(
+                                child: Container(
+                                  padding: const EdgeInsets.all(7),
+                                  color: Colors.white,
+                                  child: ClipOval(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      color: (user!.isOnline!)
+                                          ? const Color.fromARGB(255, 0, 228, 31)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]),
+                        ),
+
+                        (!user!.isOnline!)
+                            ? Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                  'last seen: ${user!.lastOnline!.hour}:${(user!.lastOnline!.minute) ~/ 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}'),
+                            )
+                            : const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                              'Online Now',style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 22
+                          ),),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(
+                            (index != -1) ? savedUsers[index] : user!.name!,
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: 10,
-                        right: 10,
-                        child: ClipOval(
-                          child: Container(
-                            padding: const EdgeInsets.all(7),
-                            color: Colors.white,
-                            child: ClipOval(
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                color: (user!.isOnline!)
-                                    ? Colors.green
-                                    : Colors.grey,
+
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(
+                            '${user!.phoneNo.substring(0, 3)} ${user!.phoneNo.substring(3)}',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+
+                        Container(
+                          color: Colors.white70,
+                          width: 200,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              user!.about!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.deepPurpleAccent,
+                                fontSize: 26,
                               ),
                             ),
                           ),
                         ),
-                      )
-                    ]),
-                    Spacer(),
-                    (!user!.isOnline!)
-                        ? Text(
-                            'last seen: ${user!.lastOnline!.hour}:${(user!.lastOnline!.minute) ~/ 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}')
-                        : const SizedBox(
-                            height: 0,
-                            width: 0,
-                          ),
-                    Text(
-                      (index != -1) ? savedUsers[index] : user!.name!,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
+
+                      ],
                     ),
-                    Spacer(),
-                    Text(
-                      '${user!.phoneNo.substring(0, 3)} ${user!.phoneNo.substring(3)}',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Spacer(),
-                    Container(
-                      color: Colors.white70,
-                      width: 350,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          user!.about!,
-                          style: const TextStyle(
-                            color: Colors.deepPurpleAccent,
-                            fontSize: 22,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Spacer()
-                  ],
+                  ),
                 ),
-              )
+            )
             : const Center(
                 child: CircularProgressIndicator(
                   color: Colors.blue,

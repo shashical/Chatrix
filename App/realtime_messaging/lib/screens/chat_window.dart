@@ -398,46 +398,50 @@ class _ImageBubbleState extends State<ImageBubble> {
                         ],
                       ),
                     ),),
-                    Center(child: (widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
-                        onPressed: () async {
-                          setState(() {
-                            isUploading = true;
-                          });
-                          final docUrl = await uploadDocument(
-                              File(widget.senderUrl));
-
-                          String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
-                          encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
-                          encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                          encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
-                          String encryptedDocUrlString = encryptedDocUrl.base64;
-
-                          ChatsRemoteServices().updateChatMessage(widget.chatId, {
-                            'uploaded': true,
-                            'text': encryptedDocUrlString
-                          }, widget.id);
-                          setState(() {
-                            uploaded = true;
-                          });
-                        }, icon: const Icon(Icons.upload))
-                        : (!uploaded) ? progressIndicator(_uploadTask,null)
-                        : const SizedBox(width: 0,) :
-                        (!downloading && !downloaded)?IconButton(
-                        onPressed: () async {
-                          setState(() {
-                            downloading=true;
-                          });
-                          final receiveUrl=await downloadImage(widget.message);
-                          ChatsRemoteServices().updateChatMessage(widget.chatId,
-                              {'receiverUrl':receiveUrl,
-                                'downloaded':true,
-                              }, widget.id);
-                          setState(() {
-                            downloaded=true;
-                          });
-
-
-                        }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                    Center(child:
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:(widget.isUser)?(uploaded)?null:Colors.white.withOpacity(0.5):(downloaded)?null:Colors.white.withOpacity(0.5),
+                      ),
+                      child:(widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              isUploading = true;});
+                            final docUrl = await uploadDocument(
+                                File(widget.senderUrl));
+                            String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
+                            encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
+                            encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                            encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
+                            String encryptedDocUrlString = encryptedDocUrl.base64;
+                            ChatsRemoteServices().updateChatMessage(widget.chatId, {
+                              'uploaded': true, 
+                              'text': encryptedDocUrlString
+                            }, widget.id);
+                            setState(() {
+                              uploaded = true;
+                            });
+                            }, icon: const Icon(Icons.upload)) 
+                          : (!uploaded) ? progressIndicator(_uploadTask,null) 
+                          : const SizedBox(width: 0,) : 
+                      (!downloading && !downloaded)?IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              downloading=true;
+                            });
+                            final receiveUrl=await downloadImage(widget.message);
+                            ChatsRemoteServices().updateChatMessage(widget.chatId, 
+                                {'receiverUrl':receiveUrl, 
+                                  'downloaded':true,
+                                }, widget.id);
+                            setState(() {
+                              downloaded=true;});
+                            }, icon: const Icon(Icons.download)):!downloaded?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                    ),
+                    
                     )
                   ]
               ),
@@ -575,6 +579,7 @@ class _ChatWindowState extends State<ChatWindow> {
   late Users currentUser;
   bool youBlocked=false;
   bool otherBlocked=false;
+  Users? otherUserStream;
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -759,43 +764,57 @@ class _ChatWindowState extends State<ChatWindow> {
                 ) :Row(
                   children: [
                     InkWell(
-                      child: Stack(
-                        children: [
-                          const SizedBox(
-                           width: 42.5,
-                           height: 40,
-                          ),
-                          CircleAvatar(
-                          foregroundImage: NetworkImage(otheruser.photoUrl!),
-                        ),
-                          (otherBlocked)?const SizedBox():Positioned(
-                            bottom: 1.5,
-                              right: 0,
-                              child: Container(
-                                height: 15,
-                            width: 15,
-                            decoration: BoxDecoration(
-                              color: (otheruser.isOnline!)?const Color.fromARGB(
-                                  255, 0, 228, 31):Colors.white70,
-                              shape: BoxShape.circle
+
+                      child: SizedBox(
+                        height: 50,
+                        width: MediaQuery.of(context).size.width*0.65,
+                        child: Row(
+                          children: [
+                            Stack(
+                              children: [
+                                const SizedBox(
+                                 width: 42.5,
+                                 height: 40,
+                                ),
+                                CircleAvatar(
+                                foregroundImage: NetworkImage((otherBlocked)?'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg':otheruser.photoUrl!),
+                              ),
+                                (otherBlocked)?const SizedBox():Positioned(
+                                  bottom: 1.5,
+                                    right: 0,
+                                    child: Container(
+                                      height: 15,
+                                  width: 15,
+                                  decoration: BoxDecoration(
+                                    color: (otherUserStream?.isOnline??false)?const Color.fromARGB(
+                                        255, 0, 228, 31):Colors.white70,
+                                    shape: BoxShape.circle
+                                  ),
+                                ))
+                            ]
                             ),
-                          ))
-                      ]
+                            const SizedBox(width: 10,),
+                            SizedBox(
+                              height: 50,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
+                                  (otherBlocked || otherUserStream==null)?const Text(''):Text((otherUserStream!.isOnline!)?'Online Now':'Last seen at ${otheruser.lastOnline?.hour}:${otheruser.lastOnline!.minute~/10}${otheruser.lastOnline!.minute%10} on ${otheruser.lastOnline!.day}/${otheruser.lastOnline!.month}/${otheruser.lastOnline!.year}'
+                                    ,style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w300),)
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                          ],
+                        ),
                       ),
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(userId: widget.otherUserId,)));
                       },
+
+
                     ),
-                    const SizedBox(width: 10,),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text((indexInContact!=-1)?savedUsers[indexInContact]:otheruser.phoneNo),
-                        (otherBlocked)?const Text(''):Text((otheruser.isOnline!)?'Online Now':'Last seen at ${otheruser.lastOnline?.hour}:${otheruser.lastOnline!.minute~/10}${otheruser.lastOnline!.minute%10} on ${otheruser.lastOnline!.day}/${otheruser.lastOnline!.month}/${otheruser.lastOnline!.year}'
-                        ,style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w300),)
-                      ],
-                    ),
-                    const Spacer(),
                     PopupMenuButton(itemBuilder: (context)=>
                     [
                       PopupMenuItem(
@@ -902,6 +921,18 @@ class _ChatWindowState extends State<ChatWindow> {
                 ),
                 child: Column(
                   children: [
+                    SizedBox(
+                      height: 1,
+                      child:StreamBuilder<Users>(
+                        stream: RemoteServices().getUserStream(widget.otherUserId),
+                        builder:( (context,snapshot){
+                          if(snapshot.hasData){
+                            otherUserStream=snapshot.data;
+                          }
+                          return const SizedBox();
+                        }),
+                      ) ,
+                    ),
                     Flexible(
                       child: StreamBuilder<List<ChatMessage>>(
                         stream: (chatid == null
@@ -1224,9 +1255,9 @@ class _ChatWindowState extends State<ChatWindow> {
                         },
                       ),
                     ),
-                    (youBlocked)?const Center(
-                      child: Text('you have blocked this chat unblock to continue !'),
-                    ):(otherBlocked)?Center(child: Text('${savedUsers[savedNumber.indexOf(otheruser.phoneNo)]} has blocked you !'),):const SizedBox(height: 0,),
+                    // (youBlocked)?const Center(
+                    //   child: Text('you have blocked this chat unblock to continue !'),
+                    // ):(otherBlocked)?Center(child: Text('${savedUsers[savedNumber.indexOf(otheruser.phoneNo)]} has blocked you !'),):const SizedBox(height: 0,),
                     Container(
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.95),
@@ -1250,7 +1281,7 @@ class _ChatWindowState extends State<ChatWindow> {
                                 child: TextField(
                                   style: const TextStyle(fontSize: 19),
                                   maxLines: null,
-                                  readOnly: (youBlocked ||otherBlocked),
+                                //  readOnly: (youBlocked ||otherBlocked),
                                   controller: messageController,
                                   onChanged: (e){
                                     setState(() {

@@ -59,6 +59,9 @@ class RemoteServices {
       rethrow;
     }
   }
+  Stream<Users> getUserStream(String id){
+    return reference.collection('users').doc(id).snapshots().map((event) => Users.fromJson(event.data()!));
+  }
 
   Future<String> uploadNewImage(File image, String id) async {
     try {

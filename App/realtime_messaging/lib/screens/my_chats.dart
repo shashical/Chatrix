@@ -11,6 +11,7 @@ import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import 'dart:math' as math;
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -279,6 +280,7 @@ class _ChatsPageState extends State<ChatsPage> {
                     ])
               ],
             ):const SizedBox(width: 0,),
+
 
             Flexible(
               child: StreamBuilder<List<UserChat>>(
