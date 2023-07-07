@@ -35,6 +35,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../constants.dart';
 
 late Users otheruser;
+UserChat? otherUserChat;
 
 class DocBuble extends StatefulWidget {
   const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded, required this.contentType}) : super(key: key);
@@ -181,6 +182,12 @@ class _DocBubleState extends State<DocBuble> {
                            });
                            final docUrl = await uploadDocument(
                                File(widget.senderUrl));
+                            if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                  SendNotificationService().sendFCMChatMessage(
+                                      otheruser.token!,
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Document"},
+                                      {});
+                                }
 
                            String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                            encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
@@ -415,6 +422,12 @@ class _ImageBubbleState extends State<ImageBubble> {
                               isUploading = true;});
                             final docUrl = await uploadDocument(
                                 File(widget.senderUrl));
+                            if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                  SendNotificationService().sendFCMChatMessage(
+                                      otheruser.token!,
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Image"},
+                                      {});
+                                }
                             String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
@@ -577,7 +590,6 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
   int fgIndex=0;
 
   bool assigned=false;
-  UserChat? otherUserChat;
   late Users currentUser;
   bool youBlocked=false;
   bool otherBlocked=false;
@@ -1892,10 +1904,10 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                 String encryptedMessageString = encryptedMessage
                                     .base64;
 
-                                if (otheruser.token != null && !isEditing) {
+                                if (otheruser.token != null && !isEditing && otheruser.current!=chatid && otherUserChat!.muted == false) {
                                   SendNotificationService().sendFCMChatMessage(
                                       otheruser.token!,
-                                      {'title': curUser!.phoneNo, 'body': temp},
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': temp},
                                       {});
                                 }
                                 if (!isEditing) {
