@@ -16,7 +16,7 @@ Widget progressIndicator(UploadTask? uploadTask,DownloadTask? downloadTask)=>Str
       children: [Center(
         child: CircularProgressIndicator(
           value: progress,
-          backgroundColor: Colors.grey[300],
+          backgroundColor: Colors.black,
           color: Colors.orangeAccent,
 
         ),

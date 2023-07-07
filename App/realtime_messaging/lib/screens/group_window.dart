@@ -14,6 +14,7 @@ import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/Services/send_notifications.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
+import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
@@ -138,10 +139,9 @@ class _DocBubbleState extends State<DocBubble> {
           (!widget.isUser)?SizedBox(
         height:25 ,
         width: 25,
-        child: CircleAvatar(
-          foregroundImage: NetworkImage(widget.photoUrl!),
-        ),
-      ):SizedBox(),
+            child: CircleAvatar(
+              foregroundImage: NetworkImage(widget.photoUrl),
+            ),):const SizedBox(),
 
           Column(
             crossAxisAlignment: align,
@@ -463,8 +463,16 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                             ],
                           ),
                         ),),
-                        Center(child: (widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
-                            onPressed: () async {
+                        Center(child:
+                            Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:(widget.isUser)?(uploaded)?null:Colors.white.withOpacity(0.5):(downloaded[cid]??false)?null:Colors.white.withOpacity(0.5),
+                              ),
+                              child:(widget.isUser) ? (!isUploading&&!uploaded) ? IconButton(
+                              onPressed: () async {
                               setState(() {
                                 isUploading = true;
                               });
@@ -504,7 +512,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
 
 
 
-                            }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),
+                            }, icon: const Icon(Icons.download)):!(downloaded[cid]??false)?progressIndicator(null, _downloadTask):const SizedBox(width: 0,),)
                         )
                       ]
                   ),
@@ -566,7 +574,7 @@ class MyBubble extends StatelessWidget {
           child: CircleAvatar(
             foregroundImage: NetworkImage(photoUrl!),
           ),
-        ):SizedBox(),
+        ):const SizedBox(),
         Column(
           crossAxisAlignment: align,
           children: [
@@ -665,6 +673,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   int fgIndex=0;
   int bgIndex=-1;
   bool assigned=false;
+  bool isEditing=false;
+  String editingId='';
   List<dynamic> participants=[];
   List<String> tokens=[];
   bool isLoaded=false;
@@ -814,18 +824,41 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
               }, icon: const Icon(Icons.star)),
               const SizedBox(width: 18,),
               (trueCount==1 &&groupmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: groupmessages[isSelected.indexOf(true)].text));
+                String?  symmKeyString = await const FlutterSecureStorage().read(key: widget.groupId);
+                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(groupmessages[isSelected.indexOf(true)].text);
+                final message = encrypter.decrypt(encryptedMessage,iv: iv);
+                await Clipboard.setData(ClipboardData(text: message));
+                setState(() {
+                  isSelected=List.filled(groupmessages.length, false);
+                  trueCount=0;
+
+                  otherUserChatSelected=[];
+                });
               }, icon: const Icon(Icons.copy)):const SizedBox(width: 0,),
 
             ],
           ) : Row(
             children: [
+              InkWell(
+                child:SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width*0.65,
+                  child: Row(
+                    children:[
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.groupPhoto),
+                  backgroundImage: NetworkImage(widget.groupPhoto),
               ),
               const SizedBox(width: 10,),
               Text(widget.groupName),
-              const Spacer(),
+              const Spacer(),]),
+                ),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                      GroupInfoPage(groupId: widget.groupId, userGroupId: widget.groupId)));
+                },
+              ),
               PopupMenuButton(itemBuilder: (context)=>
               [
                 PopupMenuItem(
@@ -1149,6 +1182,36 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                           }
                                         });
                                       }
+                                      else if(cid==groupmessage.senderId  && groupmessage.contentType=='text'){
+                                        SimpleDialog alert=SimpleDialog(
+                                          children: [
+                                            SimpleDialogOption(
+                                              child: const Row(
+                                                children: [
+                                                  Icon(Icons.edit),
+                                                  Text('edit message'),
+                                                ],
+                                              ),
+                                              onPressed: (){
+
+                                                setState(() {
+                                                  isEditing=true;
+                                                  messageController.text=message;
+                                                  editingId=groupmessage.id;
+                                                });
+                                                Navigator.of(context,rootNavigator: true).pop();
+                                              },
+                                            )
+
+
+                                          ],
+                                        ) ;
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => alert,
+                                          barrierDismissible: true,
+                                        );
+                                      }
                                     },
                                     onLongPress: () {
                                       setState(() {
@@ -1416,6 +1479,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                         },
                                         widget.groupId);
                                   }
+                                  _image=null;
 
                                 }
 
@@ -1481,6 +1545,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                         },
                                         widget.groupId);
                                   }
+                                  _image=null;
                                 }
 
                               },
@@ -1518,6 +1583,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                         });
                         String temp = messageController.text;
                         messageController.clear();
+
                         final Users currentuser =
                             (await RemoteServices().getSingleUser(cid))!;
 
@@ -1526,7 +1592,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                         encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
                         encrypt.Encrypted encryptedMessage = encrypter.encrypt(temp,iv: iv);
                         String encryptedMessageString = encryptedMessage.base64;
-
+                      if(!isEditing){
                       await GroupsRemoteServices().setGroupMessage(
                           widget.groupId,
                           GroupMessage(
@@ -1555,6 +1621,10 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               'lastMessageTime': DateTime.now().toIso8601String()
                             },
                             widget.groupId);
+                      }}
+                      else if(isEditing){
+                        GroupsRemoteServices().updateGroupMessage(widget.groupId, {'text':encryptedMessageString,
+                        'edited':true}, editingId);
                       }
                       setState(() {
                         debugPrint('$isSending');

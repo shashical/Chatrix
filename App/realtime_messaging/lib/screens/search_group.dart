@@ -108,7 +108,7 @@ class _SearchGroupState extends State<SearchGroup> {
 
                   },
 
-                ):SizedBox()
+                ):const SizedBox()
             ),
           )
         ]

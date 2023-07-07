@@ -7,9 +7,11 @@ import 'package:realtime_messaging/Services/chats_remote_services.dart';
 import 'package:realtime_messaging/constants.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import 'dart:math' as math;
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -279,6 +281,7 @@ class _ChatsPageState extends State<ChatsPage> {
               ],
             ):const SizedBox(width: 0,),
 
+
             Flexible(
               child: StreamBuilder<List<UserChat>>(
                 stream: _usersremoteServices.getUserChats(cid),
@@ -315,6 +318,7 @@ class _ChatsPageState extends State<ChatsPage> {
                       itemBuilder: (context, index) {
                         final UserChat userchat = userchats[index];
                           final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
+                        final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
 
                           if(userchat.containsSymmKey != null){
                             String encryptedSymmKeyString = userchat.containsSymmKey!;
@@ -336,6 +340,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                         future: RemoteServices().updateUserChat(cid,
                                             {
                                               'containsSymmKey': null,
+                                              'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo,
                                             }
                                             , userchat.id),
                                         builder: (context, snapshot) {
@@ -344,6 +349,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                             future: const FlutterSecureStorage().read(key: userchat.chatId),
                                             builder: (context, snapshot) {
                                               if(snapshot.hasData){
+
                                                 String message=userchat.lastMessage!;
                                                 if(userchat.lastMessageType=='text'){
                                                 symmKeyString = snapshot.data;
@@ -359,7 +365,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                         children: [
                                                           CircleAvatar(
                                                             backgroundImage: NetworkImage(
-                                                                userchat.recipientPhoto),
+                                                                !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
                                                           ),
                                                           (isSelected[index]) ?
                                                           const Positioned(
@@ -543,7 +549,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                           children: [
                                             CircleAvatar(
                                               backgroundImage: NetworkImage(
-                                                  userchat.recipientPhoto),
+                                                  !(curUser?.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
                                             ),
                                             (isSelected[index]) ?
                                             const Positioned(
