@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     cid=FirebaseAuth.instance.currentUser!.uid;
-
+    getCurUser();
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

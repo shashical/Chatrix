@@ -307,7 +307,7 @@ class ImgBubble extends StatefulWidget {
   State<ImgBubble> createState() => _ImgBubbleState();
 }
 
-class _ImgBubbleState extends State<ImgBubble> {
+class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
   late Color bg;
   late CrossAxisAlignment align;
   late IconData icon;
@@ -650,7 +650,7 @@ class GroupWindow extends StatefulWidget {
   State<GroupWindow> createState() => _GroupWindowState();
 }
 
-class _GroupWindowState extends State<GroupWindow> {
+class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   TextEditingController messageController = TextEditingController();
   //ScrollController scrollController = ScrollController();
   bool isSending=false;
@@ -672,10 +672,21 @@ class _GroupWindowState extends State<GroupWindow> {
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsBinding.instance.addObserver(this);
     backgroundImage=widget.backgroundImage;
     super.initState();
     getParticipants();
   }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if (state == AppLifecycleState.resumed) {
+      RemoteServices().updateUser(cid, {'current': widget.groupId});
+    }
+    else {
+      RemoteServices().updateUser(cid,{'current': null});
+    }
+  }
+
   Future<void>getParticipants()async{
     DocumentSnapshot docSnap = await RemoteServices()
         .reference.collection('groups').doc(

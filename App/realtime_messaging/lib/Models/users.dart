@@ -16,6 +16,7 @@ class Users {
   List<String>? blockedBy;
   String publicKey;
   String? token;
+  String? current;
 
   Users({
     required this.id,
@@ -30,6 +31,7 @@ class Users {
     this.blockedBy = const [],
     required this.publicKey,
     this.token,
+    this.current,
   });
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
@@ -45,6 +47,7 @@ class Users {
         blockedBy: List<String>.from(json['blockedBy'] ?? []),
         publicKey: json['publicKey'],
         token: json['token'],
+        current: json['current'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,5 +63,6 @@ class Users {
         "blockedBy": blockedBy,
         "publicKey": publicKey,
         "token": token,
+        "current": current,
       };
 }

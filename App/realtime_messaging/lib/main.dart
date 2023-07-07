@@ -20,14 +20,15 @@ import 'screens/splash.dart';
 import 'screens/user_info.dart';
 
 Future<void> backgroundHandler(RemoteMessage message)async{
-  debugPrint("This message is from foreground");
+  debugPrint("This message is from background");
+  LocalNotificationService.showNotificationOnForeground(message);
   debugPrint(message.notification!.title);
 }
 
 List<String> savedNumber = [];
 List<String> savedUsers = [];
 Future<void> main() async {
-  await dotenv.load();
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
@@ -48,7 +49,7 @@ Future<void> main() async {
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) {
       if (message != null) {
-        // openedFromNotification = true;
+        openedFromNotification = true;
         // backgroundImage = message.data['backgroundImage'];
         // id = message.data['chatId'];
         // isGroup = message.data['isGroup'];
@@ -67,7 +68,7 @@ Future<void> main() async {
   FirebaseMessaging.onMessageOpenedApp.listen(
     (RemoteMessage? message) {
       if (message != null) {
-        // openedFromNotification = true;
+        openedFromNotification = true;
         // backgroundImage = message.data['backgroundImage'];
         // id = message.data['chatId'];
         // isGroup = message.data['isGroup'];
