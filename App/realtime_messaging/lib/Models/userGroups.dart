@@ -26,7 +26,7 @@ class UserGroup {
     required this.pinned,
     required this.name,
     required this.imageUrl,/* = "https://geodash.gov.bd/uploaded/people_group/default_group.png"*/
-    this.unreadMessageCount,
+    this.unreadMessageCount = 0,
     this.lastMessage = '',
     this.lastMessageTime,
     this.lastMessageType,

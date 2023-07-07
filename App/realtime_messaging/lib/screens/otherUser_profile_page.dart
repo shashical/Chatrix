@@ -227,3 +227,181 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
               ));
   }
 }
+
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:flutter/material.dart';
+// import 'package:realtime_messaging/screens/search_contacts.dart';
+// import 'package:realtime_messaging/screens/user_info.dart';
+
+// import '../Models/users.dart';
+// import '../Services/users_remote_services.dart';
+// import '../main.dart';
+
+// class OtherUserProfilePage extends StatefulWidget {
+//   final String? chatId;
+//   final String? userId;
+
+//   const OtherUserProfilePage({Key? key, this.chatId, this.userId})
+//       : super(key: key);
+
+//   @override
+//   State<OtherUserProfilePage> createState() => _OtherUserProfilePageState();
+// }
+
+// class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
+//   String id = '';
+//   bool userLoaded = false;
+//   Users? user;
+//   int index = -1;
+
+//   @override
+//   void initState() {
+//     getUser();
+//     super.initState();
+//   }
+
+//   void getId() {
+//     if (widget.userId != null) {
+//       id = widget.userId!;
+//     } else if (widget.chatId!.startsWith(cid)) {
+//       id = widget.chatId!.substring(cid.length);
+//     } else {
+//       id = widget.chatId!.substring(0, widget.chatId!.length - cid.length);
+//     }
+//   }
+
+//   void getUser() async {
+//     getId();
+//     try {
+//       user = await RemoteServices().getSingleUser(id).catchError((e) => throw Exception('$e'));
+//     } on FirebaseException catch (e) {
+//       ScaffoldMessenger.of(context)
+//         ..removeCurrentSnackBar()
+//         ..showSnackBar(SnackBar(content: Text('${e.message}')));
+//     } catch (e) {
+//       ScaffoldMessenger.of(context)
+//         ..removeCurrentSnackBar()
+//         ..showSnackBar(SnackBar(content: Text('$e')));
+//     }
+//     setState(() {
+//       userLoaded = true;
+//       index = savedNumber.indexOf(user!.phoneNo);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//       ),
+//       body: (userLoaded)
+//           ? Stack(
+//               children: [
+//                 Container(
+//                   decoration: BoxDecoration(
+//                     gradient: LinearGradient(
+//                       begin: Alignment.topCenter,
+//                       end: Alignment.bottomCenter,
+//                       colors: [
+//                         Colors.purple.shade200,
+//                         Colors.purple.shade300,
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 SingleChildScrollView(
+//                   child: Column(
+//                     children: [
+//                       SizedBox(height: 20),
+//                       CircleAvatar(
+//                         radius: 80,
+//                         backgroundColor: Colors.white,
+//                         backgroundImage: NetworkImage(user!.photoUrl!),
+//                       ),
+//                       SizedBox(height: 20),
+//                       Text(
+//                         (index != -1) ? savedUsers[index] : user!.name!,
+//                         style: TextStyle(
+//                           fontSize: 28,
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                       SizedBox(height: 10),
+//                       Text(
+//                         '${user!.phoneNo.substring(0, 3)} ${user!.phoneNo.substring(3)}',
+//                         style: TextStyle(
+//                           fontSize: 18,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                       SizedBox(height: 20),
+//                       Container(
+//                         margin: EdgeInsets.symmetric(horizontal: 20),
+//                         padding: EdgeInsets.all(20),
+//                         decoration: BoxDecoration(
+//                           color: Colors.white,
+//                           borderRadius: BorderRadius.circular(10),
+//                         ),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.stretch,
+//                           children: [
+//                             Text(
+//                               'About',
+//                               style: TextStyle(
+//                                 fontSize: 22,
+//                                 fontWeight: FontWeight.bold,
+//                                 color: Colors.black,
+//                               ),
+//                             ),
+//                             SizedBox(height: 10),
+//                             Text(
+//                               user!.about!,
+//                               style: TextStyle(
+//                                 fontSize: 18,
+//                                 color: Colors.grey[800],
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       SizedBox(height: 20),
+//                       ElevatedButton(
+//                         onPressed: () {
+//                           // Handle button press
+//                         },
+//                         style: ElevatedButton.styleFrom(
+//                           primary: Colors.deepPurpleAccent,
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(30),
+//                           ),
+//                           padding: EdgeInsets.symmetric(vertical: 15),
+//                         ),
+//                         child: Text(
+//                           'Send Message',
+//                           style: TextStyle(
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.bold,
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                       ),
+//                       SizedBox(height: 20),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             )
+//           : Center(
+//               child: CircularProgressIndicator(
+//                 color: Colors.blue,
+//                 strokeWidth: 5,
+//               ),
+//             ),
+//     );
+//   }
+// }
+

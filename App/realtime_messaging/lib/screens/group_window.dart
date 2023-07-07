@@ -876,6 +876,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
     setState(() {
       isLoaded = true;
     });
+    tokens = [];
     for (int i = 0; i < participants.length; i++) {
       DocumentSnapshot docsnap = await FirebaseFirestore.instance
           .collection('users')
@@ -1744,6 +1745,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                             );
                                           } else {
                                             //debugPrint('${participants.length} rajeev ');
+                                            print(tokens);
                                             tokens[index] = null;
                                             return const SizedBox();
                                           }
@@ -2100,6 +2102,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                             validTokens.add(tokens[i]!);
                                           }
                                         }
+                                        print(validTokens);
                                         SendNotificationService()
                                             .sendFCMGroupMessage(validTokens, {
                                           'title':
