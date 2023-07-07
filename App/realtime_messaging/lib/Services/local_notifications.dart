@@ -19,7 +19,7 @@ class LocalNotificationService {
 
   static void showNotificationOnForeground(RemoteMessage message) {
     _notificationPlugin.show(
-       // payload: message.data['id'],
+        // payload: message.data['id'],
         DateTime.now().microsecond,
         message.notification!.title,
         message.notification!.body,

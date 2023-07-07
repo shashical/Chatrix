@@ -33,6 +33,10 @@ import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../constants.dart';
+
+late Users otheruser;
+UserChat? otherUserChat;
+
 class DocBuble extends StatefulWidget {
   const DocBuble({Key? key, required this.message, required this.time, required this.senderUrl, required this.id, required this.chatId, required this.receiverUrl, required this.isUser, required this.delivered, required this.read, required this.isSelected, required this.uploaded, required this.downloaded, required this.contentType}) : super(key: key);
   final String message, time,senderUrl,id,chatId,receiverUrl,contentType;
@@ -178,6 +182,12 @@ class _DocBubleState extends State<DocBuble> {
                            });
                            final docUrl = await uploadDocument(
                                File(widget.senderUrl));
+                            if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                  SendNotificationService().sendFCMChatMessage(
+                                      otheruser.token!,
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Document"},
+                                      {});
+                                }
 
                            String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                            encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
@@ -412,6 +422,12 @@ class _ImageBubbleState extends State<ImageBubble> {
                               isUploading = true;});
                             final docUrl = await uploadDocument(
                                 File(widget.senderUrl));
+                            if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                  SendNotificationService().sendFCMChatMessage(
+                                      otheruser.token!,
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Image"},
+                                      {});
+                                }
                             String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                             encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
                             encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
@@ -550,10 +566,9 @@ class ChatWindow extends StatefulWidget {
   State<ChatWindow> createState() => _ChatWindowState();
 }
 
-class _ChatWindowState extends State<ChatWindow> {
+class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
   TextEditingController messageController = TextEditingController();
    //ScrollController scrollController= ScrollController();
-  late Users otheruser;
   bool isTheOtherUserLoaded = false;
   String? chatid;
   int indexInContact=-1;
@@ -575,7 +590,6 @@ class _ChatWindowState extends State<ChatWindow> {
   int fgIndex=0;
 
   bool assigned=false;
-  UserChat? otherUserChat;
   late Users currentUser;
   bool youBlocked=false;
   bool otherBlocked=false;
@@ -619,6 +633,7 @@ class _ChatWindowState extends State<ChatWindow> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
     backgroundImage=widget.backgroundImage;
@@ -626,6 +641,15 @@ class _ChatWindowState extends State<ChatWindow> {
 
     super.initState();
 
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if (state == AppLifecycleState.resumed) {
+      RemoteServices().updateUser(cid, {'current': widget.chatId});
+    }
+    else {
+      RemoteServices().updateUser(cid,{'current': null});
+    }
   }
 
   @override
@@ -1920,10 +1944,10 @@ class _ChatWindowState extends State<ChatWindow> {
                                 String encryptedMessageString = encryptedMessage
                                     .base64;
 
-                                if (otheruser.token != null && !isEditing) {
+                                if (otheruser.token != null && !isEditing && otheruser.current!=chatid && otherUserChat!.muted == false) {
                                   SendNotificationService().sendFCMChatMessage(
                                       otheruser.token!,
-                                      {'title': curUser!.phoneNo, 'body': temp},
+                                      {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': temp},
                                       {});
                                 }
                                 if (!isEditing) {
