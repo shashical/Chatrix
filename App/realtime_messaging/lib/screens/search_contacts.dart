@@ -257,7 +257,7 @@ List<Widget> SearchMerge(
     BuildContext context,
    ) {
   void openMessagingApp(String phoneNumber )async {
-    String encodedMessage=Uri.encodeComponent('Hey join me on this amazing realtime encrypted messaging app!\n Chatrix \n you can get it from \n https://github.com/shashical/realtime_messaging.git');
+    String encodedMessage=Uri.encodeComponent('Hey join me on this amazing encrypted realtime messaging app -- \'Chatrix\'\nYou can get it from https://github.com/shashical/realtime_messaging.git');
      Uri uri=Uri.parse('sms:$phoneNumber?body=$encodedMessage');
     if(await canLaunchUrl(uri)){
       //android
