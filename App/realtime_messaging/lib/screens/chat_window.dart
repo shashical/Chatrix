@@ -637,6 +637,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
     chatid = widget.chatId;
     getTheOtherUser(widget.otherUserId);
     backgroundImage=widget.backgroundImage;
+    current=widget.chatId;
 
 
     super.initState();
@@ -645,7 +646,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
   @override
   void didChangeAppLifecycleState(AppLifecycleState state){
     if (state == AppLifecycleState.resumed) {
-      RemoteServices().updateUser(cid, {'current': widget.chatId});
+      RemoteServices().updateUser(cid, {'current': current});
     }
     else {
       RemoteServices().updateUser(cid,{'current': null});
@@ -793,6 +794,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                         height: 50,
                         width: MediaQuery.of(context).size.width*0.65,
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Stack(
                               children: [
@@ -991,7 +993,15 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                         stream: RemoteServices().getUserStream(widget.otherUserId),
                         builder:( (context,snapshot){
                           if(snapshot.hasData){
-                            otherUserStream=snapshot.data;
+                            if(snapshot.data != otherUserStream) {
+                              otherUserStream = snapshot.data;
+                              WidgetsBinding.instance.addPostFrameCallback((
+                                  timeStamp) {
+                                setState(() {
+
+                                });
+                              });
+                            }
                           }
                           return const SizedBox();
                         }),

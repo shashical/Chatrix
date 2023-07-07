@@ -412,7 +412,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                       ],
                                                     ),
                                                   ),
-                                                  onTap: () {
+                                                  onTap: () async {
                                                     if(trueCount!=0) {
                                                       if (isSelected[index]) {
                                                         setState(() {
@@ -444,9 +444,12 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     }
                                                     else{
                                                       final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                      RemoteServices().updateUser(cid,
+                                                          {'current':userchat.id});
+                                                    final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
                                                         return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                                       },));
+                                                    RemoteServices().updateUser(cid,{'current':result});
                                                     }
                                                   },
                                                   onLongPress: () {
@@ -597,7 +600,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                         ],
                                       ),
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
                                       if(trueCount!=0) {
                                         if (isSelected[index]) {
                                           setState(() {
@@ -629,9 +632,11 @@ class _ChatsPageState extends State<ChatsPage> {
                                       }
                                       else{
                                         final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                        RemoteServices().updateUser(cid, {'current':userchat.chatId});
+                                        final result =await Navigator.push(context, MaterialPageRoute(builder: (context) {
                                           return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                         },));
+                                        RemoteServices().updateUser(cid, {'current':result});
                                       }
                                     },
                                     onLongPress: () {

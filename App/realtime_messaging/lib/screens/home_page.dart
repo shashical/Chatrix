@@ -19,6 +19,7 @@ class HomePage extends StatefulWidget  {
 }
 
 Users? curUser;
+String? current;
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _currentIndex = 0;
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     cid=FirebaseAuth.instance.currentUser!.uid;
     getCurUser();
+    current=null;
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
