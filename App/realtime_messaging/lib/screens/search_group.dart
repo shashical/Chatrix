@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Models/userGroups.dart';
+import '../Services/users_remote_services.dart';
 import 'group_info_page.dart';
 import 'group_window.dart';
 
@@ -71,6 +73,7 @@ class _SearchGroupState extends State<SearchGroup> {
                       backgroundImage: NetworkImage(widget.usergroup[index].imageUrl),
                     ),
                     onTap: (){
+
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                     },
                   ),
@@ -79,10 +82,18 @@ class _SearchGroupState extends State<SearchGroup> {
                   trailing: Text((widget.usergroup[index].lastMessageTime == null
                       ? ""
                       : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
-                  onTap: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                        return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
-                      },));
+                  onTap: () async {
+                    RemoteServices().updateUser(cid, {'current':widget.usergroup[index].groupId});
+                    final result=await Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) {
+                          return GroupWindow(
+                              groupName: widget.usergroup[index].name,
+                              groupPhoto:widget.usergroup[index].imageUrl,
+                              backgroundImage: widget.usergroup[index]
+                                  .backgroundImage,
+                              groupId: widget.usergroup[index].groupId);
+                        },));
+                    RemoteServices().updateUser(cid, {'current':result});
 
                   },
 
@@ -101,10 +112,21 @@ class _SearchGroupState extends State<SearchGroup> {
                   trailing: Text((widget.usergroup[index].lastMessageTime == null
                       ? ""
                       : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return GroupWindow(groupName: widget.usergroup[index].name, groupPhoto: widget.usergroup[index].imageUrl, backgroundImage: widget.usergroup[index].backgroundImage, groupId: widget.usergroup[index].groupId);
-                    },));
+
+                    onTap: () async {
+                      RemoteServices().updateUser(cid, {'current':widget.usergroup[index].groupId});
+                      final result=await Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) {
+                            return GroupWindow(
+                                groupName: widget.usergroup[index].name,
+                                groupPhoto:widget.usergroup[index].imageUrl,
+                                backgroundImage: widget.usergroup[index]
+                                    .backgroundImage,
+                                groupId: widget.usergroup[index].groupId);
+                          },));
+                      RemoteServices().updateUser(cid, {'current':result});
+
+                    
 
                   },
 

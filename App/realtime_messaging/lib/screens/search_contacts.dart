@@ -156,7 +156,8 @@ List<Widget> MergeAppUserAndSendInvite(
                 .collection('users').doc(cid).collection('userChats').doc('$cid${users[index].id}')
                 .get();
             if (docsnap.exists) {
-              Navigator.pushReplacement(context, MaterialPageRoute(
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+              final result=await Navigator.pushReplacement(context, MaterialPageRoute(
                 builder: (context) {
                   return ChatWindow(
                     otherUserId: users[index].id,
@@ -165,21 +166,24 @@ List<Widget> MergeAppUserAndSendInvite(
                   );
                 },
               ));
+              RemoteServices().updateUser(cid, {'current':result});
             } else {
               docsnap = await FirebaseFirestore.instance
                   .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
                   .get();
               if (docsnap.exists) {
-                Navigator.pushReplacement(context, MaterialPageRoute(
+                RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+                await Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
                     return ChatWindow(
                       otherUserId: users[index].id,
 
-                      chatId: docsnap.get('ChatId'),
+                      chatId: docsnap.get('chatId'),
                       backgroundImage: docsnap.get('backgroundImage'),
                     );
                   },
                 ));
+                RemoteServices().updateUser(cid, {'current':null});
               } else {
                 Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
@@ -283,6 +287,49 @@ List<Widget> SearchMerge(
     if (index != -1) {
       if (users[index].id != cid) {
         returnablelist.add(ListTile(
+          onTap: () async {
+            DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                .collection('users').doc(cid).collection('userChats').doc('$cid${users[index].id}')
+                .get();
+            if (docsnap.exists) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+              final result=await Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: users[index].id,
+                    chatId: docsnap.get('chatId'),
+                    backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+              RemoteServices().updateUser(cid, {'current':result});
+            } else {
+              docsnap = await FirebaseFirestore.instance
+                  .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
+                  .get();
+              if (docsnap.exists) {
+                RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+                await Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return ChatWindow(
+                      otherUserId: users[index].id,
+
+                      chatId: docsnap.get('chatId'),
+                      backgroundImage: docsnap.get('backgroundImage'),
+                    );
+                  },
+                ));
+                RemoteServices().updateUser(cid, {'current':null});
+              } else {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return ChatWindow(otherUserId: users[index].id);
+                  },
+                ));
+              }
+            }
+          },
+
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage((blockedBy.contains(users[index].id))?'${users[index].photoUrl}':'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),

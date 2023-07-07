@@ -853,6 +853,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
     // TODO: implement initState
     WidgetsBinding.instance.addObserver(this);
     backgroundImage = widget.backgroundImage;
+    current=widget.groupId;
     super.initState();
     getParticipants();
   }
@@ -860,7 +861,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      RemoteServices().updateUser(cid, {'current': widget.groupId});
+      RemoteServices().updateUser(cid, {'current': current});
     } else {
       RemoteServices().updateUser(cid, {'current': null});
     }
@@ -873,10 +874,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
         .doc(widget.groupId)
         .get();
     participants = docSnap.get('participantIds');
-    setState(() {
-      isLoaded = true;
-    });
-    tokens = [];
+
+    tokens=[];
     for (int i = 0; i < participants.length; i++) {
       DocumentSnapshot docsnap = await FirebaseFirestore.instance
           .collection('users')
@@ -888,6 +887,9 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
         tokens.add(docsnap.get('token'));
       }
     }
+    setState(() {
+      isLoaded = true;
+    });
   }
 
   Future getImage(ImageSource source) async {
@@ -2109,6 +2111,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               "${widget.groupName} (${curUser!.name})",
                                           'body': temp
                                         }, {});
+                                        debugPrint(' valid tokens $validTokens');
                                         // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
                                         // List<dynamic> participants = docSnap.get('participantIds');
                                         // .getDocumentField(

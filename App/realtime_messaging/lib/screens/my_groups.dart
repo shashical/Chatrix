@@ -360,7 +360,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   ],
                                 ),
                               ),
-                              onTap: () {
+                              onTap: () async {
                                 if (trueCount != 0) {
                                   if (isSelected[index]) {
                                     setState(() {
@@ -389,7 +389,8 @@ class _GroupsPageState extends State<GroupsPage> {
                                   }
                                 }
                                 else {
-                                  Navigator.push(context,
+                                  RemoteServices().updateUser(cid, {'current':usergroup.groupId});
+                                  final result=await Navigator.push(context,
                                       MaterialPageRoute(builder: (context) {
                                         return GroupWindow(
                                             groupName: usergroup.name,
@@ -398,6 +399,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                 .backgroundImage,
                                             groupId: usergroup.groupId);
                                       },));
+                                  RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },
                               onLongPress: (){
@@ -494,7 +496,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   ],
                                 ),
                               ),
-                              onTap: () {
+                              onTap: () async {
 
                                 if(trueCount!=0) {
                                   if (isSelected[index]) {
@@ -526,9 +528,11 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 }
                                 else{
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                  RemoteServices().updateUser(cid, {'current':usergroup.groupId});
+                                  final result =await Navigator.push(context, MaterialPageRoute(builder: (context) {
                                     return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
                                   },));
+                                  RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },
                               onLongPress: (){
@@ -644,7 +648,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   ],
                                 ),
                               ),
-                              onTap: () {
+                              onTap: () async {
 
                                 if(trueCount!=0) {
                                   if (isSelected[index]) {
@@ -676,9 +680,17 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 }
                                 else{
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
-                                  },));
+                                  RemoteServices().updateUser(cid, {'current':usergroup.groupId});
+                                  final result=await Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return GroupWindow(
+                                            groupName: usergroup.name,
+                                            groupPhoto: usergroup.imageUrl,
+                                            backgroundImage: usergroup
+                                                .backgroundImage,
+                                            groupId: usergroup.groupId);
+                                      },));
+                                  RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },
                               onLongPress: (){
@@ -777,7 +789,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   ],
                                 ),
                               ),
-                              onTap: () {
+                              onTap: () async {
 
                                 if(trueCount!=0) {
                                   if (isSelected[index]) {
@@ -809,9 +821,17 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 }
                                 else{
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
-                                  },));
+                                  RemoteServices().updateUser(cid, {'current':usergroup.groupId});
+                                  final result=await Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return GroupWindow(
+                                            groupName: usergroup.name,
+                                            groupPhoto: usergroup.imageUrl,
+                                            backgroundImage: usergroup
+                                                .backgroundImage,
+                                            groupId: usergroup.groupId);
+                                      },));
+                                  RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },
                               onLongPress: (){
