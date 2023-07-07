@@ -887,41 +887,81 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                       PopupMenuItem(child: const Text('Change Wallpaper'),
                         onTap: (){
                           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                            showDialog(context: (context), builder: (context)=>
-                                AlertDialog(
-                                  title: const Text('Pick Image from'),
-                                  actions: [
-                                    ElevatedButton(onPressed: () async {
-                                      final image = await ImagePicker().pickImage(source: ImageSource.camera);
-                                      if (image == null) {
-                                        return;
-                                      }
-                                      final imageTemp = File(image.path);
-                                      backgroundImage=imageTemp.path;
-                                      RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
+                            SimpleDialog alert = SimpleDialog(
+                              title: const Text("Choose an action"),
+                              children: [
+                                SimpleDialogOption(
+                                  onPressed: () async {
+                                    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                    if (image == null) {
+                                      return;
+                                    }
+                                    final imageTemp = File(image.path);
+                                    backgroundImage=imageTemp.path;
+                                    RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
 
-                                      setState(() {
+                                    setState(() {
 
-                                      });
-                                      Navigator.of(context, rootNavigator: true).pop();
-                                    }, child: const Text('Camera')),
-                                    ElevatedButton(onPressed: () async {
-                                      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                                      if (image == null) {
-                                        return;
-                                      }
-                                      final imageTemp = File(image.path);
-                                      backgroundImage=imageTemp.path;
-                                      RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
+                                    });
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.photo,
+                                        color: Colors.blue,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Pick from gallery",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () async {
+                                    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                                    if (image == null) {
+                                      return;
+                                    }
+                                    final imageTemp = File(image.path);
+                                    backgroundImage=imageTemp.path;
+                                    RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, '$cid${widget.otherUserId}');
 
-                                      setState(() {
+                                    setState(() {
 
-                                      });
-                                      Navigator.of(context, rootNavigator: true).pop();
-                                    }, child: const Text('Gallery'),)
-                                  ],
-                                )
+                                    });
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.green,
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Text(
+                                        "Capture from camera",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             );
+                            showDialog(
+                              context: context,
+                              builder: (context) => alert,
+                              barrierDismissible: true,
+                            );
+
 
 
                           });

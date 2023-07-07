@@ -1131,186 +1131,176 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                           groupmessages[i].deletedForMe[cid] =
                                               true;
 
-                                          GroupsRemoteServices()
-                                              .updateGroupMessage(
-                                                  widget.groupId,
-                                                  {
-                                                    'deletedForMe':
-                                                        groupmessages[i]
-                                                            .deletedForMe
-                                                  },
-                                                  groupmessages[i].id);
-                                        }
-                                      }
-                                    });
-                                  },
+                          GroupsRemoteServices().updateGroupMessage(
+                              widget.groupId,
+                              {'deletedForMe': groupmessages[i].deletedForMe},
+                              groupmessages[i].id);
+                        }
+                      }
+
+                    });
+                  },),
+
+                PopupMenuItem(child: const Text('Change Wallpaper'),
+                  onTap: (){
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      SimpleDialog alert = SimpleDialog(
+                        title: const Text("Choose an action"),
+                        children: [
+                          SimpleDialogOption(
+                            onPressed: () async {
+                              final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (image == null) {
+                                return;
+                              }
+                              final imageTemp = File(image.path);
+                              backgroundImage=imageTemp.path;
+                              RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, widget.groupId);
+
+                              setState(() {
+
+                              });
+                              Navigator.of(context, rootNavigator: true).pop();
+                            },
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.photo,
+                                  color: Colors.blue,
                                 ),
-                                PopupMenuItem(
-                                  child: const Text('Change Wallpaper'),
-                                  onTap: () {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((timeStamp) {
-                                      showDialog(
-                                          context: (context),
-                                          builder: (context) => AlertDialog(
-                                                title: const Text(
-                                                    'Pick Image from'),
-                                                actions: [
-                                                  ElevatedButton(
-                                                      onPressed: () async {
-                                                        final image =
-                                                            await ImagePicker()
-                                                                .pickImage(
-                                                                    source: ImageSource
-                                                                        .camera);
-                                                        if (image == null) {
-                                                          return;
-                                                        }
-                                                        final imageTemp =
-                                                            File(image.path);
-                                                        backgroundImage =
-                                                            imageTemp.path;
-                                                        RemoteServices()
-                                                            .updateUserGroup(
-                                                                cid,
-                                                                {
-                                                                  'backgroundImage':
-                                                                      imageTemp
-                                                                          .path
-                                                                },
-                                                                widget.groupId);
+                                SizedBox(width: 8.0),
+                                Text(
+                                  "Pick from gallery",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () async {
+                              final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                              if (image == null) {
+                                return;
+                              }
+                              final imageTemp = File(image.path);
+                              backgroundImage=imageTemp.path;
+                              RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, widget.groupId);
 
-                                                        setState(() {});
-                                                        Navigator.of(context,
-                                                                rootNavigator:
-                                                                    true)
-                                                            .pop();
-                                                      },
-                                                      child:
-                                                          const Text('Camera')),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      final image =
-                                                          await ImagePicker()
-                                                              .pickImage(
-                                                                  source: ImageSource
-                                                                      .gallery);
-                                                      if (image == null) {
-                                                        return;
-                                                      }
-                                                      final imageTemp =
-                                                          File(image.path);
-                                                      backgroundImage =
-                                                          imageTemp.path;
-                                                      RemoteServices()
-                                                          .updateUserGroup(
-                                                              cid,
-                                                              {
-                                                                'backgroundImage':
-                                                                    imageTemp
-                                                                        .path
-                                                              },
-                                                              widget.groupId);
+                              setState(() {
 
-                                                      setState(() {});
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .pop();
-                                                    },
-                                                    child:
-                                                        const Text('Gallery'),
-                                                  )
-                                                ],
-                                              ));
-                                    });
-                                  },
-                                )
-                              ])
-                    ],
-                  ),
-            //actions:  <Widget>[],
+                              });
+                              Navigator.of(context, rootNavigator: true).pop();
+                            },
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.green,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  "Capture from camera",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                      showDialog(
+                        context: context,
+                        builder: (context) => alert,
+                        barrierDismissible: true,
+                      );
+
+
+                    });
+                  },
+                )
+              ])
+            ],
           ),
-          body: (!isLoaded)
-              ? const Center(child: CircularProgressIndicator())
-              : Container(
-                  decoration: BoxDecoration(
-                      image: !(backgroundImage == 'assets/backgroundimage.png')
-                          ? DecorationImage(
-                              image: FileImage(File(backgroundImage!)),
-                              fit: BoxFit.cover,
-                            )
-                          : DecorationImage(
-                              image: AssetImage(backgroundImage!),
-                              fit: BoxFit.cover)),
-                  child: Column(
-                    children: [
-                      Flexible(
-                        child: StreamBuilder<List<GroupMessage>>(
-                          stream: GroupsRemoteServices()
-                              .getGroupMessages(widget.groupId),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              groupmessages = snapshot.data!.reversed.toList();
-                              if (myMessageLength != groupmessages.length) {
-                                myMessageLength = groupmessages.length;
-                                isSelected =
-                                    List.filled(myMessageLength, false);
-                                trueCount = 0;
-                                bgIndex = 0;
-                                isUpdated =
-                                    List.filled(participants.length, false);
-                                increment = 0;
-                                if (!assigned) {
-                                  bgIndex = -1;
-                                  assigned = true;
-                                }
-                              }
-                              while (fgIndex < groupmessages.length &&
-                                  !(groupmessages[fgIndex].readBy[cid] ??
-                                      false)) {
-                                if (groupmessages[fgIndex].senderId != cid) {
-                                  groupmessages[fgIndex].readBy[cid] = true;
-                                  GroupsRemoteServices().updateGroupMessage(
-                                      widget.groupId,
-                                      {'readBy': groupmessages[fgIndex].readBy},
-                                      groupmessages[fgIndex].id);
-                                }
-                                fgIndex++;
-                              }
-                              // fgIndex=groupmessages.length;
-                              while (bgIndex >= 0) {
-                                if (groupmessages[bgIndex].senderId == cid) {
-                                  increment++;
-                                  isUpdated =
-                                      List.filled(participants.length, false);
-                                } else {
-                                  groupmessages[bgIndex].readBy[cid] = true;
-                                  GroupsRemoteServices().updateGroupMessage(
-                                      widget.groupId,
-                                      {'readBy': groupmessages[bgIndex].readBy},
-                                      groupmessages[bgIndex].id);
-                                }
-                                bgIndex--;
-                              }
-                              RemoteServices().updateUserGroup(cid,
-                                  {'unreadMessageCount': 0}, widget.groupId);
-                              // return ListView.builder(
-                              //   itemCount: chatmessages.length,
-                              //   itemBuilder: (context, index) {
-                              //     final ChatMessage chatmessage = chatmessages[index];
-                              //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
-                              //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
-                              //       if(chatmessage.delivered==false){
-                              //         if(!event.metadata.hasPendingWrites){
-                              //           chatmessage.delivered = true;
-                              //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
-                              //         }
-                              //       }
-                              //     });
-                              //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
-                              //   },
-                              // );
+          //actions:  <Widget>[],
+        ),
+        body:(!isLoaded)?const Center(child: CircularProgressIndicator()): Container(
+          decoration: BoxDecoration(
+            image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
+            image:FileImage(File(backgroundImage!)),
+            fit: BoxFit.cover,
+          ):DecorationImage(image: AssetImage(backgroundImage!),
+            fit: BoxFit.cover)
+          ),
+          child: Column(
+            children: [
+              Flexible(
+                child: StreamBuilder<List<GroupMessage>>(
+                  stream: GroupsRemoteServices().getGroupMessages(widget.groupId),
+                  builder: (context, snapshot) {
+
+                    if (snapshot.hasData) {
+                      groupmessages = snapshot.data!.reversed.toList();
+                      if(myMessageLength!=groupmessages.length){
+                        myMessageLength=groupmessages.length;
+                        isSelected=List.filled(myMessageLength, false);
+                        trueCount=0;
+                        bgIndex=0;
+                        isUpdated=List.filled(participants.length, false);
+                        increment=0;
+                        if(!assigned){
+                          bgIndex=-1;
+                          assigned=true;
+                        }
+
+
+
+                      }
+                      while(fgIndex<groupmessages.length && !(groupmessages[fgIndex].readBy[cid]??false)){
+                        if(groupmessages[fgIndex].senderId!=cid){
+                          groupmessages[fgIndex].readBy[cid]=true;
+                          GroupsRemoteServices().updateGroupMessage(widget.groupId, {'readBy':groupmessages[fgIndex].readBy}, groupmessages[fgIndex].id);
+                        }
+                        fgIndex++;
+                      }
+                      // fgIndex=groupmessages.length;
+                      while(bgIndex>=0){
+                        if(groupmessages[bgIndex].senderId==cid){
+                          increment++;
+                          isUpdated=List.filled(participants.length, false);
+
+                        }
+                        else{
+                          groupmessages[bgIndex].readBy[cid]=true;
+                          GroupsRemoteServices().updateGroupMessage(
+                              widget.groupId,
+                              {'readBy':groupmessages[bgIndex].readBy},
+                              groupmessages[bgIndex].id);
+
+                        }
+                        bgIndex--;
+                      }
+                      RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
+                      // return ListView.builder(
+                      //   itemCount: chatmessages.length,
+                      //   itemBuilder: (context, index) {
+                      //     final ChatMessage chatmessage = chatmessages[index];
+                      //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
+                      //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
+                      //       if(chatmessage.delivered==false){
+                      //         if(!event.metadata.hasPendingWrites){
+                      //           chatmessage.delivered = true;
+                      //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
+                      //         }
+                      //       }
+                      //     });
+                      //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
+                      //   },
+                      // );
 
                               // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                               //   scrollController.animateTo(
