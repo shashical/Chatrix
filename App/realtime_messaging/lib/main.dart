@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Services/local_notifications.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
@@ -11,6 +12,7 @@ import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/login_page.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/verify_otp_page.dart';
+import 'package:realtime_messaging/theme_provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -124,7 +126,7 @@ class MyApp extends StatelessWidget {
   // final String groupName;
   // final bool containsSymmKey;
 
-  const MyApp(
+  MyApp(
       {Key? key,
       // required this.containsSymmKey,
       // required this.groupPhoto,
@@ -136,16 +138,30 @@ class MyApp extends StatelessWidget {
       // required this.otherUserId})
       : super(key: key);
 
+  final lightTheme = ThemeData(
+    brightness: Brightness.light,
+  );
+
+  final darkTheme = ThemeData(
+    brightness: Brightness.dark,
+  );
+
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: (openedFromNotification?HomePage():SplashPage())
-      // home: (openedFromNotification?(containsSymmKey?HomePage():(isGroup?GroupWindow(backgroundImage: backgroundImage, groupId: id, groupName: groupName, groupPhoto: groupPhoto,):ChatWindow(otherUserId: otherUserId, backgroundImage: backgroundImage, chatId: id,))):SplashPage()),
+    return ChangeNotifierProvider(create: 
+    (_) => ThemeProvider(),
+    child: Consumer<ThemeProvider>(
+      builder: (_, themeProvider, __) {
+        return MaterialApp(
+          title: 'Chatrix',
+          theme: themeProvider.isDarkMode ? darkTheme : lightTheme,
+          debugShowCheckedModeBanner: false,
+          home: (openedFromNotification?HomePage():SplashPage())
+        );
+      },
+    ),
     );
+      // home: (openedFromNotification?(containsSymmKey?HomePage():(isGroup?GroupWindow(backgroundImage: backgroundImage, groupId: id, groupName: groupName, groupPhoto: groupPhoto,):ChatWindow(otherUserId: otherUserId, backgroundImage: backgroundImage, chatId: id,))):SplashPage()),
   }
 }

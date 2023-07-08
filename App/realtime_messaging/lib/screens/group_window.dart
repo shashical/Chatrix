@@ -716,7 +716,7 @@ class MyBubble extends StatelessWidget {
         ? Colors.lightBlue.withOpacity(.5)
         : !isUser
             ? Colors.white
-            : const Color.fromARGB(255, 126, 226, 155);
+            : Color.fromARGB(255, 121, 238, 246);
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = read ? Icons.done_all : Icons.done;
     final radius = !isUser

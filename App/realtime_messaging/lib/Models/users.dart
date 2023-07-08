@@ -24,7 +24,7 @@ class Users {
     this.photoUrl = 'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg',
     this.isOnline=true,
     required this.phoneNo,
-    this.about,
+    this.about = '',
     this.lastOnline,
     this.isOnlineVisibility = true,
     this.lastOnlineVisibility = true,

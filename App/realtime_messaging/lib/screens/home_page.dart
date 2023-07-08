@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
 import 'package:realtime_messaging/screens/new_group_page.dart';
@@ -7,6 +8,7 @@ import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:realtime_messaging/screens/welcome.dart';
 
 import '../Models/users.dart';
+import '../theme_provider.dart';
 import 'my_chats.dart';
 import 'my_groups.dart';
 
@@ -115,6 +117,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text('Log Out'),
               ],
             ),),
+            PopupMenuItem(child: 
+            Consumer<ThemeProvider>(
+  builder: (context, themeProvider, _) {
+    return SwitchListTile(
+      title: Text('Dark Mode'),
+      value: themeProvider.isDarkMode,
+      onChanged: (value) {
+        themeProvider.toggleTheme();
+      },
+    );
+  },
+)
+            ,)
           ],
           )
         ],

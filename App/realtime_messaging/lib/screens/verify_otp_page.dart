@@ -495,7 +495,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                       publicKey: publicKeyString,
                                       name: '');
                                   try {
-                                    FirebaseFirestore.instance
+                                    await FirebaseFirestore.instance
                                         .collection('users')
                                         .doc(user.id)
                                         .set(user.toJson())
