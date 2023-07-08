@@ -26,6 +26,7 @@ Messages are end to end encrypted even the owner can not see what you are sendin
 **Server:** Firebase
 
 **DataBase:** Cloud Firestore
+# Screenshots
 # Installation
 To get started with Chatrix, follow these steps:
 1. Clone the repository:
@@ -49,4 +50,31 @@ To get started with Chatrix, follow these steps:
 6. Run the app:
    ```bash
    flutter run
-     
+# Download Apk file
+# Environment Variables
+Firebase server key
+```bash
+ SERVER_KEY
+```
+# Demo
+# Working of App
+ Verify your number with otp to login in app. A basic information form appears after login asking about profile photo ,username and about .
+ ## Home screen
+ The top right corner has a pop up menu containing account, new group, Light/Dark mode and logout options.
+ A bottom navigation bar allows switch between chats and groups screen
+ ## Chats screen
+ All the user chats will appear here in such a way that most recent chat appears at top
+ Pinned chats will appears first then remaining chat appears in the same order as mentioned above.
+ Multiple selects support: on selcting chats a options bar will appear on the screen has pin/unpin, mute/unmute, delete chat options
+ A floating action button opens a bottom sheets having all contact saved app user to start chat and section containing non app users having send invites option 
+ search functionality
+ 
+# Authors
+ + [@shashical](https://github.com/shashical.git)
+ + [@rai-rajeev](https://github.com/rai-rajeev.git)
+
+# Important Note 
+
+Please provide required permissions for smooth functioning of app  
+
+ 
