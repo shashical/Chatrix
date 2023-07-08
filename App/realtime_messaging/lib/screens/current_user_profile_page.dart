@@ -116,11 +116,11 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                       right: 4,
                       child: ClipOval(
                         child: Container(
-                          padding: const EdgeInsets.all(7),
+                          padding: const EdgeInsets.all(6),
                           color: Colors.white,
                           child: ClipOval(
                             child: Container(
-                              padding: const EdgeInsets.all(10),
+                              padding:  const EdgeInsets.all(1),
                               color: Colors.lightBlue,
                               child: IconButton(
                                 onPressed: () {
