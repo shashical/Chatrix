@@ -296,13 +296,13 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
           ? Stack(
               children: [
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color.fromARGB(255, 147, 203, 216),
-                        const Color.fromARGB(255, 200, 104, 163),
+                        Color.fromARGB(255, 147, 203, 216),
+                        Color.fromARGB(255, 200, 104, 163),
                       ],
                     ),
                   ),
@@ -315,7 +315,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.arrow_back,
                               color: Colors.white,
                             ),
@@ -338,34 +338,34 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                             Container(
                               width: 20,
                               height: 20,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.green,
                                 shape: BoxShape.circle,
                               ),
                             ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
                         (index != -1) ? savedUsers[index] : user!.name!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         '${user!.phoneNo.substring(0, 3)} ${user!.phoneNo.substring(3)}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        padding: EdgeInsets.all(20),
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
@@ -373,7 +373,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
+                            const Text(
                               'About',
                               style: TextStyle(
                                 fontSize: 22,
@@ -381,9 +381,9 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Text(
-                              user!.about!,
+                              user!.about??'',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey[800],
@@ -392,20 +392,20 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
                           (user!.isOnline!)
                               ? 'Online Now'
-                              : 'Last seen: ${(user!.lastOnline!.hour) ~/ 10}${user!.lastOnline!.hour}:${(user!.lastOnline!.minute) ~/ 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}',
-                          style: TextStyle(
+                              : 'Last seen: ${(user!.lastOnline!.hour) ~/ 10}${user!.lastOnline!.hour%10}:${(user!.lastOnline!.minute) ~/ 10}${(user!.lastOnline!.minute) % 10} on ${user!.lastOnline!.day}/${user!.lastOnline!.month}/${user!.lastOnline!.year}',
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),

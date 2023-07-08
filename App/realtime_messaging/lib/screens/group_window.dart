@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/Models/users.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
@@ -17,6 +18,7 @@ import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:realtime_messaging/theme_provider.dart';
 import 'dart:math' as math;
 import '../Models/groupMessages.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -72,6 +74,7 @@ class DocBubble extends StatefulWidget {
 
 class _DocBubbleState extends State<DocBubble> {
   late Color bg;
+  late Color dbg;
   late CrossAxisAlignment align;
   late IconData icon;
   late BorderRadius radius;
@@ -93,6 +96,11 @@ class _DocBubbleState extends State<DocBubble> {
         : !widget.isUser
             ? Colors.white
             : Colors.greenAccent.shade100;
+    dbg = widget.isSelected
+        ? Colors.lightBlue.withOpacity(0.5)
+        : !widget.isUser
+        ?  const Color.fromARGB(255, 72, 69, 69)
+        : Colors.green;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser
@@ -161,220 +169,225 @@ class _DocBubbleState extends State<DocBubble> {
                   ),
                 )
               : const SizedBox(),
-          Column(
-            crossAxisAlignment: align,
-            children: [
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.8),
-                margin: const EdgeInsets.all(3.0),
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: .5,
-                        spreadRadius: 1.0,
-                        color: Colors.black.withOpacity(.12))
-                  ],
-                  color: bg,
-                  borderRadius: radius,
-                ),
-                child: IntrinsicWidth(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      (widget.isUser
-                          ? const SizedBox()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(((widget.isAcontact!) ? '' : '~') +
-                                    (widget.displayName!)),
-                                Text(((widget.isAcontact!)
-                                    ? ''
-                                    : (widget.phoneNo!))),
-                              ],
-                            )),
-                      Container(
-                        constraints: (widget.isUser)
-                            ? (uploaded)
-                                ? BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.62)
-                                : BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.72)
-                            : (downloaded[cid] ?? false)
-                                ? BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.62)
-                                : BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.72),
-                        child: InkWell(
-                          onTap: () {
-                            if (!widget.isSelected) {
-                              OpenFile.open(widget.isUser
-                                  ? widget.senderUrl
-                                  : widget.receiverUrls[cid]);
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8, top: 8),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  color: Colors.deepOrangeAccent,
-                                  child: const Icon(
-                                    CupertinoIcons.doc,
-                                    color: Colors.white70,
+          Builder(
+            builder: (context) {
+              final themeProvide=Provider.of<ThemeProvider>(context,listen: false);
+              return Column(
+                crossAxisAlignment: align,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.8),
+                    margin: const EdgeInsets.all(3.0),
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            blurRadius: .5,
+                            spreadRadius: 1.0,
+                            color: Colors.black.withOpacity(.12))
+                      ],
+                      color:themeProvide.isDarkMode?dbg: bg,
+                      borderRadius: radius,
+                    ),
+                    child: IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          (widget.isUser
+                              ? const SizedBox()
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(((widget.isAcontact!) ? '' : '~') +
+                                        (widget.displayName!)),
+                                    Text(((widget.isAcontact!)
+                                        ? ''
+                                        : (widget.phoneNo!))),
+                                  ],
+                                )),
+                          Container(
+                            constraints: (widget.isUser)
+                                ? (uploaded)
+                                    ? BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.62)
+                                    : BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.72)
+                                : (downloaded[cid] ?? false)
+                                    ? BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.62)
+                                    : BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.72),
+                            child: InkWell(
+                              onTap: () {
+                                if (!widget.isSelected) {
+                                  OpenFile.open(widget.isUser
+                                      ? widget.senderUrl
+                                      : widget.receiverUrls[cid]);
+                                }
+                              },
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8, top: 8),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.deepOrangeAccent,
+                                      child: const Icon(
+                                        CupertinoIcons.doc,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.48),
-                                child: Text(
-                                  widget.contentType.substring(8),
-                                ),
-                              ),
-                              (widget.isUser)
-                                  ? (!isUploading && !uploaded)
-                                      ? IconButton(
-                                          onPressed: () async {
-                                            setState(() {
-                                              isUploading = true;
-                                            });
-                                            final docUrl = await uploadDocument(
-                                                File(widget.senderUrl));
-                                            validTokens = [];
-                                            for (int i = 0;
-                                                i < tokens.length;
-                                                i++) {
-                                              if (tokens[i] != null) {
-                                                validTokens.add(tokens[i]!);
-                                              }
-                                            }
-                                            if(validTokens.isNotEmpty) {
-                                              SendNotificationService()
-                                                .sendFCMGroupMessage(
-                                                    validTokens, {
-                                              'title':
-                                                  "${widget.groupName} (${curUser!.name})",
-                                              'body': "Document"
-                                            }, {});
-                                            }
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.48),
+                                    child: Text(
+                                      widget.contentType.substring(8),
+                                    ),
+                                  ),
+                                  (widget.isUser)
+                                      ? (!isUploading && !uploaded)
+                                          ? IconButton(
+                                              onPressed: () async {
+                                                setState(() {
+                                                  isUploading = true;
+                                                });
+                                                final docUrl = await uploadDocument(
+                                                    File(widget.senderUrl));
+                                                validTokens = [];
+                                                for (int i = 0;
+                                                    i < tokens.length;
+                                                    i++) {
+                                                  if (tokens[i] != null) {
+                                                    validTokens.add(tokens[i]!);
+                                                  }
+                                                }
+                                                if(validTokens.isNotEmpty) {
+                                                  SendNotificationService()
+                                                    .sendFCMGroupMessage(
+                                                        validTokens, {
+                                                  'title':
+                                                      "${widget.groupName} (${curUser!.name})",
+                                                  'body': "Document"
+                                                }, {});
+                                                }
 
-                                            String symmKeyString =
-                                                (await const FlutterSecureStorage()
-                                                    .read(
-                                                        key: widget.groupId))!;
-                                            encrypt.Key symmKey =
-                                                encrypt.Key.fromBase64(
-                                                    symmKeyString);
-                                            encrypt.Encrypter encrypter =
-                                                encrypt.Encrypter(
-                                                    encrypt.AES(symmKey));
-                                            encrypt.Encrypted encryptedDocUrl =
-                                                encrypter.encrypt(docUrl,
-                                                    iv: iv);
-                                            String encryptedDocUrlString =
-                                                encryptedDocUrl.base64;
+                                                String symmKeyString =
+                                                    (await const FlutterSecureStorage()
+                                                        .read(
+                                                            key: widget.groupId))!;
+                                                encrypt.Key symmKey =
+                                                    encrypt.Key.fromBase64(
+                                                        symmKeyString);
+                                                encrypt.Encrypter encrypter =
+                                                    encrypt.Encrypter(
+                                                        encrypt.AES(symmKey));
+                                                encrypt.Encrypted encryptedDocUrl =
+                                                    encrypter.encrypt(docUrl,
+                                                        iv: iv);
+                                                String encryptedDocUrlString =
+                                                    encryptedDocUrl.base64;
 
-                                            GroupsRemoteServices()
-                                                .updateGroupMessage(
-                                                    widget.groupId,
-                                                    {
-                                                      'isUploaded': true,
-                                                      'text':
-                                                          encryptedDocUrlString
-                                                    },
-                                                    widget.id);
-                                            setState(() {
-                                              uploaded = true;
-                                            });
-                                          },
-                                          icon: const Icon(Icons.upload))
-                                      : (!uploaded)
-                                          ? Center(
-                                              child: progressIndicator(
-                                                  _uploadTask, null))
-                                          : const SizedBox(
-                                              width: 0,
-                                            )
-                                  : (!downloading &&
-                                          !(downloaded[cid] ?? false))
-                                      ? IconButton(
-                                          onPressed: () async {
-                                            setState(() {
-                                              downloading = true;
-                                            });
-                                            final receiveUrl =
-                                                await downloadImage(
-                                                    widget.message);
-                                            setState(() {
-                                              downloaded[cid] = true;
-                                            });
-                                            receiverUrls[cid] = receiveUrl;
-                                            GroupsRemoteServices()
-                                                .updateGroupMessage(
-                                                    widget.groupId,
-                                                    {
-                                                      'receiverUrls':
-                                                          receiverUrls,
-                                                      'downloaded': downloaded,
-                                                    },
-                                                    widget.id);
-                                          },
-                                          icon: const Icon(Icons.download))
-                                      : !(downloaded[cid] ?? false)
-                                          ? Center(
-                                              child: progressIndicator(
-                                                  null, _downloadTask))
-                                          : const SizedBox(
-                                              width: 0,
-                                            ),
-                            ],
+                                                GroupsRemoteServices()
+                                                    .updateGroupMessage(
+                                                        widget.groupId,
+                                                        {
+                                                          'isUploaded': true,
+                                                          'text':
+                                                              encryptedDocUrlString
+                                                        },
+                                                        widget.id);
+                                                setState(() {
+                                                  uploaded = true;
+                                                });
+                                              },
+                                              icon: const Icon(Icons.upload))
+                                          : (!uploaded)
+                                              ? Center(
+                                                  child: progressIndicator(
+                                                      _uploadTask, null))
+                                              : const SizedBox(
+                                                  width: 0,
+                                                )
+                                      : (!downloading &&
+                                              !(downloaded[cid] ?? false))
+                                          ? IconButton(
+                                              onPressed: () async {
+                                                setState(() {
+                                                  downloading = true;
+                                                });
+                                                final receiveUrl =
+                                                    await downloadImage(
+                                                        widget.message);
+                                                setState(() {
+                                                  downloaded[cid] = true;
+                                                });
+                                                receiverUrls[cid] = receiveUrl;
+                                                GroupsRemoteServices()
+                                                    .updateGroupMessage(
+                                                        widget.groupId,
+                                                        {
+                                                          'receiverUrls':
+                                                              receiverUrls,
+                                                          'downloaded': downloaded,
+                                                        },
+                                                        widget.id);
+                                              },
+                                              icon: const Icon(Icons.download))
+                                          : !(downloaded[cid] ?? false)
+                                              ? Center(
+                                                  child: progressIndicator(
+                                                      null, _downloadTask))
+                                              : const SizedBox(
+                                                  width: 0,
+                                                ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 1,
-                      ),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 55.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              widget.time,
-                              style: const TextStyle(fontSize: 13),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 55.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  widget.time,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                (!widget.isUser
+                                    ? const SizedBox()
+                                    : Icon(
+                                        icon,
+                                        size: 16,
+                                      ))
+                              ],
                             ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            (!widget.isUser
-                                ? const SizedBox()
-                                : Icon(
-                                    icon,
-                                    size: 16,
-                                  ))
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            }
           ),
         ],
       ),
@@ -416,6 +429,7 @@ class ImgBubble extends StatefulWidget {
 
 class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
   late Color bg;
+  late Color dbg;
   late CrossAxisAlignment align;
   late IconData icon;
   late BorderRadius radius;
@@ -438,6 +452,11 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
         : !widget.isUser
             ? Colors.white
             : Colors.greenAccent.shade100;
+    dbg = widget.isSelected
+        ? Colors.lightBlue.withOpacity(0.5)
+        : !widget.isUser
+        ?  const Color.fromARGB(255, 72, 69, 69)
+        : Colors.green;
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser
@@ -509,184 +528,189 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
         Column(
           crossAxisAlignment: align,
           children: [
-            Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.65,
-                  maxHeight: (widget.isUser)
-                      ? MediaQuery.of(context).size.height * .41
-                      : MediaQuery.of(context).size.height * .45),
-              margin: const EdgeInsets.all(3.0),
-              padding: const EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      blurRadius: .5,
-                      spreadRadius: 1.0,
-                      color: Colors.black.withOpacity(.12))
-                ],
-                color: bg,
-                borderRadius: radius,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  (widget.isUser
-                      ? const SizedBox()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(((widget.isAcontact!) ? '' : '~') +
-                                (widget.displayName!)),
-                            Text(((widget.isAcontact!)
-                                ? ''
-                                : (widget.phoneNo!))),
-                          ],
-                        )),
-                  Stack(children: [
-                    Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.65,
-                          maxHeight: MediaQuery.of(context).size.height * 0.4),
-                      alignment: Alignment.bottomRight,
-                      decoration: BoxDecoration(
-                        image: (widget.isUser)
-                            ? DecorationImage(
-                                image: FileImage(File(widget.senderUrl)),
-                                fit: BoxFit.cover)
-                            : (downloaded[cid] ?? false)
+            Builder(
+              builder: (context) {
+                final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
+                return Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.65,
+                      maxHeight: (widget.isUser)
+                          ? MediaQuery.of(context).size.height * .41
+                          : MediaQuery.of(context).size.height * .45),
+                  margin: const EdgeInsets.all(3.0),
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: .5,
+                          spreadRadius: 1.0,
+                          color: Colors.black.withOpacity(.12))
+                    ],
+                    color: themeProvider.isDarkMode? dbg:bg,
+                    borderRadius: radius,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      (widget.isUser
+                          ? const SizedBox()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(((widget.isAcontact!) ? '' : '~') +
+                                    (widget.displayName!)),
+                                Text(((widget.isAcontact!)
+                                    ? ''
+                                    : (widget.phoneNo!))),
+                              ],
+                            )),
+                      Stack(children: [
+                        Container(
+                          constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.65,
+                              maxHeight: MediaQuery.of(context).size.height * 0.4),
+                          alignment: Alignment.bottomRight,
+                          decoration: BoxDecoration(
+                            image: (widget.isUser)
                                 ? DecorationImage(
-                                    image: FileImage(
-                                        File(widget.receiverUrls[cid]!)),
+                                    image: FileImage(File(widget.senderUrl)),
                                     fit: BoxFit.cover)
-                                : const DecorationImage(
-                                    image: AssetImage('assets/blurimg.png'),
-                                    fit: BoxFit.cover),
-                        borderRadius: radius,
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 55.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              widget.time,
-                              style: const TextStyle(fontSize: 13),
+                                : (downloaded[cid] ?? false)
+                                    ? DecorationImage(
+                                        image: FileImage(
+                                            File(widget.receiverUrls[cid]!)),
+                                        fit: BoxFit.cover)
+                                    : const DecorationImage(
+                                        image: AssetImage('assets/blurimg.png'),
+                                        fit: BoxFit.cover),
+                            borderRadius: radius,
+                          ),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 55.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  widget.time,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                (widget.isUser)
+                                    ? Icon(
+                                        icon,
+                                        size: 16,
+                                      )
+                                    : const SizedBox(
+                                        width: 0,
+                                      )
+                              ],
                             ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            (widget.isUser)
-                                ? Icon(
-                                    icon,
-                                    size: 16,
-                                  )
-                                : const SizedBox(
-                                    width: 0,
-                                  )
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    Center(
-                        child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: (widget.isUser)
-                            ? (uploaded)
-                                ? null
-                                : Colors.white.withOpacity(0.5)
-                            : (downloaded[cid] ?? false)
-                                ? null
-                                : Colors.white.withOpacity(0.5),
-                      ),
-                      child: (widget.isUser)
-                          ? (!isUploading && !uploaded)
-                              ? IconButton(
-                                  onPressed: () async {
-                                    setState(() {
-                                      isUploading = true;
-                                    });
-                                    final docUrl = await uploadDocument(
-                                        File(widget.senderUrl));
-                                    validTokens = [];
-                                            for (int i = 0;
-                                                i < tokens.length;
-                                                i++) {
-                                              if (tokens[i] != null) {
-                                                validTokens.add(tokens[i]!);
-                                              }
-                                            }
-                                            if(validTokens.isNotEmpty) {
-                                              SendNotificationService()
-                                                .sendFCMGroupMessage(
-                                                    validTokens, {
-                                              'title':
-                                                  "${widget.groupName} (${curUser!.name})",
-                                              'body': "Document"
-                                            }, {});
-                                            }
+                        Center(
+                            child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: (widget.isUser)
+                                ? (uploaded)
+                                    ? null
+                                    : Colors.white.withOpacity(0.5)
+                                : (downloaded[cid] ?? false)
+                                    ? null
+                                    : Colors.white.withOpacity(0.5),
+                          ),
+                          child: (widget.isUser)
+                              ? (!isUploading && !uploaded)
+                                  ? IconButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          isUploading = true;
+                                        });
+                                        final docUrl = await uploadDocument(
+                                            File(widget.senderUrl));
+                                        validTokens = [];
+                                                for (int i = 0;
+                                                    i < tokens.length;
+                                                    i++) {
+                                                  if (tokens[i] != null) {
+                                                    validTokens.add(tokens[i]!);
+                                                  }
+                                                }
+                                                if(validTokens.isNotEmpty) {
+                                                  SendNotificationService()
+                                                    .sendFCMGroupMessage(
+                                                        validTokens, {
+                                                  'title':
+                                                      "${widget.groupName} (${curUser!.name})",
+                                                  'body': "Document"
+                                                }, {});
+                                                }
 
-                                    String symmKeyString =
-                                        (await const FlutterSecureStorage()
-                                            .read(key: widget.chatId))!;
-                                    encrypt.Key symmKey =
-                                        encrypt.Key.fromBase64(symmKeyString);
-                                    encrypt.Encrypter encrypter =
-                                        encrypt.Encrypter(encrypt.AES(symmKey));
-                                    encrypt.Encrypted encryptedDocUrl =
-                                        encrypter.encrypt(docUrl, iv: iv);
-                                    String encryptedDocUrlString =
-                                        encryptedDocUrl.base64;
+                                        String symmKeyString =
+                                            (await const FlutterSecureStorage()
+                                                .read(key: widget.chatId))!;
+                                        encrypt.Key symmKey =
+                                            encrypt.Key.fromBase64(symmKeyString);
+                                        encrypt.Encrypter encrypter =
+                                            encrypt.Encrypter(encrypt.AES(symmKey));
+                                        encrypt.Encrypted encryptedDocUrl =
+                                            encrypter.encrypt(docUrl, iv: iv);
+                                        String encryptedDocUrlString =
+                                            encryptedDocUrl.base64;
 
-                                    GroupsRemoteServices().updateGroupMessage(
-                                        widget.chatId,
-                                        {
-                                          'isUploaded': true,
-                                          'text': encryptedDocUrlString
-                                        },
-                                        widget.id);
-                                    setState(() {
-                                      uploaded = true;
-                                    });
-                                  },
-                                  icon: const Icon(Icons.upload))
-                              : (!uploaded)
-                                  ? progressIndicator(_uploadTask, null)
-                                  : const SizedBox(
-                                      width: 0,
-                                    )
-                          : (!downloading && !(downloaded[cid] ?? false))
-                              ? IconButton(
-                                  onPressed: () async {
-                                    setState(() {
-                                      downloading = true;
-                                    });
-                                    final receiveUrl =
-                                        await downloadImage(widget.message);
-                                    receiverUrls[cid] = receiveUrl;
-                                    setState(() {
-                                      downloaded[cid] = true;
-                                    });
-                                    GroupsRemoteServices().updateGroupMessage(
-                                        widget.chatId,
-                                        {
-                                          'receiverUrls': receiverUrls,
-                                          'downloaded': downloaded,
-                                        },
-                                        widget.id);
-                                  },
-                                  icon: const Icon(Icons.download))
-                              : !(downloaded[cid] ?? false)
-                                  ? progressIndicator(null, _downloadTask)
-                                  : const SizedBox(
-                                      width: 0,
-                                    ),
-                    ))
-                  ]),
-                ],
-              ),
+                                        GroupsRemoteServices().updateGroupMessage(
+                                            widget.chatId,
+                                            {
+                                              'isUploaded': true,
+                                              'text': encryptedDocUrlString
+                                            },
+                                            widget.id);
+                                        setState(() {
+                                          uploaded = true;
+                                        });
+                                      },
+                                      icon: const Icon(Icons.upload))
+                                  : (!uploaded)
+                                      ? progressIndicator(_uploadTask, null)
+                                      : const SizedBox(
+                                          width: 0,
+                                        )
+                              : (!downloading && !(downloaded[cid] ?? false))
+                                  ? IconButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          downloading = true;
+                                        });
+                                        final receiveUrl =
+                                            await downloadImage(widget.message);
+                                        receiverUrls[cid] = receiveUrl;
+                                        setState(() {
+                                          downloaded[cid] = true;
+                                        });
+                                        GroupsRemoteServices().updateGroupMessage(
+                                            widget.chatId,
+                                            {
+                                              'receiverUrls': receiverUrls,
+                                              'downloaded': downloaded,
+                                            },
+                                            widget.id);
+                                      },
+                                      icon: const Icon(Icons.download))
+                                  : !(downloaded[cid] ?? false)
+                                      ? progressIndicator(null, _downloadTask)
+                                      : const SizedBox(
+                                          width: 0,
+                                        ),
+                        ))
+                      ]),
+                    ],
+                  ),
+                );
+              }
             ),
           ],
         ),
@@ -721,6 +745,12 @@ class MyBubble extends StatelessWidget {
         : !isUser
             ? Colors.white
             : Color.fromARGB(255, 121, 238, 246);
+    final dbg = isSelected
+        ? Colors.lightBlue.withOpacity(0.5)
+        : !isUser
+        ?  const Color.fromARGB(255, 72, 69, 69)
+        : Colors.green;
+
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = read ? Icons.done_all : Icons.done;
     final radius = !isUser
@@ -751,63 +781,68 @@ class MyBubble extends StatelessWidget {
         Column(
           crossAxisAlignment: align,
           children: [
-            Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width *
-                      ((isUser) ? 0.8 : 0.75)),
-              margin: const EdgeInsets.all(3.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      blurRadius: .5,
-                      spreadRadius: 1.0,
-                      color: Colors.black.withOpacity(.12))
-                ],
-                color: bg,
-                borderRadius: radius,
-              ),
-              child: IntrinsicWidth(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    (isUser
-                        ? const SizedBox()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Builder(
+              builder: (context) {
+                final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
+                return Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width *
+                          ((isUser) ? 0.8 : 0.75)),
+                  margin: const EdgeInsets.all(3.0),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: .5,
+                          spreadRadius: 1.0,
+                          color: Colors.black.withOpacity(.12))
+                    ],
+                    color:themeProvider.isDarkMode?dbg: bg,
+                    borderRadius: radius,
+                  ),
+                  child: IntrinsicWidth(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        (isUser
+                            ? const SizedBox()
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(((isAcontact!) ? '' : '~') + (displayName!)),
+                                  Text(((isAcontact!) ? '' : (phoneNo!))),
+                                ],
+                              )),
+                        Text(message, style: const TextStyle(fontSize: 17)),
+                        const SizedBox(
+                          height: 1,
+                        ),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 55.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(((isAcontact!) ? '' : '~') + (displayName!)),
-                              Text(((isAcontact!) ? '' : (phoneNo!))),
+                              Text(
+                                time,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              (!isUser
+                                  ? const SizedBox()
+                                  : Icon(
+                                      icon,
+                                      size: 16,
+                                    ))
                             ],
-                          )),
-                    Text(message, style: const TextStyle(fontSize: 17)),
-                    const SizedBox(
-                      height: 1,
-                    ),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 55.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            time,
-                            style: const TextStyle(fontSize: 13),
                           ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          (!isUser
-                              ? const SizedBox()
-                              : Icon(
-                                  icon,
-                                  size: 16,
-                                ))
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              }
             ),
           ],
         ),
@@ -1255,6 +1290,9 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                       groupmessages = snapshot.data!.reversed.toList();
                       if(myMessageLength!=groupmessages.length){
                         myMessageLength=groupmessages.length;
+                        RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
+                        totalWritesFromThisPage++;
+                        debugPrint('printing from cidupdateunreadcount $totalWritesFromThisPage ');
                         isSelected=List.filled(myMessageLength, false);
                         trueCount=0;
                         otherUserChatSelected=[];
@@ -1294,9 +1332,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                         }
                         bgIndex--;
                       }
-                      RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
-                      totalWritesFromThisPage++;
-                      debugPrint('printing from cidupdateunreadcount $totalWritesFromThisPage ');
+
 
                       // return ListView.builder(
                       //   itemCount: chatmessages.length,

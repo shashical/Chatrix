@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:realtime_messaging/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
@@ -36,42 +38,47 @@ class _SearchContactPageState extends State<SearchContactPage> {
         SizedBox(
           height: 50,
           width: 390,
-          child: TextField(
-            controller: _searchController,
-            onChanged: (e) => {
-              setState(() {
-                searchedUser = [];
-                searchedNumber = [];
-                for (int i = 0; i < savedUsers.length; i++) {
-                  if (savedUsers[i].toLowerCase().contains(e.toLowerCase())) {
-                    searchedUser.add(savedUsers[i]);
-                    searchedNumber.add(savedNumber[i]);
-                  }
-                }
-              })
-            },
-            decoration: InputDecoration(
-                filled: true,
-                hintText: 'Search Contacts',
-                fillColor: Colors.blue[100],
-                prefixIcon: const Icon(
-                  Icons.search,
-                  size: 25,
-                  color: Colors.black,
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    if (_searchController.text.isEmpty) {
-                      Navigator.pop(context);
-                    } else {
-                      _searchController.clear();
+          child: Builder(
+            builder: (context) {
+              final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
+              return TextField(
+                controller: _searchController,
+                onChanged: (e) => {
+                  setState(() {
+                    searchedUser = [];
+                    searchedNumber = [];
+                    for (int i = 0; i < savedUsers.length; i++) {
+                      if (savedUsers[i].toLowerCase().contains(e.toLowerCase())) {
+                        searchedUser.add(savedUsers[i]);
+                        searchedNumber.add(savedNumber[i]);
+                      }
                     }
-                  },
-                  icon: const Icon(Icons.cancel),
-                ),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(20))),
+                  })
+                },
+                decoration: InputDecoration(
+                    filled: true,
+                    hintText: 'Search Contacts',
+                    fillColor:(themeProvider.isDarkMode?const Color.fromARGB(255, 72, 69, 69):Colors.blue[100]),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      size: 25,
+                      color: Colors.black,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        if (_searchController.text.isEmpty) {
+                          Navigator.pop(context);
+                        } else {
+                          _searchController.clear();
+                        }
+                      },
+                      icon: const Icon(Icons.cancel),
+                    ),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(20))),
+              );
+            }
           ),
         ),
         Flexible(
