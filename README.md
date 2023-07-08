@@ -58,16 +58,69 @@ Firebase server key
 ```
 # Demo
 # Working of App
- Verify your number with otp to login in app. A basic information form appears after login asking about profile photo ,username and about .
+ To log in to the app, please verify your number with the OTP (One-Time Password). After logging in, a basic information form will appear, requesting a profile photo, username, and a brief description.
  ## Home screen
- The top right corner has a pop up menu containing account, new group, Light/Dark mode and logout options.
- A bottom navigation bar allows switch between chats and groups screen
+ In the top right corner, there is a pop-up menu that includes options for the account, creating a new group, toggling between Light and Dark mode, and logging out.
+
+A bottom navigation bar allows you to switch between the chats and groups screens.
  ## Chats screen
- All the user chats will appear here in such a way that most recent chat appears at top
- Pinned chats will appears first then remaining chat appears in the same order as mentioned above.
- Multiple selects support: on selcting chats a options bar will appear on the screen has pin/unpin, mute/unmute, delete chat options
- A floating action button opens a bottom sheets having all contact saved app user to start chat and section containing non app users having send invites option 
- search functionality
+All user chats will be displayed here, with the most recent chat appearing at the top. Pinned chats will appear first, followed by the remaining chats in the same order as mentioned before.
+
+Multiple select support is available. By selecting chats, an options bar will appear on the screen, offering the ability to pin/unpin, mute/unmute, or delete a chat.
+
+  A floating action button opens a bottom sheet containing all the contacts saved in the app. This allows users to start a chat with saved contacts. There is also a section for non-app users, providing an option to send invitations.
+
+A search functionality is available for searching contacts.
+Tapping on the profile image within each chat will direct you to the profile page of that user.
+ ## Group screen 
+ All the groups in which the user is a member will be displayed here, following the same order as the chats screen. The functionality is similar to the chats screen, with the ability to perform actions on the groups such as pinning, muting, or deleting.
+
+ ##  Chat Window
+ The chat window provides a platform for users to communicate with each other. When you open a chat, the conversation between you and the other user will be displayed.
+ 
+ 
+ At the bottom of the chat window, there is a text input field where you can type and send messages. You can enter your message and press the send button to share it with the other user.
+ Additional features
+ 
+Attach Icon: Located in the bottom right corner of the chat window, the attach icon allows you to send various types of files. You can choose to send documents, images from your gallery, or capture photos/videos using the camera.
+
+Pop-up Menu: There is a pop-up menu accessible through a specific action (e.g., long-pressing on a chat or tapping on a user's profile). This menu provides options such as clearing the chat history, blocking or unblocking a user, and changing the wallpaper for the chat window.
+
+Online Status: In the  app bar, you can see the online status of users. This indicates whether the user is currently active or available for chat.
+
+Multiple Select: You can select multiple messages in the chat window by long-pressing on a message. Once selected, an options bar will appear on the screen, allowing you to perform actions on the selected messages. Common options include copying the messages and deleting them.
+
+Message Editing: By tapping on a specific message, you are provided with options to edit or correct it. This allows you to make changes to the content of a sent message.
+
+ The send icon only appear when there is something to send in the text field 
+## Group chat window
+The group chat window functions similarly to the chat window, but the user interface is designed differently to accommodate group conversations. When you open a group, the conversation among all the group members will be displayed.
+
+The features in the group chat window are similar to those in the chat window, including the ability to send messages, use the attach icon to send files, access the pop-up menu, perform multiple message selection, and edit messages.
+
+Additionally, tapping on the app bar in the group chat window will direct you to the group information page. This page provides details and  such as the group name, members, and other group-related options.
+## Group Information Screen
+key features of this Screen
+Group Name and Description: The page prominently displays the name of the group, along with a description that provides a brief overview or purpose of the group.
+
+Number of Group Members: The page shows the total number of members present in the group.
+
+Group Image: Administrators of the group are allowed to change the group image. They can upload or choose an image to represent the group visually.
+
+List of Group Members: Following the group information, there is a list of group members displayed. Each member is usually represented by their username or profile picture.
+
+Search Functionality: A search icon is present before the list of members. This feature allows you to search for specific members within the group. You can search by entering a phone number or a name to find a particular member quickly.
+
+Member Interaction: Tapping on any member's profile in the list will direct you to the chat window, where you can initiate a chat with that specific member.
+## New group Screen 
+On tapping new group option available pop-up menu of home page this pages 
+
+
+
+
+
+
+ 
  
 # Authors
  + [@shashical](https://github.com/shashical.git)
