@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         automaticallyImplyLeading: false,
         actions: [
-          PopupMenuButton(itemBuilder: (context)=>[
+          PopupMenuButton<ListTile>(itemBuilder: (context)=>[
              PopupMenuItem(
              onTap: (){
                  WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,16 +81,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                  });
              },
                child:   ListTile(
-                 leading:CircleAvatar(
-                   foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
-                   "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
+                 leading:SizedBox(
+                   height: 30,
+                   width: 30,
+                   child: CircleAvatar(
+                     foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
+                     "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
 
+                     ),
                    ),
                  ),
-                 title: const Text('Account',style: TextStyle(fontSize: 20)),
+                 title: const Text('Account',),
                ),
 
             ),
+            PopupMenuDivider(height: 2,),
+
             PopupMenuItem(
                 onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -101,6 +107,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 title: Text('New Group'),
               ),
             ),
+            PopupMenuDivider(),
+
             PopupMenuItem(child: 
             Consumer<ThemeProvider>(
   builder: (context, themeProvider, _) {
@@ -114,6 +122,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   },
 )
             ,),
+            PopupMenuDivider(),
             PopupMenuItem(
             onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) async{

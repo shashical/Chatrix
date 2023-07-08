@@ -287,6 +287,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 stream: _usersremoteServices.getUserChats(cid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    debugPrint('Rajeev');
                     userchats = snapshot.data!;
                     if(mychatlength!=userchats.length){
                       isSelected=List.filled(userchats.length,false);

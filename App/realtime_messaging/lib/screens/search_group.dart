@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
+import 'package:realtime_messaging/theme_provider.dart';
 
 import '../Models/userGroups.dart';
 import '../Services/users_remote_services.dart';
@@ -30,37 +32,40 @@ class _SearchGroupState extends State<SearchGroup> {
       SizedBox(
         height: 50,
         width: 390,
-        child: TextField(
-          controller: _searchController,
-          onChanged: (e) => {
-            setState(() {
-              // searchGroup=[];
-              // for (int i = 0; i < widget.usergroup.length; i++) {
-              //   if (widget.usergroup[i].name
-              //       .toLowerCase()
-              //       .contains(e.toLowerCase())) {
-              //     searchGroup.add(widget.usergroup[i].name);
-              //
-              //   }
-              // }
-            })
-          },
-          decoration: InputDecoration(
-              filled: true,
-              hintText: 'Search Groups',
-              fillColor: Colors.blue[100],
-              prefixIcon: const Icon(
-                Icons.search,
-                size: 25,
-                color: Colors.black,
-              ),
-              suffixIcon:IconButton(
-                onPressed: (){},
-                icon: const Icon(Icons.cancel_outlined),
-              ),
-              border: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.circular(20))),
+        child: Builder(
+            builder: (context) {
+              final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
+              return TextField(
+                controller: _searchController,
+                onChanged: (e) => {
+                  setState(() {
+
+                  })
+                },
+                decoration: InputDecoration(
+                    filled: true,
+                    hintText: 'Search Group',
+                    fillColor:(themeProvider.isDarkMode?const Color.fromARGB(255, 72, 69, 69):Colors.blue[100]),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      size: 25,
+                      color: Colors.black,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        if (_searchController.text.isEmpty) {
+                          Navigator.pop(context);
+                        } else {
+                          _searchController.clear();
+                        }
+                      },
+                      icon: const Icon(Icons.cancel),
+                    ),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(20))),
+              );
+            }
         ),
       ),
           Flexible(
