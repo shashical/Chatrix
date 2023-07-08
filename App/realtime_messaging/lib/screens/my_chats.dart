@@ -573,31 +573,34 @@ class _ChatsPageState extends State<ChatsPage> {
                                     trailing: SizedBox(
                                       height: 50,
                                       width: 80,
-                                      child: Column(
-                                        children: [
-                                          Text((userchat.lastMessageTime == null
-                                              ? ""
-                                              : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
-                                          Container(
-                                            constraints: BoxConstraints(
-                                                maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                userchat.pinned? Transform.rotate(angle: math.pi/7,
-                                                    child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                                userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                                userchat.unreadMessageCount!=0? Container(
-                                                  padding: const EdgeInsets.all(5),
-                                                  decoration:
-                                                const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                                  child:Text('${userchat.unreadMessageCount}',
-                                                    style: const TextStyle(color: Colors.white70),) ,):
-                                                const SizedBox(width: 0,height: 0,)
-                                              ],
-                                            ),
-                                          )
-                                        ],
+                                      child: IntrinsicHeight(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text((userchat.lastMessageTime == null
+                                                ? ""
+                                                : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                  maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                                      child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                                  userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                                  userchat.unreadMessageCount!=0? Container(
+                                                    padding: const EdgeInsets.all(5),
+                                                    decoration:
+                                                  const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                                    child:Text('${userchat.unreadMessageCount}',
+                                                      style: const TextStyle(color: Colors.white70),) ,):
+                                                  const SizedBox(width: 0,height: 0,)
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     onTap: () async {
@@ -637,6 +640,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                           return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                         },));
                                         RemoteServices().updateUser(cid, {'current':result});
+                                        current=null;
                                       }
                                     },
                                     onLongPress: () {

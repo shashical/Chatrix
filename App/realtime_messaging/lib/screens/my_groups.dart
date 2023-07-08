@@ -597,12 +597,11 @@ class _GroupsPageState extends State<GroupsPage> {
                                                 encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(usergroup.lastMessage!);
                                                 String message = encrypter.decrypt(encryptedMessage,iv: iv);
                                                 return ListTile(
-                          tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
-                              leading: InkWell(
-                                child: Stack(
-                                  children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(usergroup.imageUrl),
+                                                  tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null, leading: InkWell(
+                                                  child: Stack(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundImage: NetworkImage(usergroup.imageUrl),
                                   ),
                                     (isSelected[index])?
                                     const Positioned(
@@ -616,36 +615,39 @@ class _GroupsPageState extends State<GroupsPage> {
                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,userGroupId: usergroup.id,)));
                                 },
                               ),
-                              title: Text(usergroup.name),
-                              subtitle: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                  title: Text(usergroup.name),
+                                                  subtitle: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
                               trailing: SizedBox(
                                 width: 80,
                                 height: 50,
-                                child: Column(
-                                  children: [
-                                    Text((usergroup.lastMessageTime == null
-                                        ? ""
-                                        : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                              child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                          usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                          usergroup.unreadMessageCount!=0? Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration:
-                                            const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                            child:Text('${usergroup.unreadMessageCount}',
-                                              style: const TextStyle(color: Colors.white70),) ,):
-                                          const SizedBox(width: 0,height: 0,)
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                child: IntrinsicHeight(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text((usergroup.lastMessageTime == null
+                                          ? ""
+                                          : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
+                                      Container(
+                                        constraints: BoxConstraints(
+                                            maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                                child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                            usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                            usergroup.unreadMessageCount!=0? Container(
+                                              padding: const EdgeInsets.all(5),
+                                              decoration:
+                                              const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                              child:Text('${usergroup.unreadMessageCount}',
+                                                style: const TextStyle(color: Colors.white70),) ,):
+                                            const SizedBox(width: 0,height: 0,)
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                               onTap: () async {
@@ -762,31 +764,34 @@ class _GroupsPageState extends State<GroupsPage> {
                               trailing: SizedBox(
                                 width: 80,
                                 height: 50,
-                                child: Column(
-                                  children: [
-                                    Text((usergroup.lastMessageTime == null
-                                        ? ""
-                                        : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                              child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                          usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                          usergroup.unreadMessageCount!=0? Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration:
-                                            const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                            child:Text('${usergroup.unreadMessageCount}',
-                                              style: const TextStyle(color: Colors.white70),) ,):
-                                          const SizedBox(width: 0,height: 0,)
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                child: IntrinsicHeight(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text((usergroup.lastMessageTime == null
+                                          ? ""
+                                          : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
+                                      Container(
+                                        constraints: BoxConstraints(
+                                            maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            usergroup.pinned? Transform.rotate(angle: math.pi/7,
+                                                child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                            usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                            usergroup.unreadMessageCount!=0? Container(
+                                              padding: const EdgeInsets.all(5),
+                                              decoration:
+                                              const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                              child:Text('${usergroup.unreadMessageCount}',
+                                                style: const TextStyle(color: Colors.white70),) ,):
+                                            const SizedBox(width: 0,height: 0,)
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                               onTap: () async {

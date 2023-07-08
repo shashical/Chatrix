@@ -263,13 +263,15 @@ class _DocBubbleState extends State<DocBubble> {
                                                 validTokens.add(tokens[i]!);
                                               }
                                             }
-                                            SendNotificationService()
+                                            if(validTokens.isNotEmpty) {
+                                              SendNotificationService()
                                                 .sendFCMGroupMessage(
                                                     validTokens, {
                                               'title':
                                                   "${widget.groupName} (${curUser!.name})",
                                               'body': "Document"
                                             }, {});
+                                            }
 
                                             String symmKeyString =
                                                 (await const FlutterSecureStorage()
@@ -616,13 +618,15 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                                 validTokens.add(tokens[i]!);
                                               }
                                             }
-                                            SendNotificationService()
+                                            if(validTokens.isNotEmpty) {
+                                              SendNotificationService()
                                                 .sendFCMGroupMessage(
                                                     validTokens, {
                                               'title':
                                                   "${widget.groupName} (${curUser!.name})",
                                               'body': "Document"
                                             }, {});
+                                            }
 
                                     String symmKeyString =
                                         (await const FlutterSecureStorage()
@@ -875,18 +879,19 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
         .get();
     participants = docSnap.get('participantIds');
 
-    tokens=[];
-    for (int i = 0; i < participants.length; i++) {
-      DocumentSnapshot docsnap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(participants[i])
-          .get();
-      if (docsnap.get('current') == widget.groupId) {
-        tokens.add(null);
-      } else {
-        tokens.add(docsnap.get('token'));
-      }
-    }
+    tokens=List.filled(participants.length, null);
+    isUpdated=List.filled(participants.length, true);
+    // for (int i = 0; i < participants.length; i++) {
+    //   DocumentSnapshot docsnap = await FirebaseFirestore.instance
+    //       .collection('users')
+    //       .doc(participants[i])
+    //       .get();
+    //   if (docsnap.get('current') == widget.groupId) {
+    //     tokens.add(null);
+    //   } else {
+    //     tokens.add(docsnap.get('token'));
+    //   }
+    // }
     setState(() {
       isLoaded = true;
     });
@@ -903,7 +908,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
       _image = imageTemp;
     });
   }
-
+  int totalWritesFromThisPage=0;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -1252,8 +1257,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                         myMessageLength=groupmessages.length;
                         isSelected=List.filled(myMessageLength, false);
                         trueCount=0;
+                        otherUserChatSelected=[];
                         bgIndex=0;
-                        isUpdated=List.filled(participants.length, false);
                         increment=0;
                         if(!assigned){
                           bgIndex=-1;
@@ -1283,11 +1288,16 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               widget.groupId,
                               {'readBy':groupmessages[bgIndex].readBy},
                               groupmessages[bgIndex].id);
+                          totalWritesFromThisPage++;
+                              debugPrint('printing from readupdate $totalWritesFromThisPage ');
 
                         }
                         bgIndex--;
                       }
                       RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
+                      totalWritesFromThisPage++;
+                      debugPrint('printing from cidupdateunreadcount $totalWritesFromThisPage ');
+
                       // return ListView.builder(
                       //   itemCount: chatmessages.length,
                       //   itemBuilder: (context, index) {
@@ -1727,8 +1737,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                           0;
                                                   if (!isUpdated[index] &&
                                                       dummy != 0) {
-                                                    debugPrint(
-                                                        'checking $count +$dummy=${dummy + count}');
+                                                    // debugPrint(
+                                                    //     'checking $count +$dummy=${dummy + count}');
                                                     RemoteServices()
                                                         .updateUserGroup(
                                                             participants[index],
@@ -1738,7 +1748,56 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                             },
                                                             widget.groupId);
                                                     isUpdated[index] = true;
+                                                    totalWritesFromThisPage++;
+                                                    debugPrint('printing from all-participants unreadability $totalWritesFromThisPage ');
+
                                                   }
+                                                }
+                                                return const SizedBox(
+                                                  height: 0,
+                                                );
+                                              },
+                                            );
+                                          } else {
+                                            //debugPrint('${participants.length} rajeev ');
+                                            print(tokens);
+                                            tokens[index] = null;
+                                            return const SizedBox();
+                                          }
+                                        }),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                    child: ListView.builder(
+                                        physics:
+                                        const NeverScrollableScrollPhysics(),
+                                        itemCount: participants.length,
+                                        itemBuilder: (context, index) {
+                                          // debugPrint('index $index');
+                                          if (participants[index] != cid) {
+                                            //debugPrint('$isUpdated');
+                                            // if(dummy!=0) {
+                                            //debugPrint('working here also !!!!');
+                                            return StreamBuilder<Users>(
+                                              stream: RemoteServices()
+                                                  .getUserStream(
+                                                  participants[index],
+                                                  ),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<dynamic>
+                                                  snapshot) {
+                                                if (snapshot.hasData) {
+                                                  final Users gp =
+                                                      snapshot.data;
+                                                  if (gp.token!=null) {
+                                                    tokens[index] = gp.token;
+                                                  }
+                                                  if(gp.current==widget.groupId){
+                                                    tokens[index]=null;
+                                                  }
+
+
+
                                                 }
                                                 return const SizedBox(
                                                   height: 0,
@@ -2104,13 +2163,15 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                             validTokens.add(tokens[i]!);
                                           }
                                         }
-                                        print(validTokens);
-                                        SendNotificationService()
+                                        //print(validTokens);
+                                        if(validTokens.isNotEmpty) {
+                                          SendNotificationService()
                                             .sendFCMGroupMessage(validTokens, {
                                           'title':
                                               "${widget.groupName} (${curUser!.name})",
                                           'body': temp
                                         }, {});
+                                        }
                                         debugPrint(' valid tokens $validTokens');
                                         // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
                                         // List<dynamic> participants = docSnap.get('participantIds');
