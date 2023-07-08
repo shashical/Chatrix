@@ -18,7 +18,6 @@ Messages are end to end encrypted even the owner can not see what you are sendin
 +  Update profile
 +  Tracks unread messages counts
 +  Online Presence
-+  Cross-Platform (android and ios)
   
 # Tech Stack
 **Client:** Flutter
