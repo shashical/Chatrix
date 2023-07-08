@@ -643,15 +643,15 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
     super.initState();
 
   }
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
-    if (state == AppLifecycleState.resumed) {
-      RemoteServices().updateUser(cid, {'current': current});
-    }
-    else {
-      RemoteServices().updateUser(cid,{'current': null});
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state){
+  //   if (state == AppLifecycleState.resumed) {
+  //     RemoteServices().updateUser(cid, {'current': current});
+  //   }
+  //   else {
+  //     RemoteServices().updateUser(cid,{'current': null});
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -692,19 +692,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                       child: Text('$trueCount',),
                     ),
                     const Spacer(),
-                    (unStarableSelected.isEmpty)?IconButton(onPressed: (){
-                      for(int i=0;i<chatmessages.length;i++){
-                        if(isSelected[i]){
-                          StarredMessageRemoteServices().setStarredMessage(StarredMessage(id: chatmessages[i].id, messageId: chatmessages[i].id,
-                              collectionId:chatid!, isGroup: false, senderPhoneNo: (chatmessages[i].senderId==cid)?currentUser.phoneNo:otheruser.phoneNo,
-                              senderPhoto: (chatmessages[i].senderId==cid)?currentUser.photoUrl!:otheruser.photoUrl!
-                              , text: chatmessages[i].text, contentType: chatmessages[i].contentType, timestamp: chatmessages[i].timestamp,
-                            docUrl: (chatmessages[i].contentType!='text')?(chatmessages[i].senderId==cid)?chatmessages[i].senderUrl:chatmessages[i].receiverUrl:''
-                          ));
-                        }
-                      }
-                    },
-                        icon: const Icon(CupertinoIcons.star_fill)):const SizedBox(height: 0,width: 0,),
+
                     IconButton(onPressed: (){
                       showDialog(context: context, builder: (context)=>AlertDialog(
                         title: const Text('Delete message?',style: TextStyle(color: Colors.grey),),
@@ -993,7 +981,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                         stream: RemoteServices().getUserStream(widget.otherUserId),
                         builder:( (context,snapshot){
                           if(snapshot.hasData){
-                            if(snapshot.data != otherUserStream) {
+                            if(snapshot.data?.isOnline != otherUserStream?.isOnline || snapshot.data?.current!=otherUserStream?.current) {
+
                               otherUserStream = snapshot.data;
                               WidgetsBinding.instance.addPostFrameCallback((
                                   timeStamp) {
@@ -1050,7 +1039,9 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                               bgIndex--;
 
                             }
+                            debugPrint('yes printinggggggggg');
                             RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
+                             debugPrint('yes printinggggggggg');
                             // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
                             // debugPrint('unread${unreadMessageCount+ouumc}');
                             // return ListView.builder(
@@ -1093,17 +1084,20 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                             //   },
                             // );
 
-                            return StreamBuilder(
+                            return StreamBuilder<UserChat>(
                               stream: RemoteServices().getUserChatStream(otheruser.id, '${otheruser.id}$cid'),
                                 builder: (context,snapshot){
                                 if(snapshot.hasData){
                                   otherUserChat=snapshot.data;
                                   unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+                                    debugPrint(' before $ouumc');
                                   if(ouumc!=0) {
+                                    debugPrint(' before $ouumc');
                                     RemoteServices().updateUserChat(widget.otherUserId,
                                       {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
                                   }
                                   ouumc=0;
+                                  debugPrint(' after $ouumc');
                                   //debugPrint('$ouumc');
                                 }
                                 Widget listBuilder=ListView.builder(

@@ -360,7 +360,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               ),
               SizedBox(
                 width: double.infinity,
-                child: Text('   Created by ${currentGroup!.createdBy},${currentGroup!.creationTimestamp.day}/${currentGroup!.creationTimestamp.month}/${currentGroup!.creationTimestamp.year}',
+                child: Text('   Created by ${currentGroup!.createdBy} on ${currentGroup!.creationTimestamp.day}/${currentGroup!.creationTimestamp.month}/${currentGroup!.creationTimestamp.year}',
                   style: const TextStyle(fontSize: 16,color: Colors.grey),
                 ),
               ),
@@ -399,8 +399,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                       children: [
                         Row(
                           children: [
-                            Text('${currentGroup!.participantIds.length}',
-                              style: const TextStyle(color: Colors.grey,fontSize: 15),),
                             const Spacer(),
                             IconButton(onPressed: (){
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchWithinGroup(ListItem: participant, ListContent:contentList)));

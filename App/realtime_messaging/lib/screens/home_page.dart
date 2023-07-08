@@ -79,29 +79,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                Navigator.push(context, MaterialPageRoute(builder: (context)=>const CurrentUserProfilePage()));
                  });
              },
-               child: Row(
-              children: [
-                CircleAvatar(
-                  foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
-                      "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
+               child:   ListTile(
+                 leading:CircleAvatar(
+                   foregroundImage: NetworkImage((isLoaded)?curUser!.photoUrl!:
+                   "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
 
-                  ),
-                ),
-                const Text('Account',style: TextStyle(fontSize: 20),)
-              ],
-            ),),
+                   ),
+                 ),
+                 title: const Text('Account',style: TextStyle(fontSize: 20)),
+               ),
+
+            ),
             PopupMenuItem(value: 1,
                 onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.push(context, MaterialPageRoute(builder: (context)=>const NewGroupPage()));
               });
-                },child: const Text('New Group'),
+                },child: const ListTile(
+                leading: Icon(Icons.group,color: Colors.black,),
+                title: Text('New Group'),
+              ),
             ),
             PopupMenuItem(value: 3,
             onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) async{
 
-                RemoteServices().updateUser(cid, 
+                RemoteServices().updateUser(cid,
                 {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
                 );
 
@@ -109,12 +112,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
              Navigator.pushAndRemoveUntil(context,
                  MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
               });
-            },child: const Row(
-              children: [
-                Icon(Icons.logout,color: Colors.black,),
-                Text('Log Out'),
-              ],
-            ),),
+              },
+              child: const ListTile(
+                  leading: Icon(Icons.logout,color: Colors.black,),
+                  title: Text('Log Out'),
+                ),)
+
           ],
           )
         ],
