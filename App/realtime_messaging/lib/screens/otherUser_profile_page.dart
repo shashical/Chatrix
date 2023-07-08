@@ -230,12 +230,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:realtime_messaging/screens/search_contacts.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 
 import '../Models/users.dart';
 import '../Services/users_remote_services.dart';
 import '../main.dart';
+import '../theme_provider.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
   final String? chatId;
@@ -295,17 +297,25 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
       body: (userLoaded)
           ? Stack(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color.fromARGB(255, 147, 203, 216),
-                        const Color.fromARGB(255, 200, 104, 163),
-                      ],
-                    ),
-                  ),
+                Builder(
+                  builder: (context) {
+                    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: (themeProvider.isDarkMode?[
+                            Color.fromARGB(255, 61, 84, 88),
+                            Color.fromARGB(255, 86, 44, 70),
+                          ]:[
+                            const Color.fromARGB(255, 147, 203, 216),
+                            const Color.fromARGB(255, 200, 104, 163),
+                          ]),
+                        ),
+                      ),
+                    );
+                  }
                 ),
                 SingleChildScrollView(
                   child: Column(
@@ -363,34 +373,38 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              'About',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                      Builder(
+                        builder: (context) {
+                          final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              user!.about!,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[800],
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'About',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  user!.about!,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    // color: Colors.grey[800],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        }
                       ),
                       SizedBox(height: 20),
                       Padding(

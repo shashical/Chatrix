@@ -135,17 +135,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ],
           )
         ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Colors.blue.shade800,
-                const Color.fromARGB(255, 0, 102, 212),
-              ],
-            ),
-          ),
+        flexibleSpace: Builder(
+          builder: (context) {
+            final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: (themeProvider.isDarkMode?[
+                    const Color.fromARGB(255, 6, 30, 57),
+                    Color.fromARGB(255, 0, 34, 70),
+                  ]:[
+                    Colors.blue.shade800,
+                    const Color.fromARGB(255, 0, 102, 212),
+                  ]),
+                ),
+              ),
+            );
+          }
         ),
       ),
       body: PageView(
