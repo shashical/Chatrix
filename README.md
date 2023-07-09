@@ -9,6 +9,7 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 + Real-time messaging
 + Messages are **end-to-end Encrypted**
 + Chats can be one-to-one or in a group
++ Chats and groups can also be pinned and muted
 + Change wallpaper option
 +  Notification feature
 +  Supports sending images and documents
