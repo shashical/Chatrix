@@ -71,8 +71,8 @@ Multiple select support is available. By selecting your desirable chats, an opti
 
 A search functionality is available for searching the contacts.
 Tapping on the profile image within each chat will direct you to the profile page of that user.
- ## Group screen 
- All the groups in which the user is a member will be displayed here, following the same order as the chats screen. The functionality is similar to the chats screen, with the ability to perform actions on the groups such as pinning, muting, or deleting.
+ ## Groups screen 
+ All the groups in which the user is a member will be displayed here, following the same order as the chats screen. The functionalities here are similar to the chats screen, with the ability to perform actions on the groups such as pinning, muting, or deleting.
 
  ##  Chat Window
  The chat window provides a platform for users to communicate with each other. When you open a chat, the conversation between you and the other user will be displayed.
