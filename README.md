@@ -113,8 +113,8 @@ As the name suggests, this page shows you the details of the group. These includ
  
  
 # Authors
- + [@shashical](https://github.com/shashical.git)
- + [@rai-rajeev](https://github.com/rai-rajeev.git)
+ + [@shashical](https://github.com/shashical)
+ + [@rai-rajeev](https://github.com/rai-rajeev)
 
 # Important Note 
 
