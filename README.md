@@ -40,16 +40,14 @@ To get started with Chatrix, follow these steps:
    ```bash
    flutter pub get
   
-4. To set up Firebase and Firestore for your project, refer this
-   
-    https://firebase.google.com/docs/flutter/setup?continue=https%3A%2F%2Ffirebase.google.com%2Flearn%2Fpathways%2Ffirebase-flutter%23article-https%3A%2F%2Ffirebase.google.com%2Fdocs%2Fflutter%2Fsetup&platform=android
+4. To set up Firebase and Firestore for your project, refer [this](https://firebase.google.com/docs/flutter/setup?continue=https%3A%2F%2Ffirebase.google.com%2Flearn%2Fpathways%2Ffirebase-flutter%23article-https%3A%2F%2Ffirebase.google.com%2Fdocs%2Fflutter%2Fsetup&platform=android).
 5. Connect a physical device or emulator.
 6. Run the app:
    ```bash
    flutter run
 # Download Apk file
 # Environment Variables
-Firebase server key
+Firebase Cloud Messaging (FCM) server key 
 ```bash
  SERVER_KEY
 ```
@@ -57,10 +55,10 @@ Firebase server key
 + Authenticate yourself and get started
 + Enjoy chatting in real-time, whether in groups or in personal
 + Explore the various features and functionalities provided by the app
-# Working of App
- To log in to the app, please verify your number with the OTP (One-Time Password). After logging in, a basic information form will appear, requesting a profile photo, username, and a brief description.
- ## Home screen
- In the top right corner, there is a pop-up menu that includes options for the account, creating a new group, toggling between Light and Dark mode, and logging out.
+# Working of the App
+ To log in to the app, please verify your number with the OTP (One-Time Password) you get after entering your number. After logging in, a basic information form will appear, requesting a profile photo, username, and a brief description.
+ ## Home page
+ In the top right corner, there is a pop-up menu that includes options for your user account (where you can view and edit your account), creating a new group, toggling between Light and Dark theme, and logging out. Choosing to create a new group will take you to another screen where you can select the members you want in your group and then you can initialize the group with a name and photo in the screen that follows.
 
 A bottom navigation bar allows you to switch between the chats and groups screens.
  ## Chats screen
@@ -112,8 +110,6 @@ List of Group Members: Following the group information, there is a list of group
 Search Functionality: A search icon is present before the list of members. This feature allows you to search for specific members within the group. You can search by entering a phone number or a name to find a particular member quickly.
 
 Member Interaction: Tapping on any member's profile in the list will direct you to the chat window, where you can initiate a chat with that specific member.
-## New group Screen 
-On tapping new group option available pop-up menu of home page this pages 
 
 
 
