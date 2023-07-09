@@ -79,6 +79,7 @@ Tapping on the profile image within each chat will direct you to the profile pag
  
  
  At the bottom of the chat window, there is a text input field where you can type and send messages. You can enter your message and press the send button to send it to the other user.
+ 
  Additional features:
  
 **Attach Icon:** Located beside the text field, the attach icon allows you to send various types of files. You can choose to send media such as documents or images. Images can be from gallery or camera.
