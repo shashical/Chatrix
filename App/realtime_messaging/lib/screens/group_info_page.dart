@@ -9,6 +9,7 @@ import 'package:realtime_messaging/Models/userGroups.dart';
 import 'package:realtime_messaging/Services/groups_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/search_within_group.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
@@ -150,10 +151,13 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                                 .catchError((e) =>
                                             throw Exception(
                                                 '$e'));
-                                            GroupsRemoteServices().updateGroup(cid, {
-                                              "imageUrl": photoUrl
-                                            }).catchError(
+                                            for(var x in currentGroup!.participantIds) {
+                                              RemoteServices().updateUserGroup(x, {
+                                              "imageUrl": photoUrl,
+
+                                            },widget.groupId).catchError(
                                                     (e) => throw Exception('$e'));
+                                            }
                                             setState(() {
                                               currentUserGroup!.imageUrl =
                                                   photoUrl;
@@ -177,6 +181,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                               ..showSnackBar(SnackBar(
                                                   content: Text('$e')));
                                           }
+                                          _image=null;
                                         }
                                       },
                                       child: const Row(
@@ -211,10 +216,13 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                                 .catchError((e) =>
                                             throw Exception(
                                                 '$e'));
-                                            GroupsRemoteServices().updateGroup(cid, {
-                                              "imageUrl": photoUrl
-                                            }).catchError(
-                                                    (e) => throw Exception('$e'));
+                                            for(var x in currentGroup!.participantIds) {
+                                              RemoteServices().updateUserGroup(x, {
+                                                "imageUrl": photoUrl,
+
+                                              },widget.groupId).catchError(
+                                                      (e) => throw Exception('$e'));
+                                            }
                                             setState(() {
                                               photoUploading = false;
                                             });
@@ -237,6 +245,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                               ..showSnackBar(SnackBar(
                                                   content: Text('$e')));
                                           }
+                                          _image=null;
                                         }
                                       },
                                       child: const Row(
@@ -265,12 +274,13 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                                             photoUploading = true;
                                           });
 
-                                         GroupsRemoteServices().updateGroup(
-                                              widget.groupId, {
-                                            "imageUrl":
-                                            "https://geodash.gov.bd/uploaded/people_group/default_group.png"
-                                          }).catchError((e) =>
-                                          throw Exception('$e'));
+                                          for(var x in currentGroup!.participantIds) {
+                                            RemoteServices().updateUserGroup(x, {
+                                              "imageUrl":  "https://geodash.gov.bd/uploaded/people_group/default_group.png",
+
+                                            },widget.groupId).catchError(
+                                                    (e) => throw Exception('$e'));
+                                          }
                                           setState(() {
                                             currentUserGroup!.imageUrl =
                                             "https://geodash.gov.bd/uploaded/people_group/default_group.png";
@@ -339,11 +349,151 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                 height: 10,
               ),
               Center(
-                child: Text((currentUserGroup!.name),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),),
+                child: ListTile(
+                  title: Text((currentUserGroup!.name),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
+                  ),),
+                  trailing: (currentGroup!.admins!.contains(cid))?IconButton(onPressed: (){
+                    TextEditingController nameController =
+                                  TextEditingController(
+                                      text: currentUserGroup!.name);
+
+                              showModalBottomSheet(
+                                context: (context),
+                                isScrollControlled: true,
+                                builder: (context) => Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextField(
+                                        style: const TextStyle(
+                                          fontSize: 28,
+                                        ),
+                                        controller: nameController,
+                                        maxLines: 1,
+                                        autofocus: true,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter group Name ',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            vertical: 10.0,
+                                            horizontal: 15.0,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20))),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 20),
+                                                child: Text(
+                                                  'Cancel',
+                                                  style:
+                                                      TextStyle(fontSize: 26),
+                                                ),
+                                              )),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20))),
+                                            onPressed: () {
+                                              if(nameController.text.isEmpty){
+                                                showDialog(context: context, builder: (context)=>
+                                                     AlertDialog(
+                                                      content: const Text(' Group name can\'t be empty' ),
+                                                       actions: [
+                                                         ElevatedButton(onPressed: (){
+                                                           Navigator.of(context,rootNavigator: true).pop();
+                                                         }, child: const Text('Ok'))
+                                                       ],
+                                                    )
+                                                );
+                                              }else {
+                                                try {
+                                                setState(() {
+                                                  nameUpdating = true;
+                                                });
+                                                for(var x in currentGroup!.participantIds) {
+                                                  RemoteServices().updateUserGroup(
+                                                    x, {
+                                                  "name": nameController.text
+                                                },widget.groupId).catchError((e) =>
+                                                    throw Exception('$e'));
+                                                }
+                                                setState(() {
+                                                  currentUserGroup!.name =
+                                                      nameController.text;
+                                                  nameUpdating = false;
+                                                });
+                                                Navigator.pop(context);
+                                              } on FirebaseException catch (e) {
+                                                setState(() {
+                                                  nameUpdating = false;
+                                                });
+                                                ScaffoldMessenger.of(context)
+                                                  ..removeCurrentSnackBar()
+                                                  ..showSnackBar(SnackBar(
+                                                      content: Text(
+                                                          '${e.message}')));
+                                              } catch (e) {
+                                                setState(() {
+                                                  nameUpdating = false;
+                                                });
+                                                ScaffoldMessenger.of(context)
+                                                  ..removeCurrentSnackBar()
+                                                  ..showSnackBar(SnackBar(
+                                                      content: Text('$e')));
+                                              }
+                                              }
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 30),
+                                              child: Text(
+                                                'Done',
+                                                style: TextStyle(fontSize: 26),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                  },icon: const Icon(Icons.edit),):null,
+                ),
               ),
               Center(
                 child: Text('Members: ${currentGroup!.participantIds.length}',
@@ -525,9 +675,12 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       onTap: () async{
         final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${aux[i][4]}").get();
             if(docsnap.exists){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+             final  result=await  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                 return ChatWindow(otherUserId: aux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
               },));
+             RemoteServices().updateUser(cid, {'current':result});
+             current=null;
             }
             else{
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
@@ -568,9 +721,12 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       onTap: () async{
         final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${extrAux[i][4]}").get();
             if(docsnap.exists){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+            final result=await  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                 return ChatWindow(otherUserId: extrAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
               },));
+              RemoteServices().updateUser(cid, {'current':result});
+              current=null;
             }
             else{
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
@@ -610,9 +766,12 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       onTap: () async{
         final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${pAux[i][4]}").get();
             if(docsnap.exists){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+              final result=await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                 return ChatWindow(otherUserId: pAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
               },));
+              RemoteServices().updateUser(cid, {'current':result});
+              current=null;
             }
             else{
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
@@ -647,9 +806,12 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       onTap: () async{
         final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${epAux[i][4]}").get();
             if(docsnap.exists){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+              final result =await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                 return ChatWindow(otherUserId: epAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
               },));
+              RemoteServices().updateUser(cid, {'current':result});
+              current=null;
             }
             else{
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

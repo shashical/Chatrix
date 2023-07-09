@@ -1665,7 +1665,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               } else if (cid ==
                                                       groupmessage.senderId &&
                                                   groupmessage.contentType ==
-                                                      'text') {
+                                                      'text' && !groupmessage.edited) {
                                                 SimpleDialog alert =
                                                     SimpleDialog(
                                                   children: [

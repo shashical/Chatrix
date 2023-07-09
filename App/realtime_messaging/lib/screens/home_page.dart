@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                ),
 
             ),
-            PopupMenuDivider(height: 2,),
+            const PopupMenuDivider(height: 2,),
 
             PopupMenuItem(
                 onTap: (){
@@ -107,13 +107,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 title: Text('New Group'),
               ),
             ),
-            PopupMenuDivider(),
+            const PopupMenuDivider(),
 
             PopupMenuItem(child: 
             Consumer<ThemeProvider>(
   builder: (context, themeProvider, _) {
     return SwitchListTile(
-      title: Text('Dark Mode'),
+      title: const Text('Dark Mode'),
       value: themeProvider.isDarkMode,
       onChanged: (value) {
         themeProvider.toggleTheme();
@@ -129,7 +129,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                 RemoteServices().updateUser(cid,
                 {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
+
                 );
+                cid='';
 
              await FirebaseAuth.instance.signOut();
              Navigator.pushAndRemoveUntil(context,
@@ -154,7 +156,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   end: Alignment.centerRight,
                   colors: (themeProvider.isDarkMode?[
                     const Color.fromARGB(255, 6, 30, 57),
-                    Color.fromARGB(255, 0, 34, 70),
+                    const Color.fromARGB(255, 0, 34, 70),
                   ]:[
                     Colors.blue.shade800,
                     const Color.fromARGB(255, 0, 102, 212),

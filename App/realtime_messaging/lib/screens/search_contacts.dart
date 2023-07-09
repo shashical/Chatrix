@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:realtime_messaging/theme_provider.dart';
@@ -174,6 +175,7 @@ List<Widget> MergeAppUserAndSendInvite(
                 },
               ));
               RemoteServices().updateUser(cid, {'current':result});
+              current=null;
             } else {
               docsnap = await FirebaseFirestore.instance
                   .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
@@ -310,6 +312,7 @@ List<Widget> SearchMerge(
                 },
               ));
               RemoteServices().updateUser(cid, {'current':result});
+              current=null;
             } else {
               docsnap = await FirebaseFirestore.instance
                   .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')

@@ -18,6 +18,7 @@ class UserChat {
   bool blocked;
   String? containsSymmKey;
   String? displayName;
+  bool isSender;
 
   UserChat({
     required this.id,
@@ -34,6 +35,7 @@ class UserChat {
     this.blocked = false,
     this.containsSymmKey,
     this.displayName,
+    this.isSender=false,
   });
 
   factory UserChat.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,7 @@ class UserChat {
       blocked: json['blocked'],
       containsSymmKey: json['containsSymmKey'],
       displayName:json['displayName']??'',
+      isSender: json['isSender']??false,
     );
   }
 
@@ -71,6 +74,7 @@ class UserChat {
       'blocked': blocked,
       'containsSymmKey': containsSymmKey,
       'displayName':displayName,
+      'isSender':isSender,
     };
   }
 }

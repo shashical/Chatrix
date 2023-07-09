@@ -1245,7 +1245,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                       }
                                                     } });
                                                 }
-                                                else if(cid==chatmessage.senderId  && chatmessage.contentType=='text'){
+                                                else if(cid==chatmessage.senderId  && chatmessage.contentType=='text' && !chatmessage.edited){
                                                       SimpleDialog alert=SimpleDialog(
                                                         children: [
                                                           SimpleDialogOption(
@@ -1524,7 +1524,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             //   );
                                             //
                                             // }
-                                              debugPrint(' printing filels   ${files}');
+                                              //debugPrint(' printing filels   ${files}');
                                             RemoteServices().updateUserChat(
                                                 cid,
                                                 {
@@ -1533,7 +1533,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                       ?files.files[files.files.length-1].name.substring(0, 100)
                                                       : files.files[files.files.length-1].name,
                                                   'lastMessageType': "document",
-                                                  'lastMessageTime': DateTime.now().toIso8601String()
+                                                  'lastMessageTime': DateTime.now().toIso8601String().length,
+                                                  'isSender':true
                                                 },
                                                 "$cid${otheruser.id}");
                                             RemoteServices().updateUserChat(
@@ -1544,7 +1545,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                       ?files.files[files.files.length-1].name.substring(0, 100)
                                                       : files.files[files.files.length-1].name,
                                                   'lastMessageType': "document",
-                                                  'lastMessageTime': DateTime.now().toIso8601String()
+                                                  'lastMessageTime': DateTime.now().toIso8601String(),
+                                                  'isSender':false
                                                 },
                                                 "${widget.otherUserId}$cid");
 
@@ -1692,7 +1694,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                           {
                                           'lastMessage': 'image',
                                           'lastMessageType': "image",
-                                          'lastMessageTime': DateTime.now().toIso8601String()
+                                          'lastMessageTime': DateTime.now().toIso8601String(),
+                                            'isSender':true,
                                           },"$cid${otheruser.id}"
 
                                           );
@@ -1702,7 +1705,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 {
                                                   'lastMessage': 'image',
                                                   'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String()
+                                                  'lastMessageTime': DateTime.now().toIso8601String(),
+                                                  'issender':false,
                                                 },
                                                 "${widget.otherUserId}$cid");
                                                 _image=null;
@@ -1850,7 +1854,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 {
                                                   'lastMessage': 'image',
                                                   'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String()
+                                                  'lastMessageTime': DateTime.now().toIso8601String(),
+                                                  'isSender':true,
                                                 },"$cid${otheruser.id}"
 
                                             );
@@ -1860,7 +1865,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 {
                                                   'lastMessage': 'image',
                                                   'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String()
+                                                  'lastMessageTime': DateTime.now().toIso8601String(),
+                                                  'isSender':false
                                                 },
                                                 "${widget.otherUserId}$cid");
                                             _image=null;
@@ -2021,7 +2027,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             'lastMessage': encryptedMessageString,
                                             'lastMessageType': "text",
                                             'lastMessageTime': DateTime.now()
-                                                .toIso8601String()
+                                                .toIso8601String(),
+                                            'isSender':true
                                           },
                                           "$cid${widget.otherUserId}");
 
@@ -2057,7 +2064,8 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             'lastMessage': encryptedMessageString,
                                             'lastMessageType': "text",
                                             'lastMessageTime': DateTime.now()
-                                                .toIso8601String()
+                                                .toIso8601String(),
+                                            'isSender':false
                                           },
                                           "${widget.otherUserId}$cid");
                                     }

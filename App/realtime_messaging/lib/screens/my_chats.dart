@@ -334,172 +334,325 @@ class _ChatsPageState extends State<ChatsPage> {
                                   RSAPrivateKey privateKey = rsa.RsaKeyHelper().parsePrivateKeyFromPem(privateKeyString);
                                   encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(privateKey: privateKey));
                                   String symmKeyString = encrypter.decrypt(encryptedSymmKey);
-                                  return FutureBuilder(
-                                    future:  const FlutterSecureStorage().write(key: userchat.chatId, value: symmKeyString),
-                                    builder: (context, snapshot) {
-                                      return FutureBuilder(
-                                        future: RemoteServices().updateUserChat(cid,
-                                            {
-                                              'containsSymmKey': null,
-                                              'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo,
-                                            }
-                                            , userchat.id),
+                                  return Column(
+                                    children: [
+
+                                      FutureBuilder(
+                                        future:  const FlutterSecureStorage().write(key: userchat.chatId, value: symmKeyString),
                                         builder: (context, snapshot) {
-                                          String? symmKeyString;
                                           return FutureBuilder(
-                                            future: const FlutterSecureStorage().read(key: userchat.chatId),
+                                            future: RemoteServices().updateUserChat(cid,
+                                                {
+                                                  'containsSymmKey': null,
+                                                  'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo,
+                                                }
+                                                , userchat.id),
                                             builder: (context, snapshot) {
-                                              if(snapshot.hasData){
+                                              String? symmKeyString;
+                                              return FutureBuilder(
+                                                future: const FlutterSecureStorage().read(key: userchat.chatId),
+                                                builder: (context, snapshot) {
+                                                  if(snapshot.hasData){
 
-                                                String message=userchat.lastMessage!;
-                                                if(userchat.lastMessageType=='text'){
-                                                symmKeyString = snapshot.data;
-                                                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                                    String message=userchat.lastMessage!;
+                                                    if(userchat.lastMessageType=='text'){
+                                                    symmKeyString = snapshot.data;
+                                                    encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
 
-                                                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
-                                                message = encrypter.decrypt(encryptedMessage,iv: iv);}
-                                                return ListTile(
-                                                  tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
-                                                  leading: InkWell(
-                                                    child: Stack(
-                                                        children: [
-                                                          CircleAvatar(
-                                                            backgroundImage: NetworkImage(
-                                                                !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
+                                                    encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
+                                                    message = encrypter.decrypt(encryptedMessage,iv: iv);}
+                                                    if(userchat.isSender) {
+                                                      return StreamBuilder<UserChat>(
+                                                      stream: RemoteServices().getUserChatStream(otheruserid, '$otheruserid$cid'),
+                                                      builder: (context, snapshot) {
+                                                        final UserChat? otherUserChat=snapshot.data;
+                                                        final count=otherUserChat!.unreadMessageCount??0;
+                                                        return ListTile(
+                                                          tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
+                                                          leading: InkWell(
+                                                            child: Stack(
+                                                                children: [
+                                                                  CircleAvatar(
+                                                                    backgroundImage: NetworkImage(
+                                                                        !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
+                                                                  ),
+                                                                  (isSelected[index]) ?
+                                                                  const Positioned(
+                                                                      bottom: 1,
+                                                                      right: 5,
+                                                                      child: Icon(Icons.check_circle, size: 16,
+                                                                        color: Colors.cyan,)) :
+                                                                  const SizedBox(height: 0, width: 0,)
+                                                                ]
+                                                            ),
+                                                            onTap: (){
+                                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(chatId: userchat.chatId,)));
+                                                            },
                                                           ),
-                                                          (isSelected[index]) ?
-                                                          const Positioned(
-                                                              bottom: 1,
-                                                              right: 5,
-                                                              child: Icon(Icons.check_circle, size: 16,
-                                                                color: Colors.cyan,)) :
-                                                          const SizedBox(height: 0, width: 0,)
-                                                        ]
-                                                    ),
-                                                    onTap: (){
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(chatId: userchat.chatId,)));
-                                                    },
-                                                  ),
-                                                  title: Text((ind != -1) ? savedUsers[ind] : userchat
-                                                      .recipientPhoneNo),
-                                                  subtitle: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                                  trailing: SizedBox(
-                                                    height: 50,
-                                                    width: 80,
-                                                    child: Column(
-                                                      children: [
-                                                        Text((userchat.lastMessageTime == null
-                                                            ? ""
-                                                            : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
-                                                        Container(
-                                                          constraints: BoxConstraints(
-                                                              maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
-                                                          child: Row(
+                                                          title: Text((ind != -1) ? savedUsers[ind] : userchat
+                                                              .recipientPhoneNo),
+                                                          subtitle: IntrinsicWidth(
+                                                            child: Row(
+                                                              children: [
+                                                                Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                                const SizedBox(width: 10,),
+                                                                (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          trailing: SizedBox(
+                                                            height: 50,
+                                                            width: 80,
+                                                            child: Column(
+                                                              children: [
+                                                                Text((userchat.lastMessageTime == null
+                                                                    ? ""
+                                                                    : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
+                                                                Container(
+                                                                  constraints: BoxConstraints(
+                                                                      maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                                                          child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                                                      userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                                                      userchat.unreadMessageCount!=0? Container(
+                                                                        padding: const EdgeInsets.all(3),
+                                                                        decoration:
+                                                                      const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                                                        child:Text('${userchat.unreadMessageCount}',
+                                                                          style: const TextStyle(color: Colors.white70),) ,):
+                                                                      const SizedBox(width: 0,height: 0,)
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            if(trueCount!=0) {
+                                                              if (isSelected[index]) {
+                                                                setState(() {
+                                                                  if(!userchats[index].muted){
+                                                                    unMutedSelected.remove(index);
+
+                                                                  }
+                                                                  if(!userchats[index].pinned){
+                                                                    unPinnedSelected.remove(index);
+                                                                  }
+                                                                  isSelected[index] = false;
+                                                                  trueCount--;
+                                                                });
+                                                              }
+                                                              else{
+                                                                setState(() {
+                                                                  if(!userchats[index].muted){
+                                                                    unMutedSelected.add(index);
+                                                                  }
+                                                                  if(!userchats[index].pinned){
+                                                                    unPinnedSelected.add(index);
+                                                                  }
+
+                                                                  isSelected[index]=true;
+                                                                  trueCount++;
+                                                                });
+                                                              }
+
+                                                            }
+                                                            else{
+                                                              final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
+                                                              RemoteServices().updateUser(cid,
+                                                                  {'current':userchat.id});
+                                                            final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                                return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                              },));
+                                                            RemoteServices().updateUser(cid,{'current':result});
+                                                            current=null;
+                                                            }
+                                                          },
+                                                          onLongPress: () {
+
+                                                            if(isSelected[index]){
+                                                              setState(() {
+                                                                if(!userchats[index].muted){
+                                                                  unMutedSelected.remove(index);
+
+                                                                }
+                                                                if(!userchats[index].pinned){
+                                                                  unPinnedSelected.remove(index);
+                                                                }
+                                                                isSelected[index]=false;
+                                                                trueCount--;
+                                                              });
+
+                                                            }
+                                                            else{
+                                                              setState(() {
+                                                                if(!userchats[index].muted){
+                                                                  unMutedSelected.add(index);
+
+                                                                }
+                                                                if(!userchats[index].pinned){
+                                                                  unPinnedSelected.add(index);
+                                                                }
+                                                                isSelected[index]=true;
+                                                                trueCount++;
+                                                              });
+
+                                                            }
+
+                                                          },
+                                                        );
+                                                      }
+                                                    );
+                                                    }
+                                                    else{
+                                                      return ListTile(
+                                                        tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
+                                                        leading: InkWell(
+                                                          child: Stack(
+                                                              children: [
+                                                                CircleAvatar(
+                                                                  backgroundImage: NetworkImage(
+                                                                      !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
+                                                                ),
+                                                                (isSelected[index]) ?
+                                                                const Positioned(
+                                                                    bottom: 1,
+                                                                    right: 5,
+                                                                    child: Icon(Icons.check_circle, size: 16,
+                                                                      color: Colors.cyan,)) :
+                                                                const SizedBox(height: 0, width: 0,)
+                                                              ]
+                                                          ),
+                                                          onTap: (){
+                                                            Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(chatId: userchat.chatId,)));
+                                                          },
+                                                        ),
+                                                        title: Text((ind != -1) ? savedUsers[ind] : userchat
+                                                            .recipientPhoneNo),
+                                                        subtitle: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                        trailing: SizedBox(
+                                                          height: 50,
+                                                          width: 80,
+                                                          child: Column(
                                                             children: [
-                                                              userchat.pinned? Transform.rotate(angle: math.pi/7,
-                                                                  child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                                              userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                                              userchat.unreadMessageCount!=0? Container(
-                                                                padding: const EdgeInsets.all(3),
-                                                                decoration:
-                                                              const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                                                child:Text('${userchat.unreadMessageCount}',
-                                                                  style: const TextStyle(color: Colors.white70),) ,):
-                                                              const SizedBox(width: 0,height: 0,)
+                                                              Text((userchat.lastMessageTime == null
+                                                                  ? ""
+                                                                  : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
+                                                              Container(
+                                                                constraints: BoxConstraints(
+                                                                    maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
+                                                                child: Row(
+                                                                  children: [
+                                                                    userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                                                        child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                                                    userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                                                    userchat.unreadMessageCount!=0? Container(
+                                                                      padding: const EdgeInsets.all(3),
+                                                                      decoration:
+                                                                      const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                                                      child:Text('${userchat.unreadMessageCount}',
+                                                                        style: const TextStyle(color: Colors.white70),) ,):
+                                                                    const SizedBox(width: 0,height: 0,)
+                                                                  ],
+                                                                ),
+                                                              )
                                                             ],
                                                           ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  onTap: () async {
-                                                    if(trueCount!=0) {
-                                                      if (isSelected[index]) {
-                                                        setState(() {
-                                                          if(!userchats[index].muted){
-                                                            unMutedSelected.remove(index);
+                                                        ),
+                                                        onTap: () async {
+                                                          if(trueCount!=0) {
+                                                            if (isSelected[index]) {
+                                                              setState(() {
+                                                                if(!userchats[index].muted){
+                                                                  unMutedSelected.remove(index);
+
+                                                                }
+                                                                if(!userchats[index].pinned){
+                                                                  unPinnedSelected.remove(index);
+                                                                }
+                                                                isSelected[index] = false;
+                                                                trueCount--;
+                                                              });
+                                                            }
+                                                            else{
+                                                              setState(() {
+                                                                if(!userchats[index].muted){
+                                                                  unMutedSelected.add(index);
+                                                                }
+                                                                if(!userchats[index].pinned){
+                                                                  unPinnedSelected.add(index);
+                                                                }
+
+                                                                isSelected[index]=true;
+                                                                trueCount++;
+                                                              });
+                                                            }
 
                                                           }
-                                                          if(!userchats[index].pinned){
-                                                            unPinnedSelected.remove(index);
+                                                          else{
+                                                            final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
+                                                            RemoteServices().updateUser(cid,
+                                                                {'current':userchat.id});
+                                                            final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                              return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                            },));
+                                                            RemoteServices().updateUser(cid,{'current':result});
+                                                            current=null;
                                                           }
-                                                          isSelected[index] = false;
-                                                          trueCount--;
-                                                        });
-                                                      }
-                                                      else{
-                                                        setState(() {
-                                                          if(!userchats[index].muted){
-                                                            unMutedSelected.add(index);
+                                                        },
+                                                        onLongPress: () {
+
+                                                          if(isSelected[index]){
+                                                            setState(() {
+                                                              if(!userchats[index].muted){
+                                                                unMutedSelected.remove(index);
+
+                                                              }
+                                                              if(!userchats[index].pinned){
+                                                                unPinnedSelected.remove(index);
+                                                              }
+                                                              isSelected[index]=false;
+                                                              trueCount--;
+                                                            });
+
                                                           }
-                                                          if(!userchats[index].pinned){
-                                                            unPinnedSelected.add(index);
+                                                          else{
+                                                            setState(() {
+                                                              if(!userchats[index].muted){
+                                                                unMutedSelected.add(index);
+
+                                                              }
+                                                              if(!userchats[index].pinned){
+                                                                unPinnedSelected.add(index);
+                                                              }
+                                                              isSelected[index]=true;
+                                                              trueCount++;
+                                                            });
+
                                                           }
 
-                                                          isSelected[index]=true;
-                                                          trueCount++;
-                                                        });
-                                                      }
-
+                                                        },
+                                                      );
                                                     }
-                                                    else{
-                                                      final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
-                                                      RemoteServices().updateUser(cid,
-                                                          {'current':userchat.id});
-                                                    final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                        return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
-                                                      },));
-                                                    RemoteServices().updateUser(cid,{'current':result});
-                                                    }
-                                                  },
-                                                  onLongPress: () {
-
-                                                    if(isSelected[index]){
-                                                      setState(() {
-                                                        if(!userchats[index].muted){
-                                                          unMutedSelected.remove(index);
-
-                                                        }
-                                                        if(!userchats[index].pinned){
-                                                          unPinnedSelected.remove(index);
-                                                        }
-                                                        isSelected[index]=false;
-                                                        trueCount--;
-                                                      });
-
-                                                    }
-                                                    else{
-                                                      setState(() {
-                                                        if(!userchats[index].muted){
-                                                          unMutedSelected.add(index);
-
-                                                        }
-                                                        if(!userchats[index].pinned){
-                                                          unPinnedSelected.add(index);
-                                                        }
-                                                        isSelected[index]=true;
-                                                        trueCount++;
-                                                      });
-
-                                                    }
-
-                                                  },
-                                                );
-                                              }
-                                              else if(snapshot.hasError){
-                                                throw Exception("symmKey not found or ${snapshot.error}");
-                                              }
-                                              else{
-                                                return const SizedBox(
-                                                  height: 0,
-                                                );
-                                              }
+                                                  }
+                                                  else if(snapshot.hasError){
+                                                    throw Exception("symmKey not found or ${snapshot.error}");
+                                                  }
+                                                  else{
+                                                    return const SizedBox(
+                                                      height: 0,
+                                                    );
+                                                  }
+                                                },
+                                              );
                                             },
                                           );
                                         },
-                                      );
-                                    },
+                                      ),
+                                    ],
                                   );
                                 }
                                 else if(snapshot.hasError){
@@ -546,7 +699,153 @@ class _ChatsPageState extends State<ChatsPage> {
                                       message = encrypter.decrypt(
                                           encryptedMessage, iv: iv);
                                     }
-                                  return ListTile(
+                                    if(userchat.isSender) {
+                                      return StreamBuilder<UserChat>(
+                                          stream: RemoteServices().getUserChatStream(otheruserid, '$otheruserid$cid'),
+                                          builder: (context, snapshot) {
+                                            final UserChat? otherUserChat=snapshot.data;
+                                            final count=otherUserChat!.unreadMessageCount??0;
+                                            return ListTile(
+                                              tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
+                                              leading: InkWell(
+                                                child: Stack(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage: NetworkImage(
+                                                            !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
+                                                      ),
+                                                      (isSelected[index]) ?
+                                                      const Positioned(
+                                                          bottom: 1,
+                                                          right: 5,
+                                                          child: Icon(Icons.check_circle, size: 16,
+                                                            color: Colors.cyan,)) :
+                                                      const SizedBox(height: 0, width: 0,)
+                                                    ]
+                                                ),
+                                                onTap: (){
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>OtherUserProfilePage(chatId: userchat.chatId,)));
+                                                },
+                                              ),
+                                              title: Text((ind != -1) ? savedUsers[ind] : userchat
+                                                  .recipientPhoneNo),
+                                              subtitle: IntrinsicWidth(
+                                                child: Row(
+                                                  children: [
+                                                    Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                    const SizedBox(width: 10,),
+                                                    (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
+                                                  ],
+                                                ),
+                                              ),
+                                              trailing: SizedBox(
+                                                height: 50,
+                                                width: 80,
+                                                child: Column(
+                                                  children: [
+                                                    Text((userchat.lastMessageTime == null
+                                                        ? ""
+                                                        : "${userchat.lastMessageTime!.hour}:${userchat.lastMessageTime!.minute~/10}${userchat.lastMessageTime!.minute%10}")),
+                                                    Container(
+                                                      constraints: BoxConstraints(
+                                                          maxHeight:(userchat.unreadMessageCount!=0 || userchat.pinned||userchat.muted)?50:0 ),
+                                                      child: Row(
+                                                        children: [
+                                                          userchat.pinned? Transform.rotate(angle: math.pi/7,
+                                                              child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
+                                                          userchat.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
+                                                          userchat.unreadMessageCount!=0? Container(
+                                                            padding: const EdgeInsets.all(3),
+                                                            decoration:
+                                                            const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
+                                                            child:Text('${userchat.unreadMessageCount}',
+                                                              style: const TextStyle(color: Colors.white70),) ,):
+                                                          const SizedBox(width: 0,height: 0,)
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                if(trueCount!=0) {
+                                                  if (isSelected[index]) {
+                                                    setState(() {
+                                                      if(!userchats[index].muted){
+                                                        unMutedSelected.remove(index);
+
+                                                      }
+                                                      if(!userchats[index].pinned){
+                                                        unPinnedSelected.remove(index);
+                                                      }
+                                                      isSelected[index] = false;
+                                                      trueCount--;
+                                                    });
+                                                  }
+                                                  else{
+                                                    setState(() {
+                                                      if(!userchats[index].muted){
+                                                        unMutedSelected.add(index);
+                                                      }
+                                                      if(!userchats[index].pinned){
+                                                        unPinnedSelected.add(index);
+                                                      }
+
+                                                      isSelected[index]=true;
+                                                      trueCount++;
+                                                    });
+                                                  }
+
+                                                }
+                                                else{
+                                                  final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
+                                                  RemoteServices().updateUser(cid,
+                                                      {'current':userchat.id});
+                                                  final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                    return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                  },));
+                                                  RemoteServices().updateUser(cid,{'current':result});
+                                                  current=null;
+                                                }
+                                              },
+                                              onLongPress: () {
+
+                                                if(isSelected[index]){
+                                                  setState(() {
+                                                    if(!userchats[index].muted){
+                                                      unMutedSelected.remove(index);
+
+                                                    }
+                                                    if(!userchats[index].pinned){
+                                                      unPinnedSelected.remove(index);
+                                                    }
+                                                    isSelected[index]=false;
+                                                    trueCount--;
+                                                  });
+
+                                                }
+                                                else{
+                                                  setState(() {
+                                                    if(!userchats[index].muted){
+                                                      unMutedSelected.add(index);
+
+                                                    }
+                                                    if(!userchats[index].pinned){
+                                                      unPinnedSelected.add(index);
+                                                    }
+                                                    isSelected[index]=true;
+                                                    trueCount++;
+                                                  });
+
+                                                }
+
+                                              },
+                                            );
+                                          }
+                                      );
+                                    }
+                                    else {
+                                      return ListTile(
                                     tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                     leading: InkWell(
                                       child: Stack(
@@ -677,6 +976,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
                                     },
                                   );
+                                    }
                                 }
                                 else if(snapshot.hasError){
                                   throw Exception("symmKey not found or ${snapshot.error}");

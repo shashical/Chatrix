@@ -64,7 +64,7 @@ class _SearchWithinGroupState extends State<SearchWithinGroup> {
 
                           }
                         },
-                        icon: Icon(Icons.cancel_outlined),
+                        icon: const Icon(Icons.cancel_outlined),
                       ),
 
                       border: OutlineInputBorder(
@@ -87,7 +87,7 @@ class _SearchWithinGroupState extends State<SearchWithinGroup> {
                       return widget.ListItem[index];
                     }
                     else{
-                      return SizedBox(
+                      return const SizedBox(
                         height: 0,width: 0,
                       );
                     }

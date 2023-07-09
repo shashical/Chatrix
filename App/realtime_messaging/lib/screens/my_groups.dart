@@ -13,6 +13,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart' as rsa;
 import '../constants.dart';
+import 'home_page.dart';
 
 class GroupsPage extends StatefulWidget {
   @override
@@ -400,6 +401,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                             groupId: usergroup.groupId);
                                       },));
                                   RemoteServices().updateUser(cid, {'current':result});
+                                  current=null;
                                 }
                               },
                               onLongPress: (){
@@ -533,6 +535,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                     return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
                                   },));
                                   RemoteServices().updateUser(cid, {'current':result});
+                                  current=null;
                                 }
                               },
                               onLongPress: (){

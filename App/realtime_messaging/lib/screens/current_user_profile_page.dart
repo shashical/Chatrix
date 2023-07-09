@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:realtime_messaging/Models/userChats.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:io';
 import '../Models/users.dart';
@@ -22,6 +23,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
   bool photoUploading = false;
   bool nameUpdating = false;
   bool aboutUpdating = false;
+  List<UserChat> userchats=[];
   @override
   void initState() {
     // TODO: implement initState
@@ -64,8 +66,17 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
+                   SizedBox(
                     height: 22,
+                    child:StreamBuilder<List<UserChat>>(
+                      stream:RemoteServices().getUserChats(cid),
+                      builder: ((context,snapshot){
+                        if(snapshot.hasData){
+                          userchats=snapshot.data!;
+                        }
+                        return const SizedBox();
+                      }),
+                    )
                   ),
                   const Row(
                     children: [
@@ -146,6 +157,10 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                                 "photoUrl": photoUrl
                                               }).catchError(
                                                   (e) => throw Exception('$e'));
+                                              for( var x in userchats){
+                                                final otheruserid=x.id.substring(cid.length);
+                                                RemoteServices().updateUserChat(otheruserid, {'imageUrl':photoUrl}, x.id);
+                                              }
                                               setState(() {
                                                 currentUser!.photoUrl =
                                                     photoUrl;
@@ -169,6 +184,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                                 ..showSnackBar(SnackBar(
                                                     content: Text('$e')));
                                             }
+                                            _image=null;
                                           }
                                         },
                                         child: const Row(
@@ -207,9 +223,14 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                                 "photoUrl": photoUrl
                                               }).catchError(
                                                   (e) => throw Exception('$e'));
+                                              for( var x in userchats){
+                                                final otheruserid=x.id.substring(cid.length);
+                                                RemoteServices().updateUserChat(otheruserid, {'imageUrl':photoUrl}, x.id);
+                                              }
                                               setState(() {
                                                 photoUploading = false;
                                               });
+
                                             } on FirebaseException catch (e) {
                                               setState(() {
                                                 photoUploading = false;
@@ -229,6 +250,7 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                                 ..showSnackBar(SnackBar(
                                                     content: Text('$e')));
                                             }
+                                            _image=null;
                                           }
                                         },
                                         child: const Row(
@@ -263,6 +285,10 @@ class _CurrentUserProfilePageState extends State<CurrentUserProfilePage> {
                                                         "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"
                                                   }).catchError((e) =>
                                                       throw Exception('$e'));
+                                                  for( var x in userchats){
+                                                    final otheruserid=x.id.substring(cid.length);
+                                                    RemoteServices().updateUserChat(otheruserid, {'imageUrl':"https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1"}, x.id);
+                                                  }
                                                   setState(() {
                                                     currentUser!.photoUrl =
                                                         "https://th.bing.com/th/id/OIP.Ii15573m21uyos5SZQTdrAHaHa?pid=ImgDet&rs=1";

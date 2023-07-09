@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:realtime_messaging/theme_provider.dart';
 
@@ -99,6 +100,7 @@ class _SearchGroupState extends State<SearchGroup> {
                               groupId: widget.usergroup[index].groupId);
                         },));
                     RemoteServices().updateUser(cid, {'current':result});
+                    current=null;
 
                   },
 
@@ -130,6 +132,7 @@ class _SearchGroupState extends State<SearchGroup> {
                                 groupId: widget.usergroup[index].groupId);
                           },));
                       RemoteServices().updateUser(cid, {'current':result});
+                      current=null;
 
                     
 
