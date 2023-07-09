@@ -98,20 +98,10 @@ The group chat window functions similarly to the chat window, but the user inter
 
 The features in the group chat window are similar to those in the chat window, including the ability to send messages, use the attach icon to send files, access the pop-up menu, perform multiple message selection, and edit messages.
 
-Additionally, tapping on the app bar in the group chat window will direct you to the group information page. This page provides details and  such as the group name, members, and other group-related options.
-## Group Information Screen
-key features of this Screen
-Group Name and Description: The page prominently displays the name of the group, along with a description that provides a brief overview or purpose of the group.
+Additionally, tapping on the app bar in the group chat window will direct you to the group information page.
+## Group Information Page
+As the name suggests, this page shows you the details of the group. These include the group name and photo, metadata such as the group creator and the creation timestamp and also a list of participants of the group. The admins saved in your contacts are diplayed first followed by the ones that are not saved in your contacts and then come the non-admins in the similar order. Search functionality is provided for this list as well. Parameters such as group name and photo can only be edited by the admins.
 
-Number of Group Members: The page shows the total number of members present in the group.
-
-Group Image: Administrators of the group are allowed to change the group image. They can upload or choose an image to represent the group visually.
-
-List of Group Members: Following the group information, there is a list of group members displayed. Each member is usually represented by their username or profile picture.
-
-Search Functionality: A search icon is present before the list of members. This feature allows you to search for specific members within the group. You can search by entering a phone number or a name to find a particular member quickly.
-
-Member Interaction: Tapping on any member's profile in the list will direct you to the chat window, where you can initiate a chat with that specific member.
 
 
 
@@ -126,6 +116,6 @@ Member Interaction: Tapping on any member's profile in the list will direct you 
 
 # Important Note 
 
-Please provide required permissions for smooth functioning of app  
+Please provide the required permissions for smooth functioning of app.
 
  
