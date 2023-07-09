@@ -92,6 +92,8 @@ Tapping on the profile image within each chat will direct you to the profile pag
 
 **Message Editing:** By tapping on a specific message, you are provided with options to edit or correct it. This allows you to make changes to the content of a message sent by you. Note that you can do so only until the message is not read by the other user.
 
+ Tapping on the other user name/phone number (on the app bar) will take you to the other user's profile page.
+
  The send icon only appear when there is something to send in the text field 
 ## Group chat window
 The group chat window functions similarly to the chat window, but the user interface is designed differently to accommodate group conversations. When you open a group, the conversation among all the group members will be displayed.
@@ -100,7 +102,7 @@ The features in the group chat window are similar to those in the chat window, i
 
 Additionally, tapping on the app bar in the group chat window will direct you to the group information page.
 ## Group Information Page
-As the name suggests, this page shows you the details of the group. These include the group name and photo, metadata such as the group creator and the creation timestamp and also a list of participants of the group. The admins saved in your contacts are diplayed first followed by the ones that are not saved in your contacts and then come the non-admins in the similar order. Search functionality is provided for this list as well. Parameters such as group name and photo can only be edited by the admins.
+As the name suggests, this page shows you the details of the group. These include the group name and photo, metadata such as the group creator and the creation timestamp and also a list of participants of the group. The admins saved in your contacts are diplayed first followed by the ones that are not saved in your contacts and then come the non-admins in the similar order. Search functionality (by name/phone number) is provided for this list as well. Parameters such as group name and photo can only be edited by the admins.
 
 
 
