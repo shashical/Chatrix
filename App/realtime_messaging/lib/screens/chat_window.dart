@@ -67,7 +67,7 @@ class _DocBubleState extends State<DocBuble> {
         : Colors.greenAccent.shade100;
     dbg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
         ? const Color.fromARGB(255, 72, 69, 69)
-        : Colors.green;
+        : Color.fromARGB(255, 30, 75, 31);
     align = !widget.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     icon = widget.read ? Icons.done_all : Icons.done;
     radius = widget.isUser ? const BorderRadius.only(
@@ -298,7 +298,7 @@ class _ImageBubbleState extends State<ImageBubble> {
     super.initState();
     uploaded = widget.uploaded;
     downloaded=widget.downloaded;
-     dbg=widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Color.fromARGB(255, 72, 69, 69) : Colors.green;
+     dbg=widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Color.fromARGB(255, 72, 69, 69) : Color.fromARGB(255, 30, 75, 31);
     bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
         ? Colors.white
         : Colors.greenAccent.shade100;
@@ -500,7 +500,7 @@ class MyBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg =isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? Colors.white : Colors.greenAccent.shade100;
-    final dbg=isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? const Color.fromARGB(255, 72, 69, 69) : Colors.green;
+    final dbg=isSelected?Colors.lightBlue.withOpacity(0.5): !isUser ? const Color.fromARGB(255, 72, 69, 69) : Color.fromARGB(255, 30, 75, 31);
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = read ? Icons.done_all : Icons.done;
     final radius = !isUser
@@ -985,1113 +985,1118 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                 //
                 // ],
               ),
-              body: Container(
-                decoration: BoxDecoration(
-                  image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
-                    image:FileImage(File(backgroundImage)),
-                    fit: BoxFit.cover,
-                  ):DecorationImage(image: AssetImage(backgroundImage),
-                    fit: BoxFit.cover
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 1,
-                      child:StreamBuilder<Users>(
-                        stream: RemoteServices().getUserStream(widget.otherUserId),
-                        builder:( (context,snapshot){
-                          if(snapshot.hasData){
-                            if(snapshot.data?.isOnline != otherUserStream?.isOnline || snapshot.data?.current!=otherUserStream?.current) {
-
-                              otherUserStream = snapshot.data;
-                              WidgetsBinding.instance.addPostFrameCallback((
-                                  timeStamp) {
-                                setState(() {
-
-                                });
-                              });
-                            }
-                          }
-                          return const SizedBox();
-                        }),
-                      ) ,
-                    ),
-                    Flexible(
-                      child: StreamBuilder<List<ChatMessage>>(
-                        stream: (chatid == null
-                            ? null
-                            : ChatsRemoteServices().getChatMessages(chatid!)),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-
-
-                             chatmessages = snapshot.data!.reversed.toList();
-
-                            if(myMessageLength!=chatmessages.length){
-                              myMessageLength=chatmessages.length;
-                              isSelected=List.filled(myMessageLength, false);
-                              RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
-                              debugPrint('counting valuessssss');
-
-                              trueCount=0;
-                              bgIndex=0;
-                              if(!assigned){
-                                assigned=true;
-                                bgIndex=-1;
-                              }
-
-
-                            }
-                            while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
-                              if(chatmessages[fgIndex].senderId!=cid) {
-                                ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
-                              }
-                              fgIndex++;
-
-                            }
-                            //fgIndex=chatmessages.length;
-                            while(bgIndex>=0){
-                              if(chatmessages[bgIndex].senderId==cid){
-                                ouumc++;
-
-                              }
-                              else{
-
-                                ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
-                              }
-                              bgIndex--;
-
-                            }
-                            debugPrint('yes printinggggggggg');
-
-
-                            // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
-                            // debugPrint('unread${unreadMessageCount+ouumc}');
-                            // return ListView.builder(
-                            //   itemCount: chatmessages.length,
-                            //   itemBuilder: (context, index) {
-                            //     final ChatMessage chatmessage = chatmessages[index];
-                            //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
-                            //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
-                            //       if(chatmessage.delivered==false){
-                            //         if(!event.metadata.hasPendingWrites){
-                            //           chatmessage.delivered = true;
-                            //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
-                            //         }
-                            //       }
-                            //     });
-                            //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
-                            //   },
-                            // );
-
-
-
-                            //   Widget listBuilder=ListView.builder(
-                            //   controller: scrollController,
-                            //   itemCount: chatmessages.length,
-                            //   itemBuilder: (context, index) {
-                            //     final ChatMessage chatmessage = chatmessages[index];
-                            //     if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
-                            //       return MyBubble(
-                            //           message: chatmessage.text,
-                            //           time:
-                            //               ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                            //           delivered: chatmessage.delivered,
-                            //           isUser: (chatmessage.senderId == cid),
-                            //           read: chatmessage.read);
-                            //     } else {
-                            //       return const SizedBox(
-                            //         height: 0,
-                            //       );
-                            //     }
-                            //   },
-                            // );
-
-                            return StreamBuilder<UserChat>(
-                              stream: RemoteServices().getUserChatStream(otheruser.id, '${otheruser.id}$cid'),
-                                builder: (context,snapshot){
-                                if(snapshot.hasData){
-                                debugPrint("i am here");
-                                  otherUserChat=snapshot.data;
-                                  unreadMessageCount=otherUserChat?.unreadMessageCount??0;
-                                  debugPrint("before $ouumc");
-                                  if(ouumc!=0) {
-                                    debugPrint("current $ouumc");
-                                    RemoteServices().updateUserChat(widget.otherUserId,
-                                      {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
-                                  }
-                                  debugPrint("after $ouumc");
-                                  ouumc=0;
-                                  debugPrint(' after $ouumc');
-                                  //debugPrint('$ouumc');
-                                }
-                                Widget listBuilder=ListView.builder(
-                                  //controller: scrollController,
-                                  reverse: true,
-                                  itemCount: chatmessages.length,
-                                  itemBuilder: (context, index) {
-                                    final ChatMessage chatmessage = chatmessages[index];
-                                    if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
-                                      String? symmKeyString;
-                                      return FutureBuilder(
-                                        future: const FlutterSecureStorage().read(key: chatid!),
-                                        builder: (context, snapshot) {
-                                          String message='';
-                                          if(snapshot.hasData){
-                                            if(chatmessage.text!='')
-                                            {symmKeyString = snapshot.data;
-                                            encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                            encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
-                                            encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
-                                            message = encrypter.decrypt(encryptedMessage,iv: iv);}
-                                            // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                                            //   scrollController.animateTo(
-                                            //     scrollController.position.maxScrollExtent + 60,
-                                            //     duration: const Duration(milliseconds: 300),
-                                            //     curve: Curves.easeOut,
-                                            //   );
-                                            //   debugPrint('done dona-done');
-                                            // }) ;
-
-
-
-                                            return GestureDetector(
-                                              child:(chatmessage.contentType=='text')?MyBubble(
-                                                message: message,
-                                                time:
-                                                ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                                delivered: chatmessage.delivered,
-                                                isUser: (chatmessage.senderId == cid),
-                                                read: chatmessage.read,
-                                                isSelected: isSelected[index],
-                                              ):
-                                              (chatmessage.contentType=='image')?(chatmessage.uploaded)?
-                                              ImageBubble(message:message,
-                                                  time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                                  isUser: (cid==chatmessage.senderId),
-                                                  delivered: chatmessage.delivered, read: chatmessage.read,
-                                                  isSelected: isSelected[index],
-                                                  uploaded: chatmessage.uploaded,
-                                                  downloaded: chatmessage.downloaded,
-                                                  senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
-                                                  chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):
-                                              (cid==chatmessage.senderId)?ImageBubble(message:message,
-                                                  time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                                  isUser: (cid==chatmessage.senderId),
-                                                  delivered: chatmessage.delivered, read: chatmessage.read,
-                                                  isSelected: isSelected[index],
-                                                  uploaded: chatmessage.uploaded,
-                                                  downloaded: chatmessage.downloaded,
-                                                  senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
-                                                  chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):const SizedBox(height: 0,):
-                                              (chatmessage.uploaded)?DocBuble(message: message,
-                                                  time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
-                                                  , senderUrl: chatmessage.senderUrl??'',
-                                                  id: chatmessage.id,
-                                                  chatId: chatid!,
-                                                  receiverUrl: chatmessage.receiverUrl??'',
-                                                  isUser: (cid==chatmessage.senderId),
-                                                  delivered: chatmessage.delivered,
-                                                  read: chatmessage.read,
-                                                  isSelected: isSelected[index], uploaded: chatmessage.uploaded,
-                                                  downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
-                                                  :(cid==chatmessage.senderId)?
-                                              DocBuble(message: message,
-                                                  time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
-                                                  , senderUrl: chatmessage.senderUrl??'',
-                                                  id: chatmessage.id,
-                                                  chatId: chatid!,
-                                                  receiverUrl: chatmessage.receiverUrl??'',
-                                                  isUser: (cid==chatmessage.senderId),
-                                                  delivered: chatmessage.delivered,
-                                                  read: chatmessage.read,
-                                                  isSelected: isSelected[index], uploaded: chatmessage.uploaded,
-                                                  downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
-                                                  :const SizedBox(height: 0,)
-                                              ,
-                                              onTap: () {
-
-                                                if (trueCount != 0) {
-                                                  setState(() {
-
-
-                                                    if (isSelected[index]) {
-                                                      isSelected[index] = false;
-                                                      trueCount--;
-                                                      if(chatmessage.senderId!=cid){
-                                                        otherUserChatSelected.remove(index);
-                                                      }
-                                                      if(chatmessage.contentType!='text'){
-                                                        if(chatmessage.senderId!=cid){
-                                                          if(!chatmessage.downloaded){
-                                                            unStarableSelected.remove(index);
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                    else {
-                                                      trueCount++;
-                                                      isSelected[index] = true;
-                                                      if(chatmessage.senderId!=cid){
-                                                        otherUserChatSelected.add(index);
-                                                      }
-                                                      if(chatmessage.contentType!='text'){
-                                                        if(chatmessage.senderId!=cid){
-                                                          if(!chatmessage.downloaded){
-                                                            unStarableSelected.add(index);
-                                                          }
-                                                        }
-                                                      }
-                                                    } });
-                                                }
-                                                else if(cid==chatmessage.senderId  && chatmessage.contentType=='text' && !chatmessage.edited){
-                                                      SimpleDialog alert=SimpleDialog(
-                                                        children: [
-                                                          SimpleDialogOption(
-                                                            child: const Row(
-                                                              children: [
-                                                                Icon(Icons.edit),
-                                                                Text('edit message'),
-                                                              ],
-                                                            ),
-                                                            onPressed: (){
-
-                                                              setState(() {
-                                                                isEditing=true;
-                                                                messageController.text=message;
-                                                                editingId=chatmessage.id;
-                                                              });
-                                                              Navigator.of(context,rootNavigator: true).pop();
-                                                            },
-                                                          )
-
-
-                                                        ],
-                                                      ) ;
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) => alert,
-                                                        barrierDismissible: true,
-                                                      );
-                                                }
-                                              },
-                                              onLongPress: (){
-                                                setState(() {
-                                                  if(isSelected[index]){
-                                                    isSelected[index]=false;
-                                                    trueCount--;
-                                                    if(chatmessage.senderId!=cid){
-                                                      otherUserChatSelected.remove(index);
-                                                    }
-                                                    if(chatmessage.contentType!='text'){
-                                                      if(chatmessage.senderId!=cid){
-                                                        if(!chatmessage.downloaded){
-                                                          unStarableSelected.remove(index);
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                  else{
-                                                    trueCount++;
-                                                    isSelected[index]=true;
-                                                    if(chatmessage.senderId!=cid){
-                                                      otherUserChatSelected.add(index);
-                                                    }
-                                                    if(chatmessage.contentType!='text'){
-                                                      if(chatmessage.senderId!=cid){
-                                                        if(!chatmessage.downloaded){
-                                                          unStarableSelected.add(index);
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                });
-                                              },);
-
-                                          }
-                                          else if(snapshot.hasError){
-                                            throw Exception('symmKey not found. or ${snapshot.error}');
-                                          }
-                                          else{
-                                            // throw Exception("symmKey not found.");
-                                            return const SizedBox(
-                                              height: 0,
-                                            );
-                                          }
-                                        },
-                                        // (chatmessage) != null?(chatmessage.contentType=='image')?
-                                        // ImageBubble(message: chatmessage.text,
-                                        //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
-                                        //     isUser: cid==chatmessage.senderId,
-                                        //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
-                                        //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
-                                        //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
-                                        //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
-
-                                      );
-                                    } else {
-                                      return const SizedBox(
-                                        height: 0,
-                                      );
-                                    }
-                                  },
-                                );
-
-                                return listBuilder;
-                                }
-                            );
-
-
-                          } else {
-                            return const Center(child: Text("No conversations yet."));
-                          }
-                        },
+              body: Builder(
+                builder: (context) {
+                  final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+                  return Container(
+                    decoration: BoxDecoration(
+                      image:!(backgroundImage=='assets/backgroundimage.png')? DecorationImage(
+                        image:FileImage(File(backgroundImage)),
+                        fit: BoxFit.cover,
+                      ):DecorationImage(image: (themeProvider.isDarkMode?AssetImage('assets/backgroundimagedark.png'):AssetImage(backgroundImage)),
+                        fit: BoxFit.cover
                       ),
                     ),
-                    // (youBlocked)?const Center(
-                    //   child: Text('you have blocked this chat unblock to continue !'),
-                    // ):(otherBlocked)?Center(child: Text('${savedUsers[savedNumber.indexOf(otheruser.phoneNo)]} has blocked you !'),):const SizedBox(height: 0,),
-                    Builder(
-                      builder: (context) {
-                        final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-                        return Container(
-                          constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.95),
-                          margin: const EdgeInsets.all(8.0),
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
-                            borderRadius: BorderRadius.circular(24.0),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    minHeight: 0,
-                                    maxHeight: 153,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 16.0),
-                                    child: TextField(
-                                      style: const TextStyle(fontSize: 19),
-                                      maxLines: null,
-                                    //  readOnly: (youBlocked ||otherBlocked),
-                                      controller: messageController,
-                                      onChanged: (e){
-                                        setState(() {
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 1,
+                          child:StreamBuilder<Users>(
+                            stream: RemoteServices().getUserStream(widget.otherUserId),
+                            builder:( (context,snapshot){
+                              if(snapshot.hasData){
+                                if(snapshot.data?.isOnline != otherUserStream?.isOnline || snapshot.data?.current!=otherUserStream?.current) {
 
-                                        });
-                                        // if(messageController.text.length ==1||messageController.text.length==2 || messageController.text.isEmpty){
-                                        //   setState(() {
-                                        //
-                                        //   });
-                                        // }
+                                  otherUserStream = snapshot.data;
+                                  WidgetsBinding.instance.addPostFrameCallback((
+                                      timeStamp) {
+                                    setState(() {
+
+                                    });
+                                  });
+                                }
+                              }
+                              return const SizedBox();
+                            }),
+                          ) ,
+                        ),
+                        Flexible(
+                          child: StreamBuilder<List<ChatMessage>>(
+                            stream: (chatid == null
+                                ? null
+                                : ChatsRemoteServices().getChatMessages(chatid!)),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+
+
+                                 chatmessages = snapshot.data!.reversed.toList();
+
+                                if(myMessageLength!=chatmessages.length){
+                                  myMessageLength=chatmessages.length;
+                                  isSelected=List.filled(myMessageLength, false);
+                                  RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
+                                  debugPrint('counting valuessssss');
+
+                                  trueCount=0;
+                                  bgIndex=0;
+                                  if(!assigned){
+                                    assigned=true;
+                                    bgIndex=-1;
+                                  }
+
+
+                                }
+                                while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
+                                  if(chatmessages[fgIndex].senderId!=cid) {
+                                    ChatsRemoteServices().updateChatMessage(chatid!, {'read':true}, chatmessages[fgIndex].id);
+                                  }
+                                  fgIndex++;
+
+                                }
+                                //fgIndex=chatmessages.length;
+                                while(bgIndex>=0){
+                                  if(chatmessages[bgIndex].senderId==cid){
+                                    ouumc++;
+
+                                  }
+                                  else{
+
+                                    ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
+                                  }
+                                  bgIndex--;
+
+                                }
+                                debugPrint('yes printinggggggggg');
+
+
+                                // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
+                                // debugPrint('unread${unreadMessageCount+ouumc}');
+                                // return ListView.builder(
+                                //   itemCount: chatmessages.length,
+                                //   itemBuilder: (context, index) {
+                                //     final ChatMessage chatmessage = chatmessages[index];
+                                //     final docRef = FirebaseFirestore.instance.collection("chats").doc(chatmessage.id);
+                                //     docRef.snapshots(includeMetadataChanges: true).listen((event) async{
+                                //       if(chatmessage.delivered==false){
+                                //         if(!event.metadata.hasPendingWrites){
+                                //           chatmessage.delivered = true;
+                                //           await FirebaseFirestore.instance.collection("chats/$chatid/chatMessages").doc(chatmessage.id).update({"delivered":true});
+                                //         }
+                                //       }
+                                //     });
+                                //     return MyBubble(message: chatmessage.text, time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute}"), delivered: chatmessage.delivered, isUser: (chatmessage.senderId==cid), read: chatmessage.read);
+                                //   },
+                                // );
+
+
+
+                                //   Widget listBuilder=ListView.builder(
+                                //   controller: scrollController,
+                                //   itemCount: chatmessages.length,
+                                //   itemBuilder: (context, index) {
+                                //     final ChatMessage chatmessage = chatmessages[index];
+                                //     if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                                //       return MyBubble(
+                                //           message: chatmessage.text,
+                                //           time:
+                                //               ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                //           delivered: chatmessage.delivered,
+                                //           isUser: (chatmessage.senderId == cid),
+                                //           read: chatmessage.read);
+                                //     } else {
+                                //       return const SizedBox(
+                                //         height: 0,
+                                //       );
+                                //     }
+                                //   },
+                                // );
+
+                                return StreamBuilder<UserChat>(
+                                  stream: RemoteServices().getUserChatStream(otheruser.id, '${otheruser.id}$cid'),
+                                    builder: (context,snapshot){
+                                    if(snapshot.hasData){
+                                    debugPrint("i am here");
+                                      otherUserChat=snapshot.data;
+                                      unreadMessageCount=otherUserChat?.unreadMessageCount??0;
+                                      debugPrint("before $ouumc");
+                                      if(ouumc!=0) {
+                                        debugPrint("current $ouumc");
+                                        RemoteServices().updateUserChat(widget.otherUserId,
+                                          {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
+                                      }
+                                      debugPrint("after $ouumc");
+                                      ouumc=0;
+                                      debugPrint(' after $ouumc');
+                                      //debugPrint('$ouumc');
+                                    }
+                                    Widget listBuilder=ListView.builder(
+                                      //controller: scrollController,
+                                      reverse: true,
+                                      itemCount: chatmessages.length,
+                                      itemBuilder: (context, index) {
+                                        final ChatMessage chatmessage = chatmessages[index];
+                                        if (chatmessage.deletedForMe[cid] == null && chatmessage.deletedForEveryone == false) {
+                                          String? symmKeyString;
+                                          return FutureBuilder(
+                                            future: const FlutterSecureStorage().read(key: chatid!),
+                                            builder: (context, snapshot) {
+                                              String message='';
+                                              if(snapshot.hasData){
+                                                if(chatmessage.text!='')
+                                                {symmKeyString = snapshot.data;
+                                                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
+                                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessage.text);
+                                                message = encrypter.decrypt(encryptedMessage,iv: iv);}
+                                                // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                                                //   scrollController.animateTo(
+                                                //     scrollController.position.maxScrollExtent + 60,
+                                                //     duration: const Duration(milliseconds: 300),
+                                                //     curve: Curves.easeOut,
+                                                //   );
+                                                //   debugPrint('done dona-done');
+                                                // }) ;
+
+
+
+                                                return GestureDetector(
+                                                  child:(chatmessage.contentType=='text')?MyBubble(
+                                                    message: message,
+                                                    time:
+                                                    ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                                    delivered: chatmessage.delivered,
+                                                    isUser: (chatmessage.senderId == cid),
+                                                    read: chatmessage.read,
+                                                    isSelected: isSelected[index],
+                                                  ):
+                                                  (chatmessage.contentType=='image')?(chatmessage.uploaded)?
+                                                  ImageBubble(message:message,
+                                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                                      isUser: (cid==chatmessage.senderId),
+                                                      delivered: chatmessage.delivered, read: chatmessage.read,
+                                                      isSelected: isSelected[index],
+                                                      uploaded: chatmessage.uploaded,
+                                                      downloaded: chatmessage.downloaded,
+                                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):
+                                                  (cid==chatmessage.senderId)?ImageBubble(message:message,
+                                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                                      isUser: (cid==chatmessage.senderId),
+                                                      delivered: chatmessage.delivered, read: chatmessage.read,
+                                                      isSelected: isSelected[index],
+                                                      uploaded: chatmessage.uploaded,
+                                                      downloaded: chatmessage.downloaded,
+                                                      senderUrl: chatmessage.senderUrl??'', id: chatmessage.id,
+                                                      chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):const SizedBox(height: 0,):
+                                                  (chatmessage.uploaded)?DocBuble(message: message,
+                                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                                      , senderUrl: chatmessage.senderUrl??'',
+                                                      id: chatmessage.id,
+                                                      chatId: chatid!,
+                                                      receiverUrl: chatmessage.receiverUrl??'',
+                                                      isUser: (cid==chatmessage.senderId),
+                                                      delivered: chatmessage.delivered,
+                                                      read: chatmessage.read,
+                                                      isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                                      downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                                      :(cid==chatmessage.senderId)?
+                                                  DocBuble(message: message,
+                                                      time: ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}")
+                                                      , senderUrl: chatmessage.senderUrl??'',
+                                                      id: chatmessage.id,
+                                                      chatId: chatid!,
+                                                      receiverUrl: chatmessage.receiverUrl??'',
+                                                      isUser: (cid==chatmessage.senderId),
+                                                      delivered: chatmessage.delivered,
+                                                      read: chatmessage.read,
+                                                      isSelected: isSelected[index], uploaded: chatmessage.uploaded,
+                                                      downloaded: chatmessage.downloaded, contentType: chatmessage.contentType)
+                                                      :const SizedBox(height: 0,)
+                                                  ,
+                                                  onTap: () {
+
+                                                    if (trueCount != 0) {
+                                                      setState(() {
+
+
+                                                        if (isSelected[index]) {
+                                                          isSelected[index] = false;
+                                                          trueCount--;
+                                                          if(chatmessage.senderId!=cid){
+                                                            otherUserChatSelected.remove(index);
+                                                          }
+                                                          if(chatmessage.contentType!='text'){
+                                                            if(chatmessage.senderId!=cid){
+                                                              if(!chatmessage.downloaded){
+                                                                unStarableSelected.remove(index);
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                        else {
+                                                          trueCount++;
+                                                          isSelected[index] = true;
+                                                          if(chatmessage.senderId!=cid){
+                                                            otherUserChatSelected.add(index);
+                                                          }
+                                                          if(chatmessage.contentType!='text'){
+                                                            if(chatmessage.senderId!=cid){
+                                                              if(!chatmessage.downloaded){
+                                                                unStarableSelected.add(index);
+                                                              }
+                                                            }
+                                                          }
+                                                        } });
+                                                    }
+                                                    else if(cid==chatmessage.senderId  && chatmessage.contentType=='text' && !chatmessage.edited){
+                                                          SimpleDialog alert=SimpleDialog(
+                                                            children: [
+                                                              SimpleDialogOption(
+                                                                child: const Row(
+                                                                  children: [
+                                                                    Icon(Icons.edit),
+                                                                    Text('edit message'),
+                                                                  ],
+                                                                ),
+                                                                onPressed: (){
+
+                                                                  setState(() {
+                                                                    isEditing=true;
+                                                                    messageController.text=message;
+                                                                    editingId=chatmessage.id;
+                                                                  });
+                                                                  Navigator.of(context,rootNavigator: true).pop();
+                                                                },
+                                                              )
+
+
+                                                            ],
+                                                          ) ;
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (context) => alert,
+                                                            barrierDismissible: true,
+                                                          );
+                                                    }
+                                                  },
+                                                  onLongPress: (){
+                                                    setState(() {
+                                                      if(isSelected[index]){
+                                                        isSelected[index]=false;
+                                                        trueCount--;
+                                                        if(chatmessage.senderId!=cid){
+                                                          otherUserChatSelected.remove(index);
+                                                        }
+                                                        if(chatmessage.contentType!='text'){
+                                                          if(chatmessage.senderId!=cid){
+                                                            if(!chatmessage.downloaded){
+                                                              unStarableSelected.remove(index);
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                      else{
+                                                        trueCount++;
+                                                        isSelected[index]=true;
+                                                        if(chatmessage.senderId!=cid){
+                                                          otherUserChatSelected.add(index);
+                                                        }
+                                                        if(chatmessage.contentType!='text'){
+                                                          if(chatmessage.senderId!=cid){
+                                                            if(!chatmessage.downloaded){
+                                                              unStarableSelected.add(index);
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    });
+                                                  },);
+
+                                              }
+                                              else if(snapshot.hasError){
+                                                throw Exception('symmKey not found. or ${snapshot.error}');
+                                              }
+                                              else{
+                                                // throw Exception("symmKey not found.");
+                                                return const SizedBox(
+                                                  height: 0,
+                                                );
+                                              }
+                                            },
+                                            // (chatmessage) != null?(chatmessage.contentType=='image')?
+                                            // ImageBubble(message: chatmessage.text,
+                                            //     time:("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
+                                            //     isUser: cid==chatmessage.senderId,
+                                            //     delivered: chatmessage.delivered, read: chatmessage.read, isSelected: isSelected[index],
+                                            //     uploaded: chatmessage.uploaded, downloaded: chatmessage.downloaded,
+                                            //     senderUrl: chatmessage.senderUrl!, id: chatmessage.id,
+                                            //     chatId: chatid!, receiverUrl: chatmessage.receiverUrl??''):SizedBox():SizedBox(),
+
+                                          );
+                                        } else {
+                                          return const SizedBox(
+                                            height: 0,
+                                          );
+                                        }
                                       },
+                                    );
 
-                                      decoration: const InputDecoration(
-                                        hintText: 'Type here',
-                                        border: InputBorder.none,
+                                    return listBuilder;
+                                    }
+                                );
+
+
+                              } else {
+                                return const Center(child: Text("No conversations yet."));
+                              }
+                            },
+                          ),
+                        ),
+                        // (youBlocked)?const Center(
+                        //   child: Text('you have blocked this chat unblock to continue !'),
+                        // ):(otherBlocked)?Center(child: Text('${savedUsers[savedNumber.indexOf(otheruser.phoneNo)]} has blocked you !'),):const SizedBox(height: 0,),
+                        Builder(
+                          builder: (context) {
+                            final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+                            return Container(
+                              constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width * 0.95),
+                              margin: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        minHeight: 0,
+                                        maxHeight: 153,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 16.0),
+                                        child: TextField(
+                                          style: const TextStyle(fontSize: 19),
+                                          maxLines: null,
+                                        //  readOnly: (youBlocked ||otherBlocked),
+                                          controller: messageController,
+                                          onChanged: (e){
+                                            setState(() {
+
+                                            });
+                                            // if(messageController.text.length ==1||messageController.text.length==2 || messageController.text.isEmpty){
+                                            //   setState(() {
+                                            //
+                                            //   });
+                                            // }
+                                          },
+
+                                          decoration: const InputDecoration(
+                                            hintText: 'Type here',
+                                            border: InputBorder.none,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: Transform.rotate(angle: math.pi/7,
-                                child: const Icon(Icons.attach_file)),
-                                onPressed: () {
-                                  SimpleDialog alert = SimpleDialog(
-                                    title: const Text("Choose an action"),
-                                    children: [
-                                      SimpleDialogOption(
-                                        onPressed: () async {
-                                          final files=await ChatsRemoteServices().pickDocument();
-                                          Navigator.of(context,rootNavigator: true).pop();
-                                          if(files!=null){
+                                  IconButton(
+                                    icon: Transform.rotate(angle: math.pi/7,
+                                    child: const Icon(Icons.attach_file)),
+                                    onPressed: () {
+                                      SimpleDialog alert = SimpleDialog(
+                                        title: const Text("Choose an action"),
+                                        children: [
+                                          SimpleDialogOption(
+                                            onPressed: () async {
+                                              final files=await ChatsRemoteServices().pickDocument();
+                                              Navigator.of(context,rootNavigator: true).pop();
+                                              if(files!=null){
 
-                                            if (chatid == null) {
-                                              await ChatsRemoteServices().setChat(Chat(
-                                                id: "$cid${otheruser.id}",
-                                                participantIds: [cid, otheruser.id],
-                                              ));
-                                              await RemoteServices().setUserChat(
-                                        cid,
-                                        UserChat(
-                                            id: "$cid${widget.otherUserId}",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: otheruser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: otheruser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                            lastMessageTime: DateTime.now(),
-                                            ));
-                                    encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
-                                    String symmKeyString = symmKey.base64;
-                                    RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
-                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
-                                    encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
-                                    String encrytedSymmKeyString = encryptedSymmKey.base64;
-                                    final Users currentuser =
-                                        (await RemoteServices().getSingleUser(cid))!;
-                                    await RemoteServices().setUserChat(
-                                        otheruser.id,
-                                        UserChat(
-                                            id: "${widget.otherUserId}$cid",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: currentuser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: currentuser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                            containsSymmKey: encrytedSymmKeyString,
-                                          lastMessageTime: DateTime.now(),
-                                            ));
-                                    await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
-                                              setState(() {
-                                              chatid = "$cid${otheruser.id}";
-                                            });
-                                            }
-                                            await RemoteServices().setUserChat(
-                                                cid,
-                                                UserChat(
-                                                  id: "$cid${otheruser.id}",
-                                                  chatId: chatid!,
-                                                  recipientPhoto: otheruser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo:otheruser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  lastMessageTime: DateTime.now(),
-                                                ));
-                                            final Users currentuser =
-                                            (await RemoteServices().getSingleUser(cid))!;
-                                            await RemoteServices().setUserChat(
-                                               otheruser.id,
-                                                UserChat(
-                                                  id: "${otheruser.id}$cid",
-                                                  chatId: chatid!,
-                                                  recipientPhoto: currentuser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo: currentuser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  lastMessageTime: DateTime.now()
-                                                ));
-
-
-
-
-
-                                            //     if(!done){
-                                            //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
-                                            //   if(!docsnap.exists){
-                                            //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
-                                            //     await RemoteServices().setUserChat(widget.otheruser.id,
-                                            //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
-                                            //     );
-                                            //   }
-                                            // }
-
-
-
-
-
-                                            for (int i = 0; i < files.files.length; i++) {
-                                              // firebase_storage.Reference ref =
-                                              // firebase_storage.FirebaseStorage.instance.ref(
-                                              //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
-                                              // uploadTask.add(ref.putFile(File(widget.result.files[i]
-                                              //     .path!)));
-                                              // await Future.value(uploadTask);
-                                              //
-                                              // final docUrl=await ref.getDownloadURL();
-                                              await ChatsRemoteServices().setChatMessage(
-                                                  chatid!,
-                                                  ChatMessage(
-                                                      id: "${DateTime.now().microsecondsSinceEpoch}",
-                                                      senderId: cid,
-                                                      text: '',
-                                                      contentType: "document ${files.files[i].name}",
-                                                      timestamp: DateTime.now(),
-                                                      senderUrl: files.paths[i]!));
-
-                                            }
-                                            // DocumentSnapshot docsnap = await FirebaseFirestore.instance
-                                            //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
-                                            // if(!docsnap.exists){
-                                            //   await RemoteServices().setUserChat(cid,
-                                            //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
-                                            //   );
-                                            //
-                                            // }
-                                              //debugPrint(' printing filels   ${files}');
-                                            RemoteServices().updateUserChat(
-                                                cid,
-                                                {
-                                                  'lastMessage': (files.files[files.files.length-1].name.length >
-                                                      100)
-                                                      ?files.files[files.files.length-1].name.substring(0, 100)
-                                                      : files.files[files.files.length-1].name,
-                                                  'lastMessageType': "document",
-                                                  'lastMessageTime': DateTime.now().toIso8601String().length,
-                                                  'isSender':true
-                                                },
-                                                "$cid${otheruser.id}");
-                                            RemoteServices().updateUserChat(
-                                                widget.otherUserId,
-                                                {
-                                                  'lastMessage': (files.files[files.files.length-1].name.length >
-                                                      100)
-                                                      ?files.files[files.files.length-1].name.substring(0, 100)
-                                                      : files.files[files.files.length-1].name,
-                                                  'lastMessageType': "document",
-                                                  'lastMessageTime': DateTime.now().toIso8601String(),
-                                                  'isSender':false
-                                                },
-                                                "${widget.otherUserId}$cid");
-
-                                           }
-
-                                        },
-                                        child: const Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.doc,
-                                              color: Colors.blue,
-                                            ),
-                                            SizedBox(width: 8.0),
-                                            Text(
-                                              "Send document",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SimpleDialogOption(
-                                        onPressed: () async {
-                                          await getImage(ImageSource.camera);
-                                          if(_image!=null){
-
-                                            if (chatid == null) {
-                                              await ChatsRemoteServices().setChat(Chat(
-                                                id: "$cid${otheruser.id}",
-                                                participantIds: [cid, otheruser.id],
-                                              ));
-                                              await RemoteServices().setUserChat(
-                                        cid,
-                                        UserChat(
-                                            id: "$cid${widget.otherUserId}",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: otheruser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: otheruser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                          lastMessageTime: DateTime.now()
-                                            ));
-                                    encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
-                                    String symmKeyString = symmKey.base64;
-                                    RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
-                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
-                                    encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
-                                    String encrytedSymmKeyString = encryptedSymmKey.base64;
-                                    final Users currentuser =
-                                        (await RemoteServices().getSingleUser(cid))!;
-                                    await RemoteServices().setUserChat(
-                                        otheruser.id,
-                                        UserChat(
-                                            id: "${widget.otherUserId}$cid",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: currentuser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: currentuser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                            containsSymmKey: encrytedSymmKeyString,
-                                          lastMessageTime:DateTime.now(),
-                                            ));
-                                    await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
-                                              setState(() {
-                                          chatid = "$cid${otheruser.id}";
-                                          });
-                                            }
-                                            await RemoteServices().setUserChat(
-                                                cid,
-                                                UserChat(
-                                                  id: "$cid${otheruser.id}",
-                                                  chatId: chatid!,
-                                                  recipientPhoto: otheruser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo:otheruser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  lastMessageTime: DateTime.now()
-                                                ));
-                                            final Users currentuser =
-                                            (await RemoteServices().getSingleUser(cid))!;
-                                          await RemoteServices().setUserChat(
-                                          otheruser.id,
-                                          UserChat(
-                                          id: "${otheruser.id}$cid",
-                                          chatId: chatid!,
-                                          recipientPhoto: currentuser.photoUrl!,
-                                          pinned: false,
-                                          recipientPhoneNo: currentuser.phoneNo,
-                                          backgroundImage: "assets/backgroundimage.png",
-                                            lastMessageTime: DateTime.now()
-                                          ));
-
-
-
-
-
-
-                                          //     if(!done){
-                                          //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
-                                          //   if(!docsnap.exists){
-                                          //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
-                                          //     await RemoteServices().setUserChat(widget.otheruser.id,
-                                          //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
-                                          //     );
-                                          //   }
-                                          // }
-
-
-
-
-
-                                          for (int i = 0; i < 1; i++) {
-                                          // firebase_storage.Reference ref =
-                                          // firebase_storage.FirebaseStorage.instance.ref(
-                                          //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
-                                          // uploadTask.add(ref.putFile(File(widget.result.files[i]
-                                          //     .path!)));
-                                          // await Future.value(uploadTask);
-                                          //
-                                          // final docUrl=await ref.getDownloadURL();
-                                          await ChatsRemoteServices().setChatMessage(
-                                          chatid!,
-                                          ChatMessage(
-                                          id: "${DateTime.now().microsecondsSinceEpoch}",
-                                          senderId: cid,
-                                          text: '',
-                                          contentType: "image",
-                                          timestamp: DateTime.now(),
-                                          senderUrl: _image!.path));
-
-                                          }
-                                          // DocumentSnapshot docsnap = await FirebaseFirestore.instance
-                                          //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
-                                          // if(!docsnap.exists){
-                                          //   await RemoteServices().setUserChat(cid,
-                                          //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
-                                          //   );
-                                          //
-                                          // }
-
-                                          RemoteServices().updateUserChat(
-                                          cid,
-                                          {
-                                          'lastMessage': 'image',
-                                          'lastMessageType': "image",
-                                          'lastMessageTime': DateTime.now().toIso8601String(),
-                                            'isSender':true,
-                                          },"$cid${otheruser.id}"
-
-                                          );
-
-                                                RemoteServices().updateUserChat(
-                                                widget.otherUserId,
-                                                {
-                                                  'lastMessage': 'image',
-                                                  'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String(),
-                                                  'issender':false,
-                                                },
-                                                "${widget.otherUserId}$cid");
-                                                _image=null;
-                                        }
-
-                                        },
-                                        child: const Row(
-                                          children: [
-                                            Icon(
-                                              Icons.camera_alt,
-                                              color: Colors.green,
-                                            ),
-                                            SizedBox(width: 8.0),
-                                            Text(
-                                              "send from camera",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SimpleDialogOption(
-                                        onPressed: () async {
-                                          await getImage(ImageSource.gallery);
-                                          if(_image!=null){
-
-                                            if (chatid == null) {
-                                              await ChatsRemoteServices().setChat(Chat(
-                                                id: "$cid${otheruser.id}",
-                                                participantIds: [cid, otheruser.id],
-                                              ));
-                                              await RemoteServices().setUserChat(
-                                        cid,
-                                        UserChat(
-                                            id: "$cid${widget.otherUserId}",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: otheruser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: otheruser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                          lastMessageTime: DateTime.now()
-                                            ));
-                                    encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
-                                    String symmKeyString = symmKey.base64;
-                                    RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
-                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
-                                    encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
-                                    String encrytedSymmKeyString = encryptedSymmKey.base64;
-                                    final Users currentuser =
-                                        (await RemoteServices().getSingleUser(cid))!;
-                                    await RemoteServices().setUserChat(
-                                        otheruser.id,
-                                        UserChat(
-                                            id: "${widget.otherUserId}$cid",
-                                            chatId: "$cid${widget.otherUserId}",
-                                            recipientPhoto: currentuser.photoUrl!,
-                                            pinned: false,
-                                            recipientPhoneNo: currentuser.phoneNo,
-                                            backgroundImage: "assets/backgroundimage.png",
-                                            containsSymmKey: encrytedSymmKeyString,
-                                          lastMessageTime: DateTime.now(),
-                                            ));
-                                    await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
-                                              setState(() {
-                                              chatid = "$cid${otheruser.id}";
-                                            });
-                                            }
-                                            await RemoteServices().setUserChat(
-                                                cid,
-                                                UserChat(
-                                                  id: "$cid${otheruser.id}",
-                                                  chatId: chatid!,
-                                                  recipientPhoto: otheruser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo:otheruser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  lastMessageTime: DateTime.now()
-                                                ));
-                                            final Users currentuser =
-                                            (await RemoteServices().getSingleUser(cid))!;
-                                            await RemoteServices().setUserChat(
-                                                otheruser.id,
-                                                UserChat(
-                                                  id: "${otheruser.id}$cid",
-                                                  chatId: chatid!,
-                                                  recipientPhoto: currentuser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo: currentuser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  lastMessageTime: DateTime.now()
-                                                ));
-
-
-
-
-
-
-                                            //     if(!done){
-                                            //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
-                                            //   if(!docsnap.exists){
-                                            //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
-                                            //     await RemoteServices().setUserChat(widget.otheruser.id,
-                                            //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
-                                            //     );
-                                            //   }
-                                            // }
-
-
-
-
-
-                                            for (int i = 0; i < 1; i++) {
-                                              // firebase_storage.Reference ref =
-                                              // firebase_storage.FirebaseStorage.instance.ref(
-                                              //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
-                                              // uploadTask.add(ref.putFile(File(widget.result.files[i]
-                                              //     .path!)));
-                                              // await Future.value(uploadTask);
-                                              //
-                                              // final docUrl=await ref.getDownloadURL();
-                                              await ChatsRemoteServices().setChatMessage(
-                                                  chatid!,
-                                                  ChatMessage(
-                                                      id: "${DateTime.now().microsecondsSinceEpoch}",
-                                                      senderId: cid,
-                                                      text: '',
-                                                      contentType: "image",
-                                                      timestamp: DateTime.now(),
-                                                      senderUrl: _image!.path));
-
-                                            }
-                                            // DocumentSnapshot docsnap = await FirebaseFirestore.instance
-                                            //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
-                                            // if(!docsnap.exists){
-                                            //   await RemoteServices().setUserChat(cid,
-                                            //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
-                                            //   );
-                                            //
-                                            // }
-
-                                            RemoteServices().updateUserChat(
-                                                cid,
-                                                {
-                                                  'lastMessage': 'image',
-                                                  'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String(),
-                                                  'isSender':true,
-                                                },"$cid${otheruser.id}"
-
-                                            );
-
-                                            RemoteServices().updateUserChat(
-                                                widget.otherUserId,
-                                                {
-                                                  'lastMessage': 'image',
-                                                  'lastMessageType': "image",
-                                                  'lastMessageTime': DateTime.now().toIso8601String(),
-                                                  'isSender':false
-                                                },
-                                                "${widget.otherUserId}$cid");
-                                            _image=null;
-                                          }
-
-                                        },
-                                        child: const Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.photo,
-                                              color: Colors.green,
-                                            ),
-                                            SizedBox(width: 8.0),
-                                            Text(
-                                              "Send image from gallery",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => alert,
-                                    barrierDismissible: true,
-                                  );
-                                },
-                              ),
-                              (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
-                                iconSize: (24.0),
-                                onPressed: () async {
-                                  if(youBlocked){
-                                    ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(SnackBar(content: Text('You have blocked ${(savedNumber.contains(otheruser.phoneNo))?savedUsers[savedNumber.indexOf(otheruser.phoneNo)]:otheruser.phoneNo} unblock to continue chat')));
-                                  }
-                                  else if(otherBlocked){
-                                    ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(SnackBar(content: Text('${(savedNumber.contains(otheruser.phoneNo))?savedUsers[savedNumber.indexOf(otheruser.phoneNo)]:otheruser.phoneNo} has blocked you so can not continue chat')));
-                                  }
-                                  else {
-                                    setState(() {
-                                      isSending = true;
-                                    });
-                                    String temp = messageController.text;
-                                    messageController.clear();
-                                    if (!isEditing) {
-                                      if (chatid == null) {
-                                        await ChatsRemoteServices().setChat(Chat(
-                                          id: "$cid${widget.otherUserId}",
-                                          participantIds: [cid, widget.otherUserId],
-                                        ));
-                                        await RemoteServices().setUserChat(
+                                                if (chatid == null) {
+                                                  await ChatsRemoteServices().setChat(Chat(
+                                                    id: "$cid${otheruser.id}",
+                                                    participantIds: [cid, otheruser.id],
+                                                  ));
+                                                  await RemoteServices().setUserChat(
                                             cid,
                                             UserChat(
-                                              id: "$cid${widget.otherUserId}",
-                                              chatId: "$cid${widget.otherUserId}",
-                                              recipientPhoto: otheruser.photoUrl!,
-                                              pinned: false,
-                                              recipientPhoneNo: otheruser.phoneNo,
-                                              backgroundImage: "assets/backgroundimage.png",
-                                              lastMessageTime: DateTime.now()
-                                            ));
-                                        encrypt.Key symmKey = encrypt.Key
-                                            .fromSecureRandom(32);
-                                        String symmKeyString = symmKey.base64;
-                                        RSAPublicKey publicKey = rsa.RsaKeyHelper()
-                                            .parsePublicKeyFromPem(
-                                            otheruser.publicKey);
-                                        encrypt.Encrypter encrypter = encrypt
-                                            .Encrypter(
-                                            encrypt.RSA(publicKey: publicKey));
-                                        encrypt
-                                            .Encrypted encryptedSymmKey = encrypter
-                                            .encrypt(symmKeyString);
-                                        String encrytedSymmKeyString = encryptedSymmKey
-                                            .base64;
-                                        final Users currentuser =
-                                        (await RemoteServices().getSingleUser(
-                                            cid))!;
-                                        await RemoteServices().setUserChat(
-                                            otheruser.id,
-                                            UserChat(
-                                              id: "${widget.otherUserId}$cid",
-                                              chatId: "$cid${widget.otherUserId}",
-                                              recipientPhoto: currentuser.photoUrl!,
-                                              pinned: false,
-                                              recipientPhoneNo: currentuser.phoneNo,
-                                              backgroundImage: "assets/backgroundimage.png",
-                                              containsSymmKey: encrytedSymmKeyString,
-                                              lastMessageTime: DateTime.now()
-                                            ));
-                                        await const FlutterSecureStorage().write(
-                                            key: "$cid${widget.otherUserId}",
-                                            value: symmKeyString);
-                                        setState(() {
-                                          chatid = "$cid${widget.otherUserId}";
-                                        });
-                                      }
-                                    }
-                                    String symmKeyString = (await FlutterSecureStorage()
-                                        .read(key: chatid!))!;
-                                    encrypt.Key symmKey = encrypt.Key.fromBase64(
-                                        symmKeyString);
-                                    encrypt.Encrypter encrypter = encrypt.Encrypter(
-                                        encrypt.AES(symmKey));
-                                    encrypt.Encrypted encryptedMessage = encrypter
-                                        .encrypt(temp, iv: iv);
-                                    String encryptedMessageString = encryptedMessage
-                                        .base64;
-
-                                    if (otheruser.token != null && !isEditing && otheruser.current!=chatid && otherUserChat!.muted == false) {
-                                      SendNotificationService().sendFCMChatMessage(
-                                          otheruser.token!,
-                                          {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': temp},
-                                          {});
-                                    }
-                                    if (!isEditing) {
-                                      await ChatsRemoteServices().setChatMessage(
-                                          chatid!,
-                                          ChatMessage(
-                                              id: "${DateTime
-                                                  .now()
-                                                  .microsecondsSinceEpoch}",
-                                              senderId: cid,
-                                              text: encryptedMessageString,
-                                              contentType: "text",
-                                              timestamp: DateTime.now()));
-
-
-                                      DocumentSnapshot docsnap = await FirebaseFirestore
-                                          .instance
-                                          .collection('users').doc(cid).collection(
-                                          'userChats')
-                                          .doc("$cid${widget.otherUserId}")
-                                          .get();
-                                      if (!docsnap.exists) {
-                                        await RemoteServices().setUserChat(cid,
-                                            UserChat(
                                                 id: "$cid${widget.otherUserId}",
-                                                chatId: chatid!,
+                                                chatId: "$cid${widget.otherUserId}",
                                                 recipientPhoto: otheruser.photoUrl!,
                                                 pinned: false,
                                                 recipientPhoneNo: otheruser.phoneNo,
                                                 backgroundImage: "assets/backgroundimage.png",
-                                                lastMessageTime: DateTime.now())
-                                        );
-                                      }
-
-                                      RemoteServices().updateUserChat(
-                                          cid,
-                                          {
-                                            'lastMessage': encryptedMessageString,
-                                            'lastMessageType': "text",
-                                            'lastMessageTime': DateTime.now()
-                                                .toIso8601String(),
-                                            'isSender':true
-                                          },
-                                          "$cid${widget.otherUserId}");
-
-                                      docsnap =
-                                      await FirebaseFirestore.instance.collection(
-                                          'users').doc(widget.otherUserId)
-                                          .collection(
-                                          'userChats')
-                                          .doc("${widget.otherUserId}$cid")
-                                          .get();
-                                      if (!docsnap.exists) {
-                                        final Users currentuser = (await RemoteServices()
-                                            .getSingleUser(cid))!;
+                                                lastMessageTime: DateTime.now(),
+                                                ));
+                                        encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                                        String symmKeyString = symmKey.base64;
+                                        RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                                        encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                                        encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                                        String encrytedSymmKeyString = encryptedSymmKey.base64;
+                                        final Users currentuser =
+                                            (await RemoteServices().getSingleUser(cid))!;
                                         await RemoteServices().setUserChat(
-                                            widget.otherUserId,
+                                            otheruser.id,
                                             UserChat(
                                                 id: "${widget.otherUserId}$cid",
-                                                chatId: chatid!,
-                                                recipientPhoto: currentuser
-                                                    .photoUrl!,
+                                                chatId: "$cid${widget.otherUserId}",
+                                                recipientPhoto: currentuser.photoUrl!,
                                                 pinned: false,
-                                                recipientPhoneNo: currentuser
-                                                    .phoneNo,
+                                                recipientPhoneNo: currentuser.phoneNo,
                                                 backgroundImage: "assets/backgroundimage.png",
-                                                lastMessageTime: DateTime.now())
-                                        );
+                                                containsSymmKey: encrytedSymmKeyString,
+                                              lastMessageTime: DateTime.now(),
+                                                ));
+                                        await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                                  setState(() {
+                                                  chatid = "$cid${otheruser.id}";
+                                                });
+                                                }
+                                                await RemoteServices().setUserChat(
+                                                    cid,
+                                                    UserChat(
+                                                      id: "$cid${otheruser.id}",
+                                                      chatId: chatid!,
+                                                      recipientPhoto: otheruser.photoUrl!,
+                                                      pinned: false,
+                                                      recipientPhoneNo:otheruser.phoneNo,
+                                                      backgroundImage: "assets/backgroundimage.png",
+                                                      lastMessageTime: DateTime.now(),
+                                                    ));
+                                                final Users currentuser =
+                                                (await RemoteServices().getSingleUser(cid))!;
+                                                await RemoteServices().setUserChat(
+                                                   otheruser.id,
+                                                    UserChat(
+                                                      id: "${otheruser.id}$cid",
+                                                      chatId: chatid!,
+                                                      recipientPhoto: currentuser.photoUrl!,
+                                                      pinned: false,
+                                                      recipientPhoneNo: currentuser.phoneNo,
+                                                      backgroundImage: "assets/backgroundimage.png",
+                                                      lastMessageTime: DateTime.now()
+                                                    ));
+
+
+
+
+
+                                                //     if(!done){
+                                                //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                                //   if(!docsnap.exists){
+                                                //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                                //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                                //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                                //     );
+                                                //   }
+                                                // }
+
+
+
+
+
+                                                for (int i = 0; i < files.files.length; i++) {
+                                                  // firebase_storage.Reference ref =
+                                                  // firebase_storage.FirebaseStorage.instance.ref(
+                                                  //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
+                                                  // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                                  //     .path!)));
+                                                  // await Future.value(uploadTask);
+                                                  //
+                                                  // final docUrl=await ref.getDownloadURL();
+                                                  await ChatsRemoteServices().setChatMessage(
+                                                      chatid!,
+                                                      ChatMessage(
+                                                          id: "${DateTime.now().microsecondsSinceEpoch}",
+                                                          senderId: cid,
+                                                          text: '',
+                                                          contentType: "document ${files.files[i].name}",
+                                                          timestamp: DateTime.now(),
+                                                          senderUrl: files.paths[i]!));
+
+                                                }
+                                                // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                                //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                                // if(!docsnap.exists){
+                                                //   await RemoteServices().setUserChat(cid,
+                                                //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                                //   );
+                                                //
+                                                // }
+                                                  //debugPrint(' printing filels   ${files}');
+                                                RemoteServices().updateUserChat(
+                                                    cid,
+                                                    {
+                                                      'lastMessage': (files.files[files.files.length-1].name.length >
+                                                          100)
+                                                          ?files.files[files.files.length-1].name.substring(0, 100)
+                                                          : files.files[files.files.length-1].name,
+                                                      'lastMessageType': "document",
+                                                      'lastMessageTime': DateTime.now().toIso8601String().length,
+                                                      'isSender':true
+                                                    },
+                                                    "$cid${otheruser.id}");
+                                                RemoteServices().updateUserChat(
+                                                    widget.otherUserId,
+                                                    {
+                                                      'lastMessage': (files.files[files.files.length-1].name.length >
+                                                          100)
+                                                          ?files.files[files.files.length-1].name.substring(0, 100)
+                                                          : files.files[files.files.length-1].name,
+                                                      'lastMessageType': "document",
+                                                      'lastMessageTime': DateTime.now().toIso8601String(),
+                                                      'isSender':false
+                                                    },
+                                                    "${widget.otherUserId}$cid");
+
+                                               }
+
+                                            },
+                                            child: const Row(
+                                              children: [
+                                                Icon(
+                                                  CupertinoIcons.doc,
+                                                  color: Colors.blue,
+                                                ),
+                                                SizedBox(width: 8.0),
+                                                Text(
+                                                  "Send document",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SimpleDialogOption(
+                                            onPressed: () async {
+                                              await getImage(ImageSource.camera);
+                                              if(_image!=null){
+
+                                                if (chatid == null) {
+                                                  await ChatsRemoteServices().setChat(Chat(
+                                                    id: "$cid${otheruser.id}",
+                                                    participantIds: [cid, otheruser.id],
+                                                  ));
+                                                  await RemoteServices().setUserChat(
+                                            cid,
+                                            UserChat(
+                                                id: "$cid${widget.otherUserId}",
+                                                chatId: "$cid${widget.otherUserId}",
+                                                recipientPhoto: otheruser.photoUrl!,
+                                                pinned: false,
+                                                recipientPhoneNo: otheruser.phoneNo,
+                                                backgroundImage: "assets/backgroundimage.png",
+                                              lastMessageTime: DateTime.now()
+                                                ));
+                                        encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                                        String symmKeyString = symmKey.base64;
+                                        RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                                        encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                                        encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                                        String encrytedSymmKeyString = encryptedSymmKey.base64;
+                                        final Users currentuser =
+                                            (await RemoteServices().getSingleUser(cid))!;
+                                        await RemoteServices().setUserChat(
+                                            otheruser.id,
+                                            UserChat(
+                                                id: "${widget.otherUserId}$cid",
+                                                chatId: "$cid${widget.otherUserId}",
+                                                recipientPhoto: currentuser.photoUrl!,
+                                                pinned: false,
+                                                recipientPhoneNo: currentuser.phoneNo,
+                                                backgroundImage: "assets/backgroundimage.png",
+                                                containsSymmKey: encrytedSymmKeyString,
+                                              lastMessageTime:DateTime.now(),
+                                                ));
+                                        await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                                  setState(() {
+                                              chatid = "$cid${otheruser.id}";
+                                              });
+                                                }
+                                                await RemoteServices().setUserChat(
+                                                    cid,
+                                                    UserChat(
+                                                      id: "$cid${otheruser.id}",
+                                                      chatId: chatid!,
+                                                      recipientPhoto: otheruser.photoUrl!,
+                                                      pinned: false,
+                                                      recipientPhoneNo:otheruser.phoneNo,
+                                                      backgroundImage: "assets/backgroundimage.png",
+                                                      lastMessageTime: DateTime.now()
+                                                    ));
+                                                final Users currentuser =
+                                                (await RemoteServices().getSingleUser(cid))!;
+                                              await RemoteServices().setUserChat(
+                                              otheruser.id,
+                                              UserChat(
+                                              id: "${otheruser.id}$cid",
+                                              chatId: chatid!,
+                                              recipientPhoto: currentuser.photoUrl!,
+                                              pinned: false,
+                                              recipientPhoneNo: currentuser.phoneNo,
+                                              backgroundImage: "assets/backgroundimage.png",
+                                                lastMessageTime: DateTime.now()
+                                              ));
+
+
+
+
+
+
+                                              //     if(!done){
+                                              //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                              //   if(!docsnap.exists){
+                                              //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                              //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                              //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                              //     );
+                                              //   }
+                                              // }
+
+
+
+
+
+                                              for (int i = 0; i < 1; i++) {
+                                              // firebase_storage.Reference ref =
+                                              // firebase_storage.FirebaseStorage.instance.ref(
+                                              //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
+                                              // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                              //     .path!)));
+                                              // await Future.value(uploadTask);
+                                              //
+                                              // final docUrl=await ref.getDownloadURL();
+                                              await ChatsRemoteServices().setChatMessage(
+                                              chatid!,
+                                              ChatMessage(
+                                              id: "${DateTime.now().microsecondsSinceEpoch}",
+                                              senderId: cid,
+                                              text: '',
+                                              contentType: "image",
+                                              timestamp: DateTime.now(),
+                                              senderUrl: _image!.path));
+
+                                              }
+                                              // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                              //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                              // if(!docsnap.exists){
+                                              //   await RemoteServices().setUserChat(cid,
+                                              //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                              //   );
+                                              //
+                                              // }
+
+                                              RemoteServices().updateUserChat(
+                                              cid,
+                                              {
+                                              'lastMessage': 'image',
+                                              'lastMessageType': "image",
+                                              'lastMessageTime': DateTime.now().toIso8601String(),
+                                                'isSender':true,
+                                              },"$cid${otheruser.id}"
+
+                                              );
+
+                                                    RemoteServices().updateUserChat(
+                                                    widget.otherUserId,
+                                                    {
+                                                      'lastMessage': 'image',
+                                                      'lastMessageType': "image",
+                                                      'lastMessageTime': DateTime.now().toIso8601String(),
+                                                      'issender':false,
+                                                    },
+                                                    "${widget.otherUserId}$cid");
+                                                    _image=null;
+                                            }
+
+                                            },
+                                            child: const Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.camera_alt,
+                                                  color: Colors.green,
+                                                ),
+                                                SizedBox(width: 8.0),
+                                                Text(
+                                                  "send from camera",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SimpleDialogOption(
+                                            onPressed: () async {
+                                              await getImage(ImageSource.gallery);
+                                              if(_image!=null){
+
+                                                if (chatid == null) {
+                                                  await ChatsRemoteServices().setChat(Chat(
+                                                    id: "$cid${otheruser.id}",
+                                                    participantIds: [cid, otheruser.id],
+                                                  ));
+                                                  await RemoteServices().setUserChat(
+                                            cid,
+                                            UserChat(
+                                                id: "$cid${widget.otherUserId}",
+                                                chatId: "$cid${widget.otherUserId}",
+                                                recipientPhoto: otheruser.photoUrl!,
+                                                pinned: false,
+                                                recipientPhoneNo: otheruser.phoneNo,
+                                                backgroundImage: "assets/backgroundimage.png",
+                                              lastMessageTime: DateTime.now()
+                                                ));
+                                        encrypt.Key symmKey = encrypt.Key.fromSecureRandom(32);
+                                        String symmKeyString = symmKey.base64;
+                                        RSAPublicKey publicKey = rsa.RsaKeyHelper().parsePublicKeyFromPem(otheruser.publicKey);
+                                        encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: publicKey));
+                                        encrypt.Encrypted encryptedSymmKey = encrypter.encrypt(symmKeyString);
+                                        String encrytedSymmKeyString = encryptedSymmKey.base64;
+                                        final Users currentuser =
+                                            (await RemoteServices().getSingleUser(cid))!;
+                                        await RemoteServices().setUserChat(
+                                            otheruser.id,
+                                            UserChat(
+                                                id: "${widget.otherUserId}$cid",
+                                                chatId: "$cid${widget.otherUserId}",
+                                                recipientPhoto: currentuser.photoUrl!,
+                                                pinned: false,
+                                                recipientPhoneNo: currentuser.phoneNo,
+                                                backgroundImage: "assets/backgroundimage.png",
+                                                containsSymmKey: encrytedSymmKeyString,
+                                              lastMessageTime: DateTime.now(),
+                                                ));
+                                        await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
+                                                  setState(() {
+                                                  chatid = "$cid${otheruser.id}";
+                                                });
+                                                }
+                                                await RemoteServices().setUserChat(
+                                                    cid,
+                                                    UserChat(
+                                                      id: "$cid${otheruser.id}",
+                                                      chatId: chatid!,
+                                                      recipientPhoto: otheruser.photoUrl!,
+                                                      pinned: false,
+                                                      recipientPhoneNo:otheruser.phoneNo,
+                                                      backgroundImage: "assets/backgroundimage.png",
+                                                      lastMessageTime: DateTime.now()
+                                                    ));
+                                                final Users currentuser =
+                                                (await RemoteServices().getSingleUser(cid))!;
+                                                await RemoteServices().setUserChat(
+                                                    otheruser.id,
+                                                    UserChat(
+                                                      id: "${otheruser.id}$cid",
+                                                      chatId: chatid!,
+                                                      recipientPhoto: currentuser.photoUrl!,
+                                                      pinned: false,
+                                                      recipientPhoneNo: currentuser.phoneNo,
+                                                      backgroundImage: "assets/backgroundimage.png",
+                                                      lastMessageTime: DateTime.now()
+                                                    ));
+
+
+
+
+
+
+                                                //     if(!done){
+                                                //  final docsnap = await FirebaseFirestore.instance.collection('users').doc(widget.otheruser.id).collection('userChats').doc("${widget.otheruser.id}$cid").get();
+                                                //   if(!docsnap.exists){
+                                                //     final Users currentuser = (await RemoteServices().getSingleUser(cid))!;
+                                                //     await RemoteServices().setUserChat(widget.otheruser.id,
+                                                //         UserChat(id: "${widget.otheruser.id}$cid", chatId: chatid!, recipientPhoto: currentuser.photoUrl!, pinned: false, recipientPhoneNo: currentuser.phoneNo)
+                                                //     );
+                                                //   }
+                                                // }
+
+
+
+
+
+                                                for (int i = 0; i < 1; i++) {
+                                                  // firebase_storage.Reference ref =
+                                                  // firebase_storage.FirebaseStorage.instance.ref(
+                                                  //     '/documents/${DateTime.now().microsecondsSinceEpoch}');
+                                                  // uploadTask.add(ref.putFile(File(widget.result.files[i]
+                                                  //     .path!)));
+                                                  // await Future.value(uploadTask);
+                                                  //
+                                                  // final docUrl=await ref.getDownloadURL();
+                                                  await ChatsRemoteServices().setChatMessage(
+                                                      chatid!,
+                                                      ChatMessage(
+                                                          id: "${DateTime.now().microsecondsSinceEpoch}",
+                                                          senderId: cid,
+                                                          text: '',
+                                                          contentType: "image",
+                                                          timestamp: DateTime.now(),
+                                                          senderUrl: _image!.path));
+
+                                                }
+                                                // DocumentSnapshot docsnap = await FirebaseFirestore.instance
+                                                //     .collection('users').doc(cid).collection('userChats').doc("$cid${widget.otheruser.id}").get();
+                                                // if(!docsnap.exists){
+                                                //   await RemoteServices().setUserChat(cid,
+                                                //       UserChat(id: "$cid${widget.otheruser.id}", chatId: chatid!, recipientPhoto: widget.otheruser.photoUrl!, pinned: false, recipientPhoneNo: widget.otheruser.phoneNo,)
+                                                //   );
+                                                //
+                                                // }
+
+                                                RemoteServices().updateUserChat(
+                                                    cid,
+                                                    {
+                                                      'lastMessage': 'image',
+                                                      'lastMessageType': "image",
+                                                      'lastMessageTime': DateTime.now().toIso8601String(),
+                                                      'isSender':true,
+                                                    },"$cid${otheruser.id}"
+
+                                                );
+
+                                                RemoteServices().updateUserChat(
+                                                    widget.otherUserId,
+                                                    {
+                                                      'lastMessage': 'image',
+                                                      'lastMessageType': "image",
+                                                      'lastMessageTime': DateTime.now().toIso8601String(),
+                                                      'isSender':false
+                                                    },
+                                                    "${widget.otherUserId}$cid");
+                                                _image=null;
+                                              }
+
+                                            },
+                                            child: const Row(
+                                              children: [
+                                                Icon(
+                                                  CupertinoIcons.photo,
+                                                  color: Colors.green,
+                                                ),
+                                                SizedBox(width: 8.0),
+                                                Text(
+                                                  "Send image from gallery",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => alert,
+                                        barrierDismissible: true,
+                                      );
+                                    },
+                                  ),
+                                  (messageController.text.isEmpty || isSending)?const SizedBox(width: 0,):IconButton(
+                                    iconSize: (24.0),
+                                    onPressed: () async {
+                                      if(youBlocked){
+                                        ScaffoldMessenger.of(context)
+                                            ..removeCurrentSnackBar()
+                                            ..showSnackBar(SnackBar(content: Text('You have blocked ${(savedNumber.contains(otheruser.phoneNo))?savedUsers[savedNumber.indexOf(otheruser.phoneNo)]:otheruser.phoneNo} unblock to continue chat')));
                                       }
+                                      else if(otherBlocked){
+                                        ScaffoldMessenger.of(context)
+                                            ..removeCurrentSnackBar()
+                                            ..showSnackBar(SnackBar(content: Text('${(savedNumber.contains(otheruser.phoneNo))?savedUsers[savedNumber.indexOf(otheruser.phoneNo)]:otheruser.phoneNo} has blocked you so can not continue chat')));
+                                      }
+                                      else {
+                                        setState(() {
+                                          isSending = true;
+                                        });
+                                        String temp = messageController.text;
+                                        messageController.clear();
+                                        if (!isEditing) {
+                                          if (chatid == null) {
+                                            await ChatsRemoteServices().setChat(Chat(
+                                              id: "$cid${widget.otherUserId}",
+                                              participantIds: [cid, widget.otherUserId],
+                                            ));
+                                            await RemoteServices().setUserChat(
+                                                cid,
+                                                UserChat(
+                                                  id: "$cid${widget.otherUserId}",
+                                                  chatId: "$cid${widget.otherUserId}",
+                                                  recipientPhoto: otheruser.photoUrl!,
+                                                  pinned: false,
+                                                  recipientPhoneNo: otheruser.phoneNo,
+                                                  backgroundImage: "assets/backgroundimage.png",
+                                                  lastMessageTime: DateTime.now()
+                                                ));
+                                            encrypt.Key symmKey = encrypt.Key
+                                                .fromSecureRandom(32);
+                                            String symmKeyString = symmKey.base64;
+                                            RSAPublicKey publicKey = rsa.RsaKeyHelper()
+                                                .parsePublicKeyFromPem(
+                                                otheruser.publicKey);
+                                            encrypt.Encrypter encrypter = encrypt
+                                                .Encrypter(
+                                                encrypt.RSA(publicKey: publicKey));
+                                            encrypt
+                                                .Encrypted encryptedSymmKey = encrypter
+                                                .encrypt(symmKeyString);
+                                            String encrytedSymmKeyString = encryptedSymmKey
+                                                .base64;
+                                            final Users currentuser =
+                                            (await RemoteServices().getSingleUser(
+                                                cid))!;
+                                            await RemoteServices().setUserChat(
+                                                otheruser.id,
+                                                UserChat(
+                                                  id: "${widget.otherUserId}$cid",
+                                                  chatId: "$cid${widget.otherUserId}",
+                                                  recipientPhoto: currentuser.photoUrl!,
+                                                  pinned: false,
+                                                  recipientPhoneNo: currentuser.phoneNo,
+                                                  backgroundImage: "assets/backgroundimage.png",
+                                                  containsSymmKey: encrytedSymmKeyString,
+                                                  lastMessageTime: DateTime.now()
+                                                ));
+                                            await const FlutterSecureStorage().write(
+                                                key: "$cid${widget.otherUserId}",
+                                                value: symmKeyString);
+                                            setState(() {
+                                              chatid = "$cid${widget.otherUserId}";
+                                            });
+                                          }
+                                        }
+                                        String symmKeyString = (await FlutterSecureStorage()
+                                            .read(key: chatid!))!;
+                                        encrypt.Key symmKey = encrypt.Key.fromBase64(
+                                            symmKeyString);
+                                        encrypt.Encrypter encrypter = encrypt.Encrypter(
+                                            encrypt.AES(symmKey));
+                                        encrypt.Encrypted encryptedMessage = encrypter
+                                            .encrypt(temp, iv: iv);
+                                        String encryptedMessageString = encryptedMessage
+                                            .base64;
+
+                                        if (otheruser.token != null && !isEditing && otheruser.current!=chatid && otherUserChat!.muted == false) {
+                                          SendNotificationService().sendFCMChatMessage(
+                                              otheruser.token!,
+                                              {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': temp},
+                                              {});
+                                        }
+                                        if (!isEditing) {
+                                          await ChatsRemoteServices().setChatMessage(
+                                              chatid!,
+                                              ChatMessage(
+                                                  id: "${DateTime
+                                                      .now()
+                                                      .microsecondsSinceEpoch}",
+                                                  senderId: cid,
+                                                  text: encryptedMessageString,
+                                                  contentType: "text",
+                                                  timestamp: DateTime.now()));
 
 
-                                      RemoteServices().updateUserChat(
-                                          widget.otherUserId,
-                                          {
-                                            'lastMessage': encryptedMessageString,
-                                            'lastMessageType': "text",
-                                            'lastMessageTime': DateTime.now()
-                                                .toIso8601String(),
-                                            'isSender':false
-                                          },
-                                          "${widget.otherUserId}$cid");
-                                    }
-                                    if (isEditing) {
-                                      ChatsRemoteServices().updateChatMessage(
-                                          chatid!,
-                                          {'text': encryptedMessageString,
-                                            'edited': true}, editingId);
-                                      setState(() {
-                                        isEditing = false;
-                                      });
-                                    }
-                                    setState(() {
-                                      isSending = false;
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.send_rounded, color: Colors.blue),
+                                          DocumentSnapshot docsnap = await FirebaseFirestore
+                                              .instance
+                                              .collection('users').doc(cid).collection(
+                                              'userChats')
+                                              .doc("$cid${widget.otherUserId}")
+                                              .get();
+                                          if (!docsnap.exists) {
+                                            await RemoteServices().setUserChat(cid,
+                                                UserChat(
+                                                    id: "$cid${widget.otherUserId}",
+                                                    chatId: chatid!,
+                                                    recipientPhoto: otheruser.photoUrl!,
+                                                    pinned: false,
+                                                    recipientPhoneNo: otheruser.phoneNo,
+                                                    backgroundImage: "assets/backgroundimage.png",
+                                                    lastMessageTime: DateTime.now())
+                                            );
+                                          }
+
+                                          RemoteServices().updateUserChat(
+                                              cid,
+                                              {
+                                                'lastMessage': encryptedMessageString,
+                                                'lastMessageType': "text",
+                                                'lastMessageTime': DateTime.now()
+                                                    .toIso8601String(),
+                                                'isSender':true
+                                              },
+                                              "$cid${widget.otherUserId}");
+
+                                          docsnap =
+                                          await FirebaseFirestore.instance.collection(
+                                              'users').doc(widget.otherUserId)
+                                              .collection(
+                                              'userChats')
+                                              .doc("${widget.otherUserId}$cid")
+                                              .get();
+                                          if (!docsnap.exists) {
+                                            final Users currentuser = (await RemoteServices()
+                                                .getSingleUser(cid))!;
+                                            await RemoteServices().setUserChat(
+                                                widget.otherUserId,
+                                                UserChat(
+                                                    id: "${widget.otherUserId}$cid",
+                                                    chatId: chatid!,
+                                                    recipientPhoto: currentuser
+                                                        .photoUrl!,
+                                                    pinned: false,
+                                                    recipientPhoneNo: currentuser
+                                                        .phoneNo,
+                                                    backgroundImage: "assets/backgroundimage.png",
+                                                    lastMessageTime: DateTime.now())
+                                            );
+                                          }
+
+
+                                          RemoteServices().updateUserChat(
+                                              widget.otherUserId,
+                                              {
+                                                'lastMessage': encryptedMessageString,
+                                                'lastMessageType': "text",
+                                                'lastMessageTime': DateTime.now()
+                                                    .toIso8601String(),
+                                                'isSender':false
+                                              },
+                                              "${widget.otherUserId}$cid");
+                                        }
+                                        if (isEditing) {
+                                          ChatsRemoteServices().updateChatMessage(
+                                              chatid!,
+                                              {'text': encryptedMessageString,
+                                                'edited': true}, editingId);
+                                          setState(() {
+                                            isEditing = false;
+                                          });
+                                        }
+                                        setState(() {
+                                          isSending = false;
+                                        });
+                                      }
+                                    },
+                                    icon: const Icon(Icons.send_rounded, color: Colors.blue),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }
+                            );
+                          }
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                }
               ),
             ),
         ));
