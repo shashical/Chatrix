@@ -65,11 +65,11 @@ A bottom navigation bar allows you to switch between the chats and groups screen
  ## Chats screen
 All user chats will be displayed here, with the most recent chat appearing at the top. Pinned chats will appear first, followed by the remaining chats in the same order as mentioned before.
 
-Multiple select support is available. By selecting chats, an options bar will appear on the screen, offering the ability to pin/unpin, mute/unmute, or delete a chat.
+Multiple select support is available. By selecting your desirable chats, an options' bar will appear on the screen, offering the ability to pin/unpin, mute/unmute, or delete the chat(s).
 
-  A floating action button opens a bottom sheet containing all the contacts saved in the app. This allows users to start a chat with saved contacts. There is also a section for non-app users, providing an option to send invitations.
+  A floating action button opens a bottom sheet containing all the contacts saved in the app. This allows users to start a chat with saved contacts. There is also a section for non-user contacts, providing an option to send invitations.
 
-A search functionality is available for searching contacts.
+A search functionality is available for searching the contacts.
 Tapping on the profile image within each chat will direct you to the profile page of that user.
  ## Group screen 
  All the groups in which the user is a member will be displayed here, following the same order as the chats screen. The functionality is similar to the chats screen, with the ability to perform actions on the groups such as pinning, muting, or deleting.
