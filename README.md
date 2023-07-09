@@ -1,7 +1,7 @@
  ![chatrix_logo (1)](https://github.com/shashical/realtime_messaging/assets/106883666/9a600f40-1a50-43d1-aa59-710286cb5ba1)
-#  Chatrix - Realtime Encrypted Messaging App
-This is a real-time encrypted messaging app built using Flutter as the client-side framework, Firebase as the server-side infrastructure, and Cloud Firestore as the database. The app provides secure and private messaging functionality while ensuring real-time communication between users.
-Messages are end to end encrypted even the owner can not see what you are sending in messages and also support send document and  images from camera and gallery. Users can see other users profile and whether they are online now or not , pin or mute  chats/groups.  Delete for me/everyone, Clear chats are  also supported in our app
+#  Chatrix - Encrypted Realtime Messaging App
+This is an encrypted real-time messaging app built using Flutter as the client-side framework, Firebase as the server-side infrastructure, and Cloud Firestore as the database. The app provides secure and private messaging functionality while ensuring real-time communication between users.
+Messages are end-to-end encrypted, that is, not even the developers or the owner of the app can see your messages.
 # Features
 + Light/dark mode toggle
 + Change wallpaper
