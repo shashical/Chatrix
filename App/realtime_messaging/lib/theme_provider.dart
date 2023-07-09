@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:realtime_messaging/main.dart';
+
 
 class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode = false;
+  bool _isDarkMode = darkmode;
 
   // Future<void> loadThemePreference() async {
   //   String? themePreference = await FlutterSecureStorage().read(key: 'theme_preference');

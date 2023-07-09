@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Services/local_notifications.dart';
 import 'package:realtime_messaging/screens/chat_window.dart';
@@ -20,7 +21,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'screens/my_chats.dart';
 import 'screens/splash.dart';
 import 'screens/user_info.dart';
-
+bool darkmode=false;
 Future<void> backgroundHandler(RemoteMessage message)async{
   debugPrint("This message is from background");
   LocalNotificationService.showNotificationOnForeground(message);
@@ -48,6 +49,11 @@ Future<void> main() async {
   // String groupPhoto = '';
   // String groupName = '';
   // bool containsSymmKey = false;
+  String? themePreference = await const FlutterSecureStorage().read(key: 'theme_preference');
+  if(themePreference=='true'){
+    darkmode=true;
+  }
+
 
 
   FirebaseMessaging.instance.getInitialMessage().then(

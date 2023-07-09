@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/screens/current_user_profile_page.dart';
@@ -48,6 +49,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     else {
       RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
+
     }
   }
   void getCurUser()async{
@@ -115,8 +117,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return SwitchListTile(
       title: const Text('Dark Mode'),
       value: themeProvider.isDarkMode,
-      onChanged: (value) {
+      onChanged: (value)  async {
         themeProvider.toggleTheme();
+          await const FlutterSecureStorage().write(key: 'theme_preference',value: value.toString());
       },
     );
   },
