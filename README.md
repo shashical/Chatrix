@@ -7,7 +7,7 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 +  Search functionality
 + Light/Dark theme toggle
 + Real-time messaging
-+ Messages are **end to end Encrypted**
++ Messages are **end-to-end Encrypted**
 + Chats can be one-to-one or in a group
 + Change wallpaper option
 +  Notification feature
@@ -40,8 +40,7 @@ To get started with Chatrix, follow these steps:
    ```bash
    flutter pub get
   
-4. Set up Firebase and Firestore in your Firebase console
-   refer this
+4. To set up Firebase and Firestore for your project, refer this
    
     https://firebase.google.com/docs/flutter/setup?continue=https%3A%2F%2Ffirebase.google.com%2Flearn%2Fpathways%2Ffirebase-flutter%23article-https%3A%2F%2Ffirebase.google.com%2Fdocs%2Fflutter%2Fsetup&platform=android
 5. Connect a physical device or emulator.
@@ -55,6 +54,9 @@ Firebase server key
  SERVER_KEY
 ```
 # Demo
++ Authenticate yourself and get started
++ Enjoy chatting in real-time, whether in groups or in personal
++ Explore the various features and functionalities provided by the app
 # Working of App
  To log in to the app, please verify your number with the OTP (One-Time Password). After logging in, a basic information form will appear, requesting a profile photo, username, and a brief description.
  ## Home screen
