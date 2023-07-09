@@ -78,18 +78,18 @@ Tapping on the profile image within each chat will direct you to the profile pag
  The chat window provides a platform for users to communicate with each other. When you open a chat, the conversation between you and the other user will be displayed.
  
  
- At the bottom of the chat window, there is a text input field where you can type and send messages. You can enter your message and press the send button to share it with the other user.
- Additional features
+ At the bottom of the chat window, there is a text input field where you can type and send messages. You can enter your message and press the send button to send it to the other user.
+ Additional features:
  
-Attach Icon: Located in the bottom right corner of the chat window, the attach icon allows you to send various types of files. You can choose to send documents, images from your gallery, or capture photos/videos using the camera.
+**Attach Icon:** Located beside the text field, the attach icon allows you to send various types of files. You can choose to send media such as documents or images. Images can be from gallery or camera.
 
-Pop-up Menu: There is a pop-up menu accessible through a specific action (e.g., long-pressing on a chat or tapping on a user's profile). This menu provides options such as clearing the chat history, blocking or unblocking a user, and changing the wallpaper for the chat window.
+**Pop-up Menu:** There is a pop-up menu button present on the top right of the screen. This menu provides options such as clearing the chat history, blocking or unblocking the other user, and changing the wallpaper for this particular chat window.
 
-Online Status: In the  app bar, you can see the online status of users. This indicates whether the user is currently active or available for chat.
+**Online Status:** In the app bar, you can see the online status of users. This indicates whether the user is currently active in the app or not.
 
-Multiple Select: You can select multiple messages in the chat window by long-pressing on a message. Once selected, an options bar will appear on the screen, allowing you to perform actions on the selected messages. Common options include copying the messages and deleting them.
+**Multiple Select:** You can select multiple messages in the chat window. When you do so, some options will appear on the app bar, allowing you to perform certain actions on the selected messages (such as deleting and copying, depending on whether you have selected one or more than one).
 
-Message Editing: By tapping on a specific message, you are provided with options to edit or correct it. This allows you to make changes to the content of a sent message.
+**Message Editing:** By tapping on a specific message, you are provided with options to edit or correct it. This allows you to make changes to the content of a message sent by you. Note that you can do so only until the message is not read by the other user.
 
  The send icon only appear when there is something to send in the text field 
 ## Group chat window
