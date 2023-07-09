@@ -34,6 +34,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+  // await ThemeProvider().loadThemePreference();
+
   LocalNotificationService.initialize();
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
