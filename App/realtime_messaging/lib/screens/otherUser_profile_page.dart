@@ -306,8 +306,8 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: (themeProvider.isDarkMode?[
-                            Color.fromARGB(255, 61, 84, 88),
-                            Color.fromARGB(255, 86, 44, 70),
+                            const Color.fromARGB(255, 61, 84, 88),
+                            const Color.fromARGB(255, 86, 44, 70),
                           ]:[
                             const Color.fromARGB(255, 147, 203, 216),
                             const Color.fromARGB(255, 200, 104, 163),
@@ -335,7 +335,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 60),
+                      const SizedBox(height: 60),
                       Stack(
                         alignment: Alignment.bottomRight,
                         children: [
@@ -344,13 +344,17 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                             backgroundColor: Colors.white,
                             backgroundImage: NetworkImage(user!.photoUrl!),
                           ),
-                          if (user!.isOnline!)
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: const BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
+
+                            Positioned(
+                              bottom: 12,
+                              right: 12,
+                              child: Container(
+                                width: 25,
+                                height: 25,
+                                decoration: BoxDecoration(
+                                  color: (user!.isOnline!)? Colors.green:Colors.grey,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
                         ],
@@ -395,7 +399,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                                 ),
                                 SizedBox(height: 10),
                                 Text(
-                                  user!.about!,
+                                  user!.about??'',
                                   style: TextStyle(
                                     fontSize: 18,
                                     // color: Colors.grey[800],
