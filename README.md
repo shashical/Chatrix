@@ -17,7 +17,7 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 +  Block/Unblock a user functionality
 +  Update profile option
 +  Tracks unread messages counts
-+  Online presence
++  Tracks whether the user is currently active or not
   
 # Tech Stack
 **Client:** Flutter
