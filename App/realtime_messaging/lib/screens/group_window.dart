@@ -1984,7 +1984,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       'lastMessageType': "document",
                                                       'lastMessageTime':
                                                           DateTime.now()
-                                                              .toIso8601String()
+                                                              .toIso8601String(),
+                                                      'senderId':cid
                                                     },
                                                     widget.groupId);
                                               }
@@ -2058,7 +2059,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       'lastMessageType': "image",
                                                       'lastMessageTime':
                                                           DateTime.now()
-                                                              .toIso8601String()
+                                                              .toIso8601String(),
+                                                      'senderId':cid
                                                     },
                                                     widget.groupId);
                                               }
@@ -2130,7 +2132,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       'lastMessageType': "image",
                                                       'lastMessageTime':
                                                           DateTime.now()
-                                                              .toIso8601String()
+                                                              .toIso8601String(),
+                                                      'senderId':cid
                                                     },
                                                     widget.groupId);
                                               }
@@ -2242,7 +2245,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                     'lastMessageType': "text",
                                                     'lastMessageTime':
                                                         DateTime.now()
-                                                            .toIso8601String()
+                                                            .toIso8601String(),
+                                                    'senderId':cid
                                                   },
                                                   widget.groupId);
                                             }
