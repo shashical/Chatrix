@@ -205,7 +205,7 @@ List<Widget> MergeAppUserAndSendInvite(
           leading: InkWell(
             child: CircleAvatar(
               foregroundImage: NetworkImage(
-                (blockedBy.contains(users[index].id))?'${users[index].photoUrl}':'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg',
+                !(blockedBy.contains(users[index].id))?'${users[index].photoUrl}':'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg',
               ),
             ),
             onTap: () {

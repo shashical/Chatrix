@@ -27,14 +27,14 @@ class UserChat {
     this.backgroundImage,
     required this.pinned,
     required this.recipientPhoneNo,
-    this.unreadMessageCount,
+    this.unreadMessageCount=1,
     this.lastMessage='',
     this.lastMessageType='',
     this.lastMessageTime,
     this.muted = false,
     this.blocked = false,
     this.containsSymmKey,
-    this.displayName,
+    this.displayName='',
     this.isSender=false,
   });
 

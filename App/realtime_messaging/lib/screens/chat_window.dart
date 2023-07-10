@@ -188,9 +188,9 @@ class _DocBubleState extends State<DocBuble> {
                                });
                                final docUrl = await uploadDocument(
                                    File(widget.senderUrl));
-                                if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                if (otherUserStream!.token != null && otherUserStream!.current!=widget.chatId && otherUserChat!.muted == false) {
                                       SendNotificationService().sendFCMChatMessage(
-                                          otheruser.token!,
+                                          otherUserStream!.token!,
                                           {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Document"},
                                           {});
                                     }
@@ -436,9 +436,9 @@ class _ImageBubbleState extends State<ImageBubble> {
                                   isUploading = true;});
                                 final docUrl = await uploadDocument(
                                     File(widget.senderUrl));
-                                if (otheruser.token != null && otheruser.current!=widget.chatId && otherUserChat!.muted == false) {
+                                if (otherUserStream!.token != null && otherUserStream!.current!=widget.chatId && otherUserChat!.muted == false) {
                                       SendNotificationService().sendFCMChatMessage(
-                                          otheruser.token!,
+                                          otherUserStream!.token!,
                                           {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': "Image"},
                                           {});
                                     }
@@ -570,7 +570,7 @@ class MyBubble extends StatelessWidget {
     );
   }
 }
-
+Users? otherUserStream;
 class ChatWindow extends StatefulWidget {
   final String backgroundImage, otherUserId;
   final String? chatId;
@@ -615,7 +615,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
   late Users currentUser;
   bool youBlocked=false;
   bool otherBlocked=false;
-  Users? otherUserStream;
+
   
   Future getImage(ImageSource source) async {
     final image = await ImagePicker().pickImage(source: source);
@@ -1011,7 +1011,6 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                   WidgetsBinding.instance.addPostFrameCallback((
                                       timeStamp) {
                                     setState(() {
-
                                     });
                                   });
                                 }
@@ -1035,7 +1034,6 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                   myMessageLength=chatmessages.length;
                                   isSelected=List.filled(myMessageLength, false);
                                   RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
-                                  debugPrint('counting valuessssss');
 
                                   trueCount=0;
                                   bgIndex=0;
@@ -1043,7 +1041,6 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                     assigned=true;
                                     bgIndex=-1;
                                   }
-
 
                                 }
                                 while(fgIndex<chatmessages.length && !chatmessages[fgIndex].read){
@@ -1062,11 +1059,12 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                   else{
 
                                     ChatsRemoteServices().updateChatMessage(chatid!,{'read':true}, chatmessages[bgIndex].id);
+
                                   }
                                   bgIndex--;
 
                                 }
-                                debugPrint('yes printinggggggggg');
+
 
 
                                 // RemoteServices().updateUserChat(otheruser.id,{'unreadMessageCount':unreadMessageCount+ouumc} , '${otheruser.id}$cid');
@@ -1115,18 +1113,17 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                   stream: RemoteServices().getUserChatStream(otheruser.id, '${otheruser.id}$cid'),
                                     builder: (context,snapshot){
                                     if(snapshot.hasData){
-                                    debugPrint("i am here");
+
                                       otherUserChat=snapshot.data;
                                       unreadMessageCount=otherUserChat?.unreadMessageCount??0;
-                                      debugPrint("before $ouumc");
+
                                       if(ouumc!=0) {
-                                        debugPrint("current $ouumc");
+
                                         RemoteServices().updateUserChat(widget.otherUserId,
                                           {'unreadMessageCount':unreadMessageCount+ouumc}, '${otherUserChat?.id}');
                                       }
-                                      debugPrint("after $ouumc");
+
                                       ouumc=0;
-                                      debugPrint(' after $ouumc');
                                       //debugPrint('$ouumc');
                                     }
                                     Widget listBuilder=ListView.builder(
@@ -1469,17 +1466,19 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     ));
                                                 final Users currentuser =
                                                 (await RemoteServices().getSingleUser(cid))!;
+                                                otherUserChat=UserChat(
+                                                    id: "${otheruser.id}$cid",
+                                                    chatId: chatid!,
+                                                    recipientPhoto: currentuser.photoUrl!,
+                                                    pinned: false,
+                                                    recipientPhoneNo: currentuser.phoneNo,
+                                                    backgroundImage: "assets/backgroundimage.png",
+                                                    lastMessageTime: DateTime.now()
+                                                );
                                                 await RemoteServices().setUserChat(
                                                    otheruser.id,
-                                                    UserChat(
-                                                      id: "${otheruser.id}$cid",
-                                                      chatId: chatid!,
-                                                      recipientPhoto: currentuser.photoUrl!,
-                                                      pinned: false,
-                                                      recipientPhoneNo: currentuser.phoneNo,
-                                                      backgroundImage: "assets/backgroundimage.png",
-                                                      lastMessageTime: DateTime.now()
-                                                    ));
+                                                  otherUserChat!
+                                                    );
 
 
 
@@ -1602,18 +1601,20 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                         String encrytedSymmKeyString = encryptedSymmKey.base64;
                                         final Users currentuser =
                                             (await RemoteServices().getSingleUser(cid))!;
+                                        otherUserChat=UserChat(
+                                          id: "${widget.otherUserId}$cid",
+                                          chatId: "$cid${widget.otherUserId}",
+                                          recipientPhoto: currentuser.photoUrl!,
+                                          pinned: false,
+                                          recipientPhoneNo: currentuser.phoneNo,
+                                          backgroundImage: "assets/backgroundimage.png",
+                                          containsSymmKey: encrytedSymmKeyString,
+                                          lastMessageTime:DateTime.now(),
+                                        );
                                         await RemoteServices().setUserChat(
                                             otheruser.id,
-                                            UserChat(
-                                                id: "${widget.otherUserId}$cid",
-                                                chatId: "$cid${widget.otherUserId}",
-                                                recipientPhoto: currentuser.photoUrl!,
-                                                pinned: false,
-                                                recipientPhoneNo: currentuser.phoneNo,
-                                                backgroundImage: "assets/backgroundimage.png",
-                                                containsSymmKey: encrytedSymmKeyString,
-                                              lastMessageTime:DateTime.now(),
-                                                ));
+                                          otherUserChat!
+                                            );
                                         await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                                   setState(() {
                                               chatid = "$cid${otheruser.id}";
@@ -1632,17 +1633,21 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     ));
                                                 final Users currentuser =
                                                 (await RemoteServices().getSingleUser(cid))!;
-                                              await RemoteServices().setUserChat(
-                                              otheruser.id,
-                                              UserChat(
-                                              id: "${otheruser.id}$cid",
-                                              chatId: chatid!,
-                                              recipientPhoto: currentuser.photoUrl!,
-                                              pinned: false,
-                                              recipientPhoneNo: currentuser.phoneNo,
-                                              backgroundImage: "assets/backgroundimage.png",
-                                                lastMessageTime: DateTime.now()
-                                              ));
+
+                                                otherUserChat=UserChat(
+                                                  id: "${widget.otherUserId}$cid",
+                                                  chatId: "$cid${widget.otherUserId}",
+                                                  recipientPhoto: currentuser.photoUrl!,
+                                                  pinned: false,
+                                                  recipientPhoneNo: currentuser.phoneNo,
+                                                  backgroundImage: "assets/backgroundimage.png",
+                                                 // containsSymmKey: encrytedSymmKeyString,
+                                                  lastMessageTime:DateTime.now(),
+                                                );
+                                                await RemoteServices().setUserChat(
+                                                    otheruser.id,
+                                                    otherUserChat!
+                                                );
 
 
 
@@ -1762,18 +1767,21 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                         String encrytedSymmKeyString = encryptedSymmKey.base64;
                                         final Users currentuser =
                                             (await RemoteServices().getSingleUser(cid))!;
-                                        await RemoteServices().setUserChat(
-                                            otheruser.id,
-                                            UserChat(
-                                                id: "${widget.otherUserId}$cid",
-                                                chatId: "$cid${widget.otherUserId}",
-                                                recipientPhoto: currentuser.photoUrl!,
-                                                pinned: false,
-                                                recipientPhoneNo: currentuser.phoneNo,
-                                                backgroundImage: "assets/backgroundimage.png",
-                                                containsSymmKey: encrytedSymmKeyString,
-                                              lastMessageTime: DateTime.now(),
-                                                ));
+
+                                                  otherUserChat=UserChat(
+                                                    id: "${widget.otherUserId}$cid",
+                                                    chatId: "$cid${widget.otherUserId}",
+                                                    recipientPhoto: currentuser.photoUrl!,
+                                                    pinned: false,
+                                                    recipientPhoneNo: currentuser.phoneNo,
+                                                    backgroundImage: "assets/backgroundimage.png",
+                                                    containsSymmKey: encrytedSymmKeyString,
+                                                    lastMessageTime:DateTime.now(),
+                                                  );
+                                                  await RemoteServices().setUserChat(
+                                                      otheruser.id,
+                                                      otherUserChat!
+                                                  );
                                         await const FlutterSecureStorage().write(key: "$cid${widget.otherUserId}",value: symmKeyString);
                                                   setState(() {
                                                   chatid = "$cid${otheruser.id}";
@@ -1792,17 +1800,20 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     ));
                                                 final Users currentuser =
                                                 (await RemoteServices().getSingleUser(cid))!;
+                                                otherUserChat=UserChat(
+                                                  id: "${widget.otherUserId}$cid",
+                                                  chatId: "$cid${widget.otherUserId}",
+                                                  recipientPhoto: currentuser.photoUrl!,
+                                                  pinned: false,
+                                                  recipientPhoneNo: currentuser.phoneNo,
+                                                  backgroundImage: "assets/backgroundimage.png",
+                                                  //containsSymmKey: encrytedSymmKeyString,
+                                                  lastMessageTime:DateTime.now(),
+                                                );
                                                 await RemoteServices().setUserChat(
                                                     otheruser.id,
-                                                    UserChat(
-                                                      id: "${otheruser.id}$cid",
-                                                      chatId: chatid!,
-                                                      recipientPhoto: currentuser.photoUrl!,
-                                                      pinned: false,
-                                                      recipientPhoneNo: currentuser.phoneNo,
-                                                      backgroundImage: "assets/backgroundimage.png",
-                                                      lastMessageTime: DateTime.now()
-                                                    ));
+                                                    otherUserChat!
+                                                );
 
 
 
@@ -1955,18 +1966,20 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             final Users currentuser =
                                             (await RemoteServices().getSingleUser(
                                                 cid))!;
+                                            otherUserChat=UserChat(
+                                              id: "${widget.otherUserId}$cid",
+                                              chatId: "$cid${widget.otherUserId}",
+                                              recipientPhoto: currentuser.photoUrl!,
+                                              pinned: false,
+                                              recipientPhoneNo: currentuser.phoneNo,
+                                              backgroundImage: "assets/backgroundimage.png",
+                                              containsSymmKey: encrytedSymmKeyString,
+                                              lastMessageTime:DateTime.now(),
+                                            );
                                             await RemoteServices().setUserChat(
                                                 otheruser.id,
-                                                UserChat(
-                                                  id: "${widget.otherUserId}$cid",
-                                                  chatId: "$cid${widget.otherUserId}",
-                                                  recipientPhoto: currentuser.photoUrl!,
-                                                  pinned: false,
-                                                  recipientPhoneNo: currentuser.phoneNo,
-                                                  backgroundImage: "assets/backgroundimage.png",
-                                                  containsSymmKey: encrytedSymmKeyString,
-                                                  lastMessageTime: DateTime.now()
-                                                ));
+                                                otherUserChat!
+                                            );
                                             await const FlutterSecureStorage().write(
                                                 key: "$cid${widget.otherUserId}",
                                                 value: symmKeyString);
@@ -1986,9 +1999,9 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                         String encryptedMessageString = encryptedMessage
                                             .base64;
 
-                                        if (otheruser.token != null && !isEditing && otheruser.current!=chatid && otherUserChat!.muted == false) {
+                                        if (otherUserStream!.token != null && !isEditing && otherUserStream!.current!=chatid && otherUserChat!.muted == false) {
                                           SendNotificationService().sendFCMChatMessage(
-                                              otheruser.token!,
+                                              otherUserStream!.token!,
                                               {'title': (otherUserChat!.displayName ?? curUser!.phoneNo), 'body': temp},
                                               {});
                                         }
@@ -2045,18 +2058,19 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                           if (!docsnap.exists) {
                                             final Users currentuser = (await RemoteServices()
                                                 .getSingleUser(cid))!;
+                                            otherUserChat=UserChat(
+                                              id: "${widget.otherUserId}$cid",
+                                              chatId: "$cid${widget.otherUserId}",
+                                              recipientPhoto: currentuser.photoUrl!,
+                                              pinned: false,
+                                              recipientPhoneNo: currentuser.phoneNo,
+                                              backgroundImage: "assets/backgroundimage.png",
+                                              //containsSymmKey: encrytedSymmKeyString,
+                                              lastMessageTime:DateTime.now(),
+                                            );
                                             await RemoteServices().setUserChat(
-                                                widget.otherUserId,
-                                                UserChat(
-                                                    id: "${widget.otherUserId}$cid",
-                                                    chatId: chatid!,
-                                                    recipientPhoto: currentuser
-                                                        .photoUrl!,
-                                                    pinned: false,
-                                                    recipientPhoneNo: currentuser
-                                                        .phoneNo,
-                                                    backgroundImage: "assets/backgroundimage.png",
-                                                    lastMessageTime: DateTime.now())
+                                                otheruser.id,
+                                                otherUserChat!
                                             );
                                           }
 
