@@ -406,7 +406,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                                 ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                                     child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                                 const SizedBox(width: 5,),
-                                                                (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
+                                                                (count==0)?const Icon(Icons.done_all, size: 20,):const Icon(Icons.done)
                                                               ],
                                                             ),
                                                           ),
@@ -748,7 +748,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                     child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                     const SizedBox(width: 5,),
-                                                    (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
+                                                    (count==0)?const Icon(Icons.done_all,size: 20,):const Icon(Icons.done)
                                                   ],
                                                 ),
                                               ),

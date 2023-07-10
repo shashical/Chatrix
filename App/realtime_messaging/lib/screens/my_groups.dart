@@ -968,7 +968,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                     ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                         child: Text(usergroup.lastMessage??'', maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                     const SizedBox(width: 5,),
-                                    (usergroup.senderId==cid)?const SizedBox(width: 0,):const Icon(Icons.done)
+                                    (usergroup.senderId==cid)?const SizedBox(width: 0,):const Icon(Icons.done, size:20)
                                   ],
                                 ),
                               ),
