@@ -320,6 +320,12 @@ class _ChatsPageState extends State<ChatsPage> {
                         final UserChat userchat = userchats[index];
                           final ind = savedNumber.indexOf(userchat.recipientPhoneNo);
                         final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
+                        if(userchat.displayName=='' || userchat.displayName==null ){
+                          RemoteServices().updateUserChat(cid,{'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo}, userchat.id);
+                        }
+                        else if(ind!=-1 && userchat.displayName!=savedUsers[ind] ){
+                          RemoteServices().updateUserChat(cid, {'displayName':savedUsers[ind]}, userchat.id);
+                        }
 
                           if(userchat.containsSymmKey != null){
                             String encryptedSymmKeyString = userchat.containsSymmKey!;
@@ -345,7 +351,6 @@ class _ChatsPageState extends State<ChatsPage> {
                                             future: RemoteServices().updateUserChat(cid,
                                                 {
                                                   'containsSymmKey': null,
-                                                  'displayName':(ind!=-1)?savedUsers[ind]:userchat.recipientPhoneNo,
                                                 }
                                                 , userchat.id),
                                             builder: (context, snapshot) {
@@ -370,6 +375,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                         debugPrint("getuserchatstream my chats");
                                                         final UserChat? otherUserChat=snapshot.data;
                                                         final count=otherUserChat!.unreadMessageCount??0;
+                                                        debugPrint('my chat is culprit because of this stream builder ');
                                                         return ListTile(
                                                           tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                                           leading: InkWell(
@@ -394,19 +400,19 @@ class _ChatsPageState extends State<ChatsPage> {
                                                           ),
                                                           title: Text((ind != -1) ? savedUsers[ind] : userchat
                                                               .recipientPhoneNo),
-                                                          subtitle: IntrinsicWidth(
+                                                          subtitle:IntrinsicWidth(
                                                             child: Row(
                                                               children: [
-                                                                Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                                                const SizedBox(width: 10,),
+                                                                ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
+                                                                    child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                                                                const SizedBox(width: 5,),
                                                                 (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
                                                               ],
                                                             ),
                                                           ),
-                                                          trailing: SizedBox(
-                                                            height: 50,
-                                                            width: 80,
+                                                          trailing: IntrinsicWidth(
                                                             child: Column(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
                                                               children: [
                                                                 Text((userchat.lastMessageTime == null
                                                                     ? ""
@@ -600,6 +606,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                             final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
                                                             RemoteServices().updateUser(cid,
                                                                 {'current':userchat.id});
+                                                            debugPrint('my chat is culprit  ');
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
                                                               return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                                             },));
@@ -738,16 +745,16 @@ class _ChatsPageState extends State<ChatsPage> {
                                               subtitle: IntrinsicWidth(
                                                 child: Row(
                                                   children: [
-                                                    Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                                    const SizedBox(width: 10,),
+                                                    ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
+                                                    child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                                                    const SizedBox(width: 5,),
                                                     (count==0)?const Icon(Icons.done_all):const Icon(Icons.done)
                                                   ],
                                                 ),
                                               ),
-                                              trailing: SizedBox(
-                                                height: 50,
-                                                width: 80,
+                                              trailing: IntrinsicWidth(
                                                 child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
                                                     Text((userchat.lastMessageTime == null
                                                         ? ""

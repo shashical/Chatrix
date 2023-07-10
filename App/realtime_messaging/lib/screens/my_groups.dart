@@ -299,92 +299,182 @@ class _GroupsPageState extends State<GroupsPage> {
                                             }
                                             , usergroup.groupId),
                                       builder: (context, snapshot) {
+                                        debugPrint('my group is culprit ');
                                         if(usergroup.lastMessageType == 'text' && usergroup.lastMessage != ''){
+
                                           String? symmKeyString;
                                           return FutureBuilder(
                                             future: const FlutterSecureStorage().read(key: usergroup.groupId),
                                             builder: (context, snapshot) {
-                                              if(snapshot.hasData){
+                                              if(snapshot.hasData) {
                                                 symmKeyString = snapshot.data;
-                                                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                                encrypt.Key symmKey = encrypt
+                                                    .Key.fromBase64(
+                                                    symmKeyString!);
+                                                encrypt
+                                                    .Encrypter encrypter = encrypt
+                                                    .Encrypter(encrypt.AES(
+                                                    symmKey));
 
-                                                encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(usergroup.lastMessage!);
-                                                String message = encrypter.decrypt(encryptedMessage,iv: iv);
+                                                encrypt
+                                                    .Encrypted encryptedMessage = encrypt
+                                                    .Encrypted.fromBase64(
+                                                    usergroup.lastMessage!);
+                                                String message = encrypter
+                                                    .decrypt(
+                                                    encryptedMessage, iv: iv);
                                                 return ListTile(
-                          tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
-                              leading: InkWell(
-                                child: Stack(
-                                  children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(usergroup.imageUrl),
-                                  ),
-                                    (isSelected[index])?
-                                    const Positioned(
-                                        bottom: 1,
-                                        right: 5,
-                                        child: Icon(Icons.check_circle,color: Colors.cyan,size: 16,))
-                                        :const SizedBox(height: 0,width: 0,)
-                                ]
-                                ),
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,userGroupId: usergroup.id,)));
-                                },
-                              ),
-                              title: Text(usergroup.name),
-                              subtitle: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                              trailing: SizedBox(
-                                width: 80,
-                                height: 50,
-                                child: Column(
-                                  children: [
-                                    Text((usergroup.lastMessageTime == null
-                                        ? ""
-                                        : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                              child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                          usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                          usergroup.unreadMessageCount!=0? Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration:
-                                            const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                            child:Text('${usergroup.unreadMessageCount}',
-                                              style: const TextStyle(color: Colors.white70),) ,):
-                                          const SizedBox(width: 0,height: 0,)
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () async {
-                                if (trueCount != 0) {
-                                  if (isSelected[index]) {
-                                    setState(() {
-                                      if (!usergroups[index].muted) {
-                                        unMutedSelected.remove(index);
-                                      }
-                                      if (!usergroups[index].pinned) {
-                                        unPinnedSelected.remove(index);
-                                      }
-                                      isSelected[index] = false;
-                                      trueCount--;
-                                    });
-                                  }
-                                  else {
-                                    setState(() {
-                                      if (!usergroups[index].muted) {
-                                        unMutedSelected.add(index);
-                                      }
-                                      if (!usergroups[index].pinned) {
-                                        unPinnedSelected.add(index);
-                                      }
+                                                  tileColor: isSelected[index]
+                                                      ? Colors.blue.withOpacity(
+                                                      0.5)
+                                                      : null,
+                                                  leading: InkWell(
+                                                    child: Stack(
+                                                        children: [
+                                                          CircleAvatar(
+                                                            backgroundImage: NetworkImage(
+                                                                usergroup
+                                                                    .imageUrl),
+                                                          ),
+                                                          (isSelected[index]) ?
+                                                          const Positioned(
+                                                              bottom: 1,
+                                                              right: 5,
+                                                              child: Icon(Icons
+                                                                  .check_circle,
+                                                                color: Colors
+                                                                    .cyan,
+                                                                size: 16,))
+                                                              : const SizedBox(
+                                                            height: 0,
+                                                            width: 0,)
+                                                        ]),
+                                                    onTap: () {
+                                                      Navigator.push(context,
+                                                          MaterialPageRoute(
+                                                              builder: (
+                                                                  context) =>
+                                                                  GroupInfoPage(
+                                                                    groupId: usergroup
+                                                                        .groupId,
+                                                                    userGroupId: usergroup
+                                                                        .id,)));
+                                                    },),
+                                                  title: Text(usergroup.name),
+                                                  subtitle: Text(message,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow
+                                                        .ellipsis,),
+                                                  trailing: SizedBox(
+                                                    width: 80,
+                                                    height: 50,
+                                                    child: Column(
+                                                      children: [
+                                                        Text((usergroup
+                                                            .lastMessageTime ==
+                                                            null
+                                                            ? ""
+                                                            : "${usergroup
+                                                            .lastMessageTime!
+                                                            .hour}:${usergroup
+                                                            .lastMessageTime!
+                                                            .minute ~/
+                                                            10}${usergroup
+                                                            .lastMessageTime!
+                                                            .minute % 10}")),
+                                                        Container(
+                                                          constraints: BoxConstraints(
+                                                              maxHeight: (usergroup
+                                                                  .unreadMessageCount !=
+                                                                  0 || usergroup
+                                                                  .pinned ||
+                                                                  usergroup
+                                                                      .muted)
+                                                                  ? 50
+                                                                  : 0),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .end,
+                                                            children: [
+                                                              usergroup.pinned
+                                                                  ? Transform
+                                                                  .rotate(
+                                                                  angle: math
+                                                                      .pi / 7,
+                                                                  child: const Icon(
+                                                                    CupertinoIcons
+                                                                        .pin_fill,
+                                                                    size: 20,))
+                                                                  : const SizedBox(
+                                                                width: 0,
+                                                                height: 0,),
+                                                              usergroup.muted
+                                                                  ? const Icon(
+                                                                  CupertinoIcons
+                                                                      .volume_off,
+                                                                  size: 20)
+                                                                  : const SizedBox(
+                                                                width: 0,
+                                                                height: 0,),
+                                                              usergroup
+                                                                  .unreadMessageCount !=
+                                                                  0
+                                                                  ? Container(
+                                                                padding: const EdgeInsets
+                                                                    .all(5),
+                                                                decoration:
+                                                                const BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    color: Colors
+                                                                        .orangeAccent),
+                                                                child: Text(
+                                                                  '${usergroup
+                                                                      .unreadMessageCount}',
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .white70),),)
+                                                                  :
+                                                              const SizedBox(
+                                                                width: 0,
+                                                                height: 0,)
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  onTap: () async {
+                                                    if (trueCount != 0) {
+                                                      if (isSelected[index]) {
+                                                        setState(() {
+                                                          if (!usergroups[index]
+                                                              .muted) {
+                                                            unMutedSelected
+                                                                .remove(index);
+                                                          }
+                                                          if (!usergroups[index]
+                                                              .pinned) {
+                                                            unPinnedSelected
+                                                                .remove(index);
+                                                          }
+                                                          isSelected[index] =
+                                                          false;
+                                                          trueCount--;
+                                                        });
+                                                      }
+                                                      else {
+                                                        setState(() {
+                                                          if (!usergroups[index]
+                                                              .muted) {
+                                                            unMutedSelected.add(
+                                                                index);
+                                                          }
+                                                          if (!usergroups[index]
+                                                              .pinned) {
+                                                            unPinnedSelected
+                                                                .add(index);
+                                                          }
 
                                       isSelected[index] = true;
                                       trueCount++;
@@ -448,131 +538,213 @@ class _GroupsPageState extends State<GroupsPage> {
                                             },
                                           );
                                         }
-                                        else{
+                                        else {
                                           return ListTile(
-                          tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
-                              leading: InkWell(
-                                child: Stack(
-                                  children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(usergroup.imageUrl),
-                                  ),
-                                    (isSelected[index])?
-                                    const Positioned(
-                                        bottom: 1,
-                                        right: 5,
-                                        child: Icon(Icons.check_circle,color: Colors.cyan,size: 16,))
-                                        :const SizedBox(height: 0,width: 0,)
-                                ]
-                                ),
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,userGroupId: usergroup.id,)));
-                                },
-                              ),
-                              title: Text(usergroup.name),
-                              subtitle: Text(usergroup.lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                              trailing: SizedBox(
-                                width: 80,
-                                height: 50,
-                                child: Column(
-                                  children: [
-                                    Text((usergroup.lastMessageTime == null
-                                        ? ""
-                                        : "${usergroup.lastMessageTime!.hour}:${usergroup.lastMessageTime!.minute~/10}${usergroup.lastMessageTime!.minute%10}")),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight:(usergroup.unreadMessageCount!=0 || usergroup.pinned||usergroup.muted)?50:0 ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          usergroup.pinned? Transform.rotate(angle: math.pi/7,
-                                              child: const Icon(CupertinoIcons.pin_fill,size: 20,)):const SizedBox(width: 0,height: 0,),
-                                          usergroup.muted? const Icon(CupertinoIcons.volume_off,size:20) :const SizedBox(width: 0,height: 0,),
-                                          usergroup.unreadMessageCount!=0? Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration:
-                                            const BoxDecoration(shape: BoxShape.circle,color: Colors.orangeAccent),
-                                            child:Text('${usergroup.unreadMessageCount}',
-                                              style: const TextStyle(color: Colors.white70),) ,):
-                                          const SizedBox(width: 0,height: 0,)
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () async {
+                                            tileColor: isSelected[index]
+                                                ? Colors.blue.withOpacity(0.5)
+                                                : null,
+                                            leading: InkWell(
+                                              child: Stack(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          usergroup.imageUrl),
+                                                    ),
+                                                    (isSelected[index]) ?
+                                                    const Positioned(
+                                                        bottom: 1,
+                                                        right: 5,
+                                                        child: Icon(
+                                                          Icons.check_circle,
+                                                          color: Colors.cyan,
+                                                          size: 16,))
+                                                        : const SizedBox(
+                                                      height: 0, width: 0,)
+                                                  ]
+                                              ),
+                                              onTap: () {
+                                                Navigator.push(context,
+                                                    MaterialPageRoute(builder: (
+                                                        context) =>
+                                                        GroupInfoPage(
+                                                          groupId: usergroup
+                                                              .groupId,
+                                                          userGroupId: usergroup
+                                                              .id,)));
+                                              },
+                                            ),
+                                            title: Text(usergroup.name),
+                                            subtitle: Text(
+                                              usergroup.lastMessage ?? "",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,),
+                                            trailing: SizedBox(
+                                              width: 80,
+                                              height: 50,
+                                              child: Column(
+                                                children: [
+                                                  Text((usergroup
+                                                      .lastMessageTime == null
+                                                      ? ""
+                                                      : "${usergroup
+                                                      .lastMessageTime!
+                                                      .hour}:${usergroup
+                                                      .lastMessageTime!
+                                                      .minute ~/ 10}${usergroup
+                                                      .lastMessageTime!.minute %
+                                                      10}")),
+                                                  Container(
+                                                    constraints: BoxConstraints(
+                                                        maxHeight: (usergroup
+                                                            .unreadMessageCount !=
+                                                            0 ||
+                                                            usergroup.pinned ||
+                                                            usergroup.muted)
+                                                            ? 50
+                                                            : 0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment
+                                                          .end,
+                                                      children: [
+                                                        usergroup.pinned
+                                                            ? Transform.rotate(
+                                                            angle: math.pi / 7,
+                                                            child: const Icon(
+                                                              CupertinoIcons
+                                                                  .pin_fill,
+                                                              size: 20,))
+                                                            : const SizedBox(
+                                                          width: 0, height: 0,),
+                                                        usergroup.muted
+                                                            ? const Icon(
+                                                            CupertinoIcons
+                                                                .volume_off,
+                                                            size: 20)
+                                                            : const SizedBox(
+                                                          width: 0, height: 0,),
+                                                        usergroup
+                                                            .unreadMessageCount !=
+                                                            0
+                                                            ? Container(
+                                                          padding: const EdgeInsets
+                                                              .all(5),
+                                                          decoration:
+                                                          const BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: Colors
+                                                                  .orangeAccent),
+                                                          child: Text(
+                                                            '${usergroup
+                                                                .unreadMessageCount}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .white70),),)
+                                                            :
+                                                        const SizedBox(
+                                                          width: 0, height: 0,)
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            onTap: () async {
+                                              if (trueCount != 0) {
+                                                if (isSelected[index]) {
+                                                  setState(() {
+                                                    if (!usergroups[index]
+                                                        .muted) {
+                                                      unMutedSelected.remove(
+                                                          index);
+                                                    }
+                                                    if (!usergroups[index]
+                                                        .pinned) {
+                                                      unPinnedSelected.remove(
+                                                          index);
+                                                    }
+                                                    isSelected[index] = false;
+                                                    trueCount--;
+                                                  });
+                                                }
+                                                else {
+                                                  setState(() {
+                                                    if (!usergroups[index]
+                                                        .muted) {
+                                                      unMutedSelected.add(
+                                                          index);
+                                                    }
+                                                    if (!usergroups[index]
+                                                        .pinned) {
+                                                      unPinnedSelected.add(
+                                                          index);
+                                                    }
 
-                                if(trueCount!=0) {
-                                  if (isSelected[index]) {
-                                    setState(() {
-                                      if(!usergroups[index].muted){
-                                        unMutedSelected.remove(index);
-
-                                      }
-                                      if(!usergroups[index].pinned){
-                                        unPinnedSelected.remove(index);
-                                      }
-                                      isSelected[index] = false;
-                                      trueCount--;
-                                    });
-                                  }
-                                  else{
-                                    setState(() {
-                                      if(!usergroups[index].muted){
-                                        unMutedSelected.add(index);
-                                      }
-                                      if(!usergroups[index].pinned){
-                                        unPinnedSelected.add(index);
-                                      }
-
-                                      isSelected[index]=true;
-                                      trueCount++;
-                                    });
-                                  }
-
-                                }
-                                else{
-                                  RemoteServices().updateUser(cid, {'current':usergroup.groupId});
-                                  final result =await Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
-                                  },));
-                                  debugPrint("my groups current 2");
-                                  RemoteServices().updateUser(cid, {'current':result});
-                                  current=null;
-                                }
-                              },
-                              onLongPress: (){
-                                    if(isSelected[index]){
-                                      setState(() {
-                                        if(!usergroups[index].muted){
-                                          unMutedSelected.remove(index);
-
-                                        }
-                                        if(!usergroups[index].pinned){
-                                          unPinnedSelected.remove(index);
-                                        }
-                                        isSelected[index]=false;
-                                        trueCount--;
-                                      });
-
-                                    }
-                                    else{
-                                      setState(() {
-                                        if(!usergroups[index].muted){
-                                          unMutedSelected.add(index);
-
-                                        }
-                                        if(!usergroups[index].pinned){
-                                          unPinnedSelected.add(index);
-                                        }
-                                        isSelected[index]=true;
-                                        trueCount++;
-                                      });
-
-                                    }
-                              },
-                            );
+                                                    isSelected[index] = true;
+                                                    trueCount++;
+                                                  });
+                                                }
+                                              }
+                                              else {
+                                                debugPrint("a");
+                                                RemoteServices().updateUser(cid,
+                                                    {
+                                                      'current': usergroup
+                                                          .groupId
+                                                    });
+                                                final result = await Navigator
+                                                    .push(
+                                                    context, MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return GroupWindow(
+                                                        groupName: usergroup
+                                                            .name,
+                                                        groupPhoto: usergroup
+                                                            .imageUrl,
+                                                        backgroundImage: usergroup
+                                                            .backgroundImage,
+                                                        groupId: usergroup
+                                                            .groupId);
+                                                  },));
+                                                  debugPrint("b");
+                                                RemoteServices().updateUser(
+                                                    cid, {'current': result});
+                                                current = null;
+                                              }
+                                            },
+                                            onLongPress: () {
+                                              if (isSelected[index]) {
+                                                setState(() {
+                                                  if (!usergroups[index]
+                                                      .muted) {
+                                                    unMutedSelected.remove(
+                                                        index);
+                                                  }
+                                                  if (!usergroups[index]
+                                                      .pinned) {
+                                                    unPinnedSelected.remove(
+                                                        index);
+                                                  }
+                                                  isSelected[index] = false;
+                                                  trueCount--;
+                                                });
+                                              }
+                                              else {
+                                                setState(() {
+                                                  if (!usergroups[index]
+                                                      .muted) {
+                                                    unMutedSelected.add(index);
+                                                  }
+                                                  if (!usergroups[index]
+                                                      .pinned) {
+                                                    unPinnedSelected.add(index);
+                                                  }
+                                                  isSelected[index] = true;
+                                                  trueCount++;
+                                                });
+                                              }
+                                            },
+                                          );
                                         }
                                       },
                                     );
@@ -618,8 +790,12 @@ class _GroupsPageState extends State<GroupsPage> {
                                         :const SizedBox(height: 0,width: 0,)
                                 ]
                                 ),
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: usergroup.groupId,userGroupId: usergroup.id,)));
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          GroupInfoPage(
+                                            groupId: usergroup.groupId,
+                                            userGroupId: usergroup.id,)));
                                 },
                               ),
                                                   title: Text(usergroup.name),
@@ -689,6 +865,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 }
                                 else{
+                                  debugPrint("c");
                                   RemoteServices().updateUser(cid, {'current':usergroup.groupId});
                                   final result=await Navigator.push(context,
                                       MaterialPageRoute(builder: (context) {
@@ -834,6 +1011,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 }
                                 else{
+                                  debugPrint("d");
                                   RemoteServices().updateUser(cid, {'current':usergroup.groupId});
                                   final result=await Navigator.push(context,
                                       MaterialPageRoute(builder: (context) {
