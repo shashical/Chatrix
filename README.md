@@ -119,5 +119,6 @@ As the name suggests, this page shows you the details of the group. These includ
 # Important Note 
 
 Please provide the required permissions for smooth functioning of app.
+Also, note that the convention in our app is that a single tick means 'sent' and a double tick means 'read'.
 
  
