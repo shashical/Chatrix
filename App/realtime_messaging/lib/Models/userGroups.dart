@@ -17,6 +17,7 @@ class UserGroup {
   String? lastMessageType;
   bool muted;
   String? containsSymmKey;
+  String? senderId;
 
   UserGroup({
     required this.id,
@@ -32,6 +33,8 @@ class UserGroup {
     this.lastMessageType,
     this.muted = false,
     this.containsSymmKey,
+    this.senderId='',
+
   });
 
   factory UserGroup.fromJson(Map<String, dynamic> json) {
@@ -48,7 +51,8 @@ class UserGroup {
       lastMessageTime: (json['lastMessageTime']!=null)?DateTime.parse(json['lastMessageTime']):null,
       lastMessageType: json['lastMessageType'],
       muted: json['muted'],
-      containsSymmKey: json['containsSymmKey']
+      containsSymmKey: json['containsSymmKey'],
+      senderId: json['senderId'],
     );
   }
 
@@ -66,7 +70,8 @@ class UserGroup {
       'lastMessageTime': lastMessageTime?.toIso8601String(),
       'lastMessageType': lastMessageType,
       'muted': muted,
-      'containsSymmKey': containsSymmKey
+      'containsSymmKey': containsSymmKey,
+      'senderId':senderId
     };
   }
 }

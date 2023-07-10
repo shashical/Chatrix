@@ -291,23 +291,6 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                     ),
                     Row(
                       children: [
-                        Countdown(
-                          controller: _controller,
-                          seconds: 30,
-                          build: (_, double time) => Text(
-                            time.toString().substring(0, 2),
-                            style: const TextStyle(
-                              fontSize: 35,
-                            ),
-                          ),
-                          interval: const Duration(milliseconds: 10),
-                          onFinished: () {
-                            setState(() {
-                              canresend = true;
-                            });
-                          },
-                        ),
-                        const Spacer(),
                         TextButton(
                             onPressed: () {
                               if (canresend) {
@@ -332,12 +315,12 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                                     return ElevatedButton(
                                                         onPressed: () {
                                                           Navigator.of(context,
-                                                                  rootNavigator:
-                                                                      true)
+                                                              rootNavigator:
+                                                              true)
                                                               .pop();
                                                         },
                                                         child:
-                                                            const Text('OK'));
+                                                        const Text('OK'));
                                                   })
                                                 ],
                                               );
@@ -363,7 +346,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                               return ElevatedButton(
                                                   onPressed: () {
                                                     Navigator.of(context,
-                                                            rootNavigator: true)
+                                                        rootNavigator: true)
                                                         .pop();
                                                   },
                                                   child: const Text('OK'));
@@ -382,7 +365,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                               return ElevatedButton(
                                                   onPressed: () {
                                                     Navigator.of(context,
-                                                            rootNavigator: true)
+                                                        rootNavigator: true)
                                                         .pop();
                                                   },
                                                   child: const Text('OK'));
@@ -396,13 +379,34 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             child: Text(
                               'Resend OTP',
                               style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w300,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
                                 color: (canresend)
-                                    ? Colors.deepPurpleAccent
-                                    : Colors.red,
+                                    ? Colors.blue
+                                    : Colors.grey,
                               ),
-                            ))
+                            )),
+                        const Text(' in ',style: TextStyle(fontSize: 26),),
+
+                        const Spacer(),
+                        Countdown(
+                          controller: _controller,
+                          seconds: 30,
+                          build: (_, double time) => Text(
+                            '00:${(time~/10).toString()}${(time%10).toString().substring(0,1)} ',
+                            style: const TextStyle(
+                              fontSize: 35,
+                            ),
+                          ),
+                          interval: const Duration(milliseconds: 10),
+                          onFinished: () {
+                            setState(() {
+                              canresend = true;
+                            });
+                          },
+                        ),
+                        
+                       
                       ],
                     ),
                     const SizedBox(
