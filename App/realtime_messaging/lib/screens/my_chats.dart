@@ -287,7 +287,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 stream: _usersremoteServices.getUserChats(cid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    debugPrint('Rajeev');
+                    debugPrint('My chats first stream');
                     userchats = snapshot.data!;
                     if(mychatlength!=userchats.length){
                       isSelected=List.filled(userchats.length,false);
@@ -340,6 +340,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                       FutureBuilder(
                                         future:  const FlutterSecureStorage().write(key: userchat.chatId, value: symmKeyString),
                                         builder: (context, snapshot) {
+                                          debugPrint("My chats containssymmkey");
                                           return FutureBuilder(
                                             future: RemoteServices().updateUserChat(cid,
                                                 {
@@ -366,6 +367,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                       return StreamBuilder<UserChat>(
                                                       stream: RemoteServices().getUserChatStream(otheruserid, '$otheruserid$cid'),
                                                       builder: (context, snapshot) {
+                                                        debugPrint("getuserchatstream my chats");
                                                         final UserChat? otherUserChat=snapshot.data;
                                                         final count=otherUserChat!.unreadMessageCount??0;
                                                         return ListTile(
@@ -467,6 +469,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
                                                                 return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                                               },));
+                                                              debugPrint("my chats current update");
                                                             RemoteServices().updateUser(cid,{'current':result});
                                                             current=null;
                                                             }
@@ -508,6 +511,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     );
                                                     }
                                                     else{
+                                                      debugPrint("my chats else list tile");
                                                       return ListTile(
                                                         tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                                         leading: InkWell(
@@ -599,6 +603,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
                                                               return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                                             },));
+                                                            debugPrint("my chats current update");
                                                             RemoteServices().updateUser(cid,{'current':result});
                                                             current=null;
                                                           }
@@ -703,8 +708,9 @@ class _ChatsPageState extends State<ChatsPage> {
                                       return StreamBuilder<UserChat>(
                                           stream: RemoteServices().getUserChatStream(otheruserid, '$otheruserid$cid'),
                                           builder: (context, snapshot) {
+                                            debugPrint("getuserchatstream 2");
                                             final UserChat? otherUserChat=snapshot.data;
-                                            final count=otherUserChat!.unreadMessageCount??0;
+                                            final count=otherUserChat?.unreadMessageCount??0;
                                             return ListTile(
                                               tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                               leading: InkWell(
@@ -712,7 +718,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     children: [
                                                       CircleAvatar(
                                                         backgroundImage: NetworkImage(
-                                                            !(curUser!.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
+                                                            !(curUser?.blockedBy?.contains(otheruserid)??false)? userchat.recipientPhoto:'http://ronaldmottram.co.nz/wp-content/uploads/2019/01/default-user-icon-8.jpg'),
                                                       ),
                                                       (isSelected[index]) ?
                                                       const Positioned(
@@ -804,6 +810,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                   final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
                                                     return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
                                                   },));
+                                                  debugPrint("my chats current 3");
                                                   RemoteServices().updateUser(cid,{'current':result});
                                                   current=null;
                                                 }
@@ -845,6 +852,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                       );
                                     }
                                     else {
+                                      debugPrint("list tile 4?");
                                       return ListTile(
                                     tileColor: isSelected[index]?Colors.blue.withOpacity(0.5):null,
                                     leading: InkWell(

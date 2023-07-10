@@ -245,6 +245,7 @@ class _GroupsPageState extends State<GroupsPage> {
               child: StreamBuilder<List<UserGroup>>(
                 stream: _remoteServices.getUserGroups(cid),
                 builder: (context, snapshot) {
+                  debugPrint("usergroupliststream1");
                   if (snapshot.hasData) {
                      usergroups = snapshot.data!;
                      if(myGroupsLength!=usergroups.length) {
@@ -290,6 +291,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                 return FutureBuilder(
                                   future: const FlutterSecureStorage().write(key: usergroup.groupId, value: symmKeyString),
                                   builder: (context, snapshot) {
+                                    debugPrint("symmkeynull 1 my groups");
                                     return FutureBuilder(
                                       future: RemoteServices().updateUserGroup(cid,
                                             {
@@ -400,6 +402,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                 .backgroundImage,
                                             groupId: usergroup.groupId);
                                       },));
+                                  debugPrint("my groups current 1");
                                   RemoteServices().updateUser(cid, {'current':result});
                                   current=null;
                                 }
@@ -534,6 +537,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   final result =await Navigator.push(context, MaterialPageRoute(builder: (context) {
                                     return GroupWindow(groupName: usergroup.name, groupPhoto: usergroup.imageUrl, backgroundImage: usergroup.backgroundImage, groupId: usergroup.groupId);
                                   },));
+                                  debugPrint("my groups current 2");
                                   RemoteServices().updateUser(cid, {'current':result});
                                   current=null;
                                 }
@@ -695,6 +699,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                 .backgroundImage,
                                             groupId: usergroup.groupId);
                                       },));
+                                      debugPrint("my groups current 6");
                                   RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },
@@ -839,6 +844,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                 .backgroundImage,
                                             groupId: usergroup.groupId);
                                       },));
+                                      debugPrint("my groups current 7");
                                   RemoteServices().updateUser(cid, {'current':result});
                                 }
                               },

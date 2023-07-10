@@ -900,8 +900,10 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      debugPrint("group window resume");
       RemoteServices().updateUser(cid, {'current': current});
     } else {
+      debugPrint("group window exit");
       RemoteServices().updateUser(cid, {'current': null});
     }
   }
@@ -1293,6 +1295,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                           groupmessages = snapshot.data!.reversed.toList();
                           if(myMessageLength!=groupmessages.length){
                             myMessageLength=groupmessages.length;
+                            debugPrint("group window umc 0");
                             RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
                             totalWritesFromThisPage++;
                             debugPrint('printing from cidupdateunreadcount $totalWritesFromThisPage ');
@@ -1312,6 +1315,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                           while(fgIndex<groupmessages.length && !(groupmessages[fgIndex].readBy[cid]??false)){
                             if(groupmessages[fgIndex].senderId!=cid){
                               groupmessages[fgIndex].readBy[cid]=true;
+                              debugPrint("group window read by 1");
                               GroupsRemoteServices().updateGroupMessage(widget.groupId, {'readBy':groupmessages[fgIndex].readBy}, groupmessages[fgIndex].id);
                             }
                             fgIndex++;
@@ -1325,6 +1329,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                             }
                             else{
                               groupmessages[bgIndex].readBy[cid]=true;
+                              debugPrint("group window read by 2");
                               GroupsRemoteServices().updateGroupMessage(
                                   widget.groupId,
                                   {'readBy':groupmessages[bgIndex].readBy},
@@ -1765,6 +1770,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   builder: (BuildContext context,
                                                       AsyncSnapshot<dynamic>
                                                           snapshot) {
+                                                            debugPrint("group window get user stream");
                                                     if (snapshot.hasData) {
                                                       final UserGroup gp =
                                                           snapshot.data;
@@ -1778,6 +1784,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                           dummy != 0) {
                                                         // debugPrint(
                                                         //     'checking $count +$dummy=${dummy + count}');
+                                                        debugPrint("group window count + dummy");
                                                         RemoteServices()
                                                             .updateUserGroup(
                                                                 participants[index],
@@ -1884,6 +1891,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                       maxLines: null,
                                       controller: messageController,
                                       onChanged: (e) {
+                                        debugPrint("group window sus set state");
                                         setState(() {});
                                         // if(messageController.text.isEmpty||messageController.text.length==1||messageController.text.length==2){
                                         //   setState(() {
@@ -1919,6 +1927,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               for (int i = 0;
                                                   i < files.files.length;
                                                   i++) {
+                                                    debugPrint("set group message");
                                                 await GroupsRemoteServices()
                                                     .setGroupMessage(
                                                         widget.groupId,
@@ -1950,6 +1959,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               // .getDocumentField(
                                               //     "groups/${widget.groupId}", 'participantIds');
                                               for (var x in participants) {
+                                                debugPrint("group window update user group");
                                                 RemoteServices().updateUserGroup(
                                                     x,
                                                     {
@@ -2008,6 +2018,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   (await RemoteServices()
                                                       .getSingleUser(cid))!;
                                               for (int i = 0; i < 1; i++) {
+                                                debugPrint("group window set group message 2");
                                                 await GroupsRemoteServices()
                                                     .setGroupMessage(
                                                         widget.groupId,
@@ -2039,6 +2050,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               // .getDocumentField(
                                               //     "groups/${widget.groupId}", 'participantIds');
                                               for (var x in participants) {
+                                                debugPrint("group window update user group 2");
                                                 RemoteServices().updateUserGroup(
                                                     x,
                                                     {
@@ -2078,6 +2090,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   (await RemoteServices()
                                                       .getSingleUser(cid))!;
                                               for (int i = 0; i < 1; i++) {
+                                                debugPrint("group window set group message 3");
                                                 await GroupsRemoteServices()
                                                     .setGroupMessage(
                                                         widget.groupId,
@@ -2109,6 +2122,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               // .getDocumentField(
                                               //     "groups/${widget.groupId}", 'participantIds');
                                               for (var x in participants) {
+                                                debugPrint("group window update user group 3");
                                                 RemoteServices().updateUserGroup(
                                                     x,
                                                     {
@@ -2179,6 +2193,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                           String encryptedMessageString =
                                               encryptedMessage.base64;
                                           if (!isEditing) {
+                                            debugPrint("group window set group message 4");
                                             await GroupsRemoteServices()
                                                 .setGroupMessage(
                                                     widget.groupId,
@@ -2218,6 +2233,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                             //     "groups/${widget.groupId}", 'participantIds');
 
                                             for (var x in participants) {
+                                              debugPrint("group window update user group 4");
                                               RemoteServices().updateUserGroup(
                                                   x,
                                                   {
@@ -2231,6 +2247,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   widget.groupId);
                                             }
                                           } else if (isEditing) {
+                                            debugPrint("group window update group message");
                                             GroupsRemoteServices()
                                                 .updateGroupMessage(
                                                     widget.groupId,

@@ -45,9 +45,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      debugPrint("app life cycle resume");
       RemoteServices().updateUser(cid, {'isOnline':true});
     }
     else {
+      debugPrint("app life cycle exit");
       RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
 
     }
