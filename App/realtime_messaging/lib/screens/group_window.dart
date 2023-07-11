@@ -221,7 +221,7 @@ class _DocBubbleState extends State<DocBubble> {
                                     ? BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
-                                                0.62)
+                                                0.63)
                                     : BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
@@ -1880,417 +1880,422 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               },
                             ),
                           ),
-                          Builder(
-                            builder: (context) {
-                              final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-                              return Container(
-                                constraints: BoxConstraints(
-                                    maxWidth: MediaQuery.of(context).size.width * 0.95),
-                                margin: const EdgeInsets.all(8.0),
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                decoration: BoxDecoration(
-                                  color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
-                                  borderRadius: BorderRadius.circular(24.0),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 16.0),
-                                        child: TextField(
-                                          style: const TextStyle(fontSize: 19),
-                                          maxLines: null,
-                                          controller: messageController,
-                                          onChanged: (e) {
-                                            debugPrint("group window sus set state");
-                                            setState(() {});
-                                            // if(messageController.text.isEmpty||messageController.text.length==1||messageController.text.length==2){
-                                            //   setState(() {
-                                            //      // debugPrint('${messageController.text.length}');
-                                            //   });
-                                            // }
-                                          },
-                                          decoration: const InputDecoration(
-                                            hintText: "Type here...",
-                                            border: InputBorder.none,
+                              Builder(
+                                builder: (context) {
+                                  final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+                                  return Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth: MediaQuery.of(context).size.width * 0.95),
+                                    margin: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    decoration: BoxDecoration(
+                                      color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
+                                      borderRadius: BorderRadius.circular(24.0),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 16.0),
+                                            child: TextField(
+                                              style: const TextStyle(fontSize: 19),
+                                              maxLines: null,
+                                              controller: messageController,
+                                              onChanged: (e) {
+                                                debugPrint("group window sus set state");
+                                                setState(() {});
+                                                // if(messageController.text.isEmpty||messageController.text.length==1||messageController.text.length==2){
+                                                //   setState(() {
+                                                //      // debugPrint('${messageController.text.length}');
+                                                //   });
+                                                // }
+                                              },
+                                              decoration: const InputDecoration(
+                                                hintText: "Type here...",
+                                                border: InputBorder.none,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: Transform.rotate(
-                                          angle: math.pi / 7,
-                                          child: const Icon(Icons.attach_file)),
-                                      onPressed: () {
-                                        SimpleDialog alert = SimpleDialog(
-                                          title: const Text("Choose an action"),
-                                          children: [
-                                            SimpleDialogOption(
-                                              onPressed: () async {
-                                                final files =
-                                                    await GroupsRemoteServices()
-                                                        .pickDocument();
+                                        IconButton(
+                                          icon: Transform.rotate(
+                                              angle: math.pi / 7,
+                                              child: const Icon(Icons.attach_file)),
+                                          onPressed: () {
+                                            SimpleDialog alert = SimpleDialog(
+                                              title: const Text("Choose an action"),
+                                              children: [
+                                                SimpleDialogOption(
+                                                  onPressed: () async {
+                                                    final files =
+                                                        await GroupsRemoteServices()
+                                                            .pickDocument();
 
-                                                if (files != null) {
+                                                    if (files != null) {
+                                                      final Users currentuser =
+                                                          (await RemoteServices()
+                                                              .getSingleUser(cid))!;
+                                                      for (int i = 0;
+                                                          i < files.files.length;
+                                                          i++) {
+                                                            debugPrint("set group message");
+                                                        await GroupsRemoteServices()
+                                                            .setGroupMessage(
+                                                                widget.groupId,
+                                                                GroupMessage(
+                                                                  id: "${DateTime.now().microsecondsSinceEpoch}",
+                                                                  senderId: cid,
+                                                                  text: '',
+                                                                  contentType:
+                                                                      "document ${files.files[i].name}",
+                                                                  timestamp: DateTime.now(),
+                                                                  senderName:
+                                                                      currentuser.name!,
+                                                                  senderPhoneNo:
+                                                                      currentuser.phoneNo,
+                                                                  senderPhotoUrl:
+                                                                      currentuser.photoUrl!,
+                                                                  senderUrl:
+                                                                      files.files[i].path!,
+                                                                  isUploaded: false,
+                                                                ));
+                                                      }
+
+                                                      // DocumentSnapshot docSnap = await RemoteServices()
+                                                      //     .reference.collection('groups').doc(
+                                                      //     widget.groupId)
+                                                      //     .get();
+                                                      // List<dynamic> participants = docSnap.get(
+                                                      //     'participantIds');
+                                                      // .getDocumentField(
+                                                      //     "groups/${widget.groupId}", 'participantIds');
+                                                      for (var x in participants) {
+                                                        debugPrint("group window update user group");
+                                                        RemoteServices().updateUserGroup(
+                                                            x,
+                                                            {
+                                                              'lastMessage': (files
+                                                                          .files[files.files
+                                                                                  .length -
+                                                                              1]
+                                                                          .name
+                                                                          .length >
+                                                                      100
+                                                                  ? files
+                                                                      .files[files.files
+                                                                              .length -
+                                                                          1]
+                                                                      .name
+                                                                      .substring(0, 100)
+                                                                  : files
+                                                                      .files[files.files
+                                                                              .length -
+                                                                          1]
+                                                                      .name),
+                                                              'lastMessageType': "document",
+                                                              'lastMessageTime':
+                                                                  DateTime.now()
+                                                                      .toIso8601String(),
+                                                              'senderId':cid
+                                                            },
+                                                            widget.groupId);
+                                                      }
+                                                    }
+                                                    Navigator.of(context,
+                                                            rootNavigator: true)
+                                                        .pop();
+                                                  },
+                                                  child: const Row(
+                                                    children: [
+                                                      Icon(
+                                                        CupertinoIcons.doc,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      SizedBox(width: 8.0),
+                                                      Text(
+                                                        "Send document",
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SimpleDialogOption(
+                                                  onPressed: () async {
+                                                    await getImage(ImageSource.camera);
+                                                    if (_image != null) {
+                                                      final Users currentuser =
+                                                          (await RemoteServices()
+                                                              .getSingleUser(cid))!;
+                                                      for (int i = 0; i < 1; i++) {
+                                                        debugPrint("group window set group message 2");
+                                                        await GroupsRemoteServices()
+                                                            .setGroupMessage(
+                                                                widget.groupId,
+                                                                GroupMessage(
+                                                                    id:
+                                                                        "${DateTime.now().microsecondsSinceEpoch}",
+                                                                    senderId: cid,
+                                                                    text: '',
+                                                                    contentType: "image",
+                                                                    timestamp:
+                                                                        DateTime.now(),
+                                                                    senderName:
+                                                                        currentuser.name!,
+                                                                    senderPhoneNo:
+                                                                        currentuser.phoneNo,
+                                                                    senderPhotoUrl:
+                                                                        currentuser
+                                                                            .photoUrl!,
+                                                                    senderUrl: _image!.path,
+                                                                    isUploaded: false));
+                                                      }
+
+                                                      // DocumentSnapshot docSnap = await RemoteServices()
+                                                      //     .reference.collection('groups').doc(
+                                                      //     widget.groupId)
+                                                      //     .get();
+                                                      // List<dynamic> participants = docSnap.get(
+                                                      //     'participantIds');
+                                                      // .getDocumentField(
+                                                      //     "groups/${widget.groupId}", 'participantIds');
+                                                      for (var x in participants) {
+                                                        debugPrint("group window update user group 2");
+                                                        RemoteServices().updateUserGroup(
+                                                            x,
+                                                            {
+                                                              'lastMessage': 'image',
+                                                              'lastMessageType': "image",
+                                                              'lastMessageTime':
+                                                                  DateTime.now()
+                                                                      .toIso8601String(),
+                                                              'senderId':cid
+                                                            },
+                                                            widget.groupId);
+                                                      }
+                                                      _image = null;
+                                                    }
+                                                  },
+                                                  child: const Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.camera_alt,
+                                                        color: Colors.green,
+                                                      ),
+                                                      SizedBox(width: 8.0),
+                                                      Text(
+                                                        "send from camera",
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SimpleDialogOption(
+                                                  onPressed: () async {
+                                                    await getImage(ImageSource.gallery);
+                                                    if (_image != null) {
+                                                      final Users currentuser =
+                                                          (await RemoteServices()
+                                                              .getSingleUser(cid))!;
+                                                      for (int i = 0; i < 1; i++) {
+                                                        debugPrint("group window set group message 3");
+                                                        await GroupsRemoteServices()
+                                                            .setGroupMessage(
+                                                                widget.groupId,
+                                                                GroupMessage(
+                                                                    id:
+                                                                        "${DateTime.now().microsecondsSinceEpoch}",
+                                                                    senderId: cid,
+                                                                    text: '',
+                                                                    contentType: "image",
+                                                                    timestamp:
+                                                                        DateTime.now(),
+                                                                    senderName:
+                                                                        currentuser.name!,
+                                                                    senderPhoneNo:
+                                                                        currentuser.phoneNo,
+                                                                    senderPhotoUrl:
+                                                                        currentuser
+                                                                            .photoUrl!,
+                                                                    senderUrl:
+                                                                        _image!.path));
+                                                      }
+
+                                                      // DocumentSnapshot docSnap = await RemoteServices()
+                                                      //     .reference.collection('groups').doc(
+                                                      //     widget.groupId)
+                                                      //     .get();
+                                                      // List<dynamic> participants = docSnap.get(
+                                                      //     'participantIds');
+                                                      // .getDocumentField(
+                                                      //     "groups/${widget.groupId}", 'participantIds');
+                                                      for (var x in participants) {
+                                                        debugPrint("group window update user group 3");
+                                                        RemoteServices().updateUserGroup(
+                                                            x,
+                                                            {
+                                                              'lastMessage': 'image',
+                                                              'lastMessageType': "image",
+                                                              'lastMessageTime':
+                                                                  DateTime.now()
+                                                                      .toIso8601String(),
+                                                              'senderId':cid
+                                                            },
+                                                            widget.groupId);
+                                                      }
+                                                      _image = null;
+                                                    }
+                                                  },
+                                                  child: const Row(
+                                                    children: [
+                                                      Icon(
+                                                        CupertinoIcons.photo,
+                                                        color: Colors.green,
+                                                      ),
+                                                      SizedBox(width: 8.0),
+                                                      Text(
+                                                        "Send image from gallery",
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => alert,
+                                              barrierDismissible: true,
+                                            );
+                                          },
+                                        ),
+                                        ((messageController.text.isEmpty || isSending)
+                                            ? const SizedBox(
+                                                width: 0,
+                                              )
+                                            : IconButton(
+                                                iconSize: 24,
+                                                onPressed: () async {
+                                                  setState(() {
+                                                    isSending = true;
+                                                  });
+                                                  String temp = messageController.text;
+                                                  messageController.clear();
+
                                                   final Users currentuser =
                                                       (await RemoteServices()
                                                           .getSingleUser(cid))!;
-                                                  for (int i = 0;
-                                                      i < files.files.length;
-                                                      i++) {
-                                                        debugPrint("set group message");
+
+                                                  String symmKeyString =
+                                                      (await const FlutterSecureStorage()
+                                                          .read(key: widget.groupId))!;
+                                                  encrypt.Key symmKey =
+                                                      encrypt.Key.fromBase64(symmKeyString);
+                                                  encrypt.Encrypter encrypter =
+                                                      encrypt.Encrypter(
+                                                          encrypt.AES(symmKey));
+                                                  encrypt.Encrypted encryptedMessage =
+                                                      encrypter.encrypt(temp, iv: iv);
+                                                  String encryptedMessageString =
+                                                      encryptedMessage.base64;
+                                                  if (!isEditing) {
+                                                    debugPrint("group window set group message 4");
                                                     await GroupsRemoteServices()
                                                         .setGroupMessage(
                                                             widget.groupId,
                                                             GroupMessage(
                                                               id: "${DateTime.now().microsecondsSinceEpoch}",
                                                               senderId: cid,
-                                                              text: '',
-                                                              contentType:
-                                                                  "document ${files.files[i].name}",
+                                                              text: encryptedMessageString,
+                                                              contentType: "text",
                                                               timestamp: DateTime.now(),
-                                                              senderName:
-                                                                  currentuser.name!,
+                                                              senderName: currentuser.name!,
                                                               senderPhoneNo:
                                                                   currentuser.phoneNo,
                                                               senderPhotoUrl:
                                                                   currentuser.photoUrl!,
-                                                              senderUrl:
-                                                                  files.files[i].path!,
-                                                              isUploaded: false,
                                                             ));
-                                                  }
+                                                    validTokens = [];
+                                                    for (int i = 0;
+                                                        i < tokens.length;
+                                                        i++) {
+                                                      if (tokens[i] != null) {
+                                                        validTokens.add(tokens[i]!);
+                                                      }
+                                                    }
+                                                    //print(validTokens);
+                                                    if(validTokens.isNotEmpty) {
+                                                      SendNotificationService()
+                                                        .sendFCMGroupMessage(validTokens, {
+                                                      'title':
+                                                          "${widget.groupName} (${curUser!.name})",
+                                                      'body': temp
+                                                    }, {});
+                                                    }
+                                                    debugPrint(' valid tokens $validTokens');
+                                                    // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
+                                                    // List<dynamic> participants = docSnap.get('participantIds');
+                                                    // .getDocumentField(
+                                                    //     "groups/${widget.groupId}", 'participantIds');
 
-                                                  // DocumentSnapshot docSnap = await RemoteServices()
-                                                  //     .reference.collection('groups').doc(
-                                                  //     widget.groupId)
-                                                  //     .get();
-                                                  // List<dynamic> participants = docSnap.get(
-                                                  //     'participantIds');
-                                                  // .getDocumentField(
-                                                  //     "groups/${widget.groupId}", 'participantIds');
-                                                  for (var x in participants) {
-                                                    debugPrint("group window update user group");
-                                                    RemoteServices().updateUserGroup(
-                                                        x,
-                                                        {
-                                                          'lastMessage': (files
-                                                                      .files[files.files
-                                                                              .length -
-                                                                          1]
-                                                                      .name
-                                                                      .length >
-                                                                  100
-                                                              ? files
-                                                                  .files[files.files
-                                                                          .length -
-                                                                      1]
-                                                                  .name
-                                                                  .substring(0, 100)
-                                                              : files
-                                                                  .files[files.files
-                                                                          .length -
-                                                                      1]
-                                                                  .name),
-                                                          'lastMessageType': "document",
-                                                          'lastMessageTime':
-                                                              DateTime.now()
-                                                                  .toIso8601String(),
-                                                          'senderId':cid
-                                                        },
-                                                        widget.groupId);
-                                                  }
-                                                }
-                                                Navigator.of(context,
-                                                        rootNavigator: true)
-                                                    .pop();
-                                              },
-                                              child: const Row(
-                                                children: [
-                                                  Icon(
-                                                    CupertinoIcons.doc,
-                                                    color: Colors.blue,
-                                                  ),
-                                                  SizedBox(width: 8.0),
-                                                  Text(
-                                                    "Send document",
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SimpleDialogOption(
-                                              onPressed: () async {
-                                                await getImage(ImageSource.camera);
-                                                if (_image != null) {
-                                                  final Users currentuser =
-                                                      (await RemoteServices()
-                                                          .getSingleUser(cid))!;
-                                                  for (int i = 0; i < 1; i++) {
-                                                    debugPrint("group window set group message 2");
-                                                    await GroupsRemoteServices()
-                                                        .setGroupMessage(
+                                                    for (var x in participants) {
+                                                      debugPrint("group window update user group 4");
+                                                      RemoteServices().updateUserGroup(
+                                                          x,
+                                                          {
+                                                            'lastMessage':
+                                                                encryptedMessageString,
+                                                            'lastMessageType': "text",
+                                                            'lastMessageTime':
+                                                                DateTime.now()
+                                                                    .toIso8601String(),
+                                                            'senderId':cid
+                                                          },
+                                                          widget.groupId);
+                                                    }
+                                                  } else if (isEditing) {
+                                                    debugPrint("group window update group message");
+                                                    GroupsRemoteServices()
+                                                        .updateGroupMessage(
                                                             widget.groupId,
-                                                            GroupMessage(
-                                                                id:
-                                                                    "${DateTime.now().microsecondsSinceEpoch}",
-                                                                senderId: cid,
-                                                                text: '',
-                                                                contentType: "image",
-                                                                timestamp:
-                                                                    DateTime.now(),
-                                                                senderName:
-                                                                    currentuser.name!,
-                                                                senderPhoneNo:
-                                                                    currentuser.phoneNo,
-                                                                senderPhotoUrl:
-                                                                    currentuser
-                                                                        .photoUrl!,
-                                                                senderUrl: _image!.path,
-                                                                isUploaded: false));
+                                                            {
+                                                              'text':
+                                                                  encryptedMessageString,
+                                                              'edited': true
+                                                            },
+                                                            editingId);
+                                                            isEditing = false;
+                                                            setState(() {
+                                                              
+                                                            });
                                                   }
-
-                                                  // DocumentSnapshot docSnap = await RemoteServices()
-                                                  //     .reference.collection('groups').doc(
-                                                  //     widget.groupId)
-                                                  //     .get();
-                                                  // List<dynamic> participants = docSnap.get(
-                                                  //     'participantIds');
-                                                  // .getDocumentField(
-                                                  //     "groups/${widget.groupId}", 'participantIds');
-                                                  for (var x in participants) {
-                                                    debugPrint("group window update user group 2");
-                                                    RemoteServices().updateUserGroup(
-                                                        x,
-                                                        {
-                                                          'lastMessage': 'image',
-                                                          'lastMessageType': "image",
-                                                          'lastMessageTime':
-                                                              DateTime.now()
-                                                                  .toIso8601String(),
-                                                          'senderId':cid
-                                                        },
-                                                        widget.groupId);
-                                                  }
-                                                  _image = null;
-                                                }
-                                              },
-                                              child: const Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.camera_alt,
-                                                    color: Colors.green,
-                                                  ),
-                                                  SizedBox(width: 8.0),
-                                                  Text(
-                                                    "send from camera",
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SimpleDialogOption(
-                                              onPressed: () async {
-                                                await getImage(ImageSource.gallery);
-                                                if (_image != null) {
-                                                  final Users currentuser =
-                                                      (await RemoteServices()
-                                                          .getSingleUser(cid))!;
-                                                  for (int i = 0; i < 1; i++) {
-                                                    debugPrint("group window set group message 3");
-                                                    await GroupsRemoteServices()
-                                                        .setGroupMessage(
-                                                            widget.groupId,
-                                                            GroupMessage(
-                                                                id:
-                                                                    "${DateTime.now().microsecondsSinceEpoch}",
-                                                                senderId: cid,
-                                                                text: '',
-                                                                contentType: "image",
-                                                                timestamp:
-                                                                    DateTime.now(),
-                                                                senderName:
-                                                                    currentuser.name!,
-                                                                senderPhoneNo:
-                                                                    currentuser.phoneNo,
-                                                                senderPhotoUrl:
-                                                                    currentuser
-                                                                        .photoUrl!,
-                                                                senderUrl:
-                                                                    _image!.path));
-                                                  }
-
-                                                  // DocumentSnapshot docSnap = await RemoteServices()
-                                                  //     .reference.collection('groups').doc(
-                                                  //     widget.groupId)
-                                                  //     .get();
-                                                  // List<dynamic> participants = docSnap.get(
-                                                  //     'participantIds');
-                                                  // .getDocumentField(
-                                                  //     "groups/${widget.groupId}", 'participantIds');
-                                                  for (var x in participants) {
-                                                    debugPrint("group window update user group 3");
-                                                    RemoteServices().updateUserGroup(
-                                                        x,
-                                                        {
-                                                          'lastMessage': 'image',
-                                                          'lastMessageType': "image",
-                                                          'lastMessageTime':
-                                                              DateTime.now()
-                                                                  .toIso8601String(),
-                                                          'senderId':cid
-                                                        },
-                                                        widget.groupId);
-                                                  }
-                                                  _image = null;
-                                                }
-                                              },
-                                              child: const Row(
-                                                children: [
-                                                  Icon(
-                                                    CupertinoIcons.photo,
-                                                    color: Colors.green,
-                                                  ),
-                                                  SizedBox(width: 8.0),
-                                                  Text(
-                                                    "Send image from gallery",
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) => alert,
-                                          barrierDismissible: true,
-                                        );
-                                      },
+                                                  setState(() {
+                                                    debugPrint('$isSending');
+                                                    isSending = false;
+                                                  });
+                                                },
+                                                icon: const Icon(Icons.send_rounded,
+                                                    color: Colors.blue),
+                                              )),
+                                      ],
                                     ),
-                                    ((messageController.text.isEmpty || isSending)
-                                        ? const SizedBox(
-                                            width: 0,
-                                          )
-                                        : IconButton(
-                                            iconSize: 24,
-                                            onPressed: () async {
-                                              setState(() {
-                                                isSending = true;
-                                              });
-                                              String temp = messageController.text;
-                                              messageController.clear();
-
-                                              final Users currentuser =
-                                                  (await RemoteServices()
-                                                      .getSingleUser(cid))!;
-
-                                              String symmKeyString =
-                                                  (await const FlutterSecureStorage()
-                                                      .read(key: widget.groupId))!;
-                                              encrypt.Key symmKey =
-                                                  encrypt.Key.fromBase64(symmKeyString);
-                                              encrypt.Encrypter encrypter =
-                                                  encrypt.Encrypter(
-                                                      encrypt.AES(symmKey));
-                                              encrypt.Encrypted encryptedMessage =
-                                                  encrypter.encrypt(temp, iv: iv);
-                                              String encryptedMessageString =
-                                                  encryptedMessage.base64;
-                                              if (!isEditing) {
-                                                debugPrint("group window set group message 4");
-                                                await GroupsRemoteServices()
-                                                    .setGroupMessage(
-                                                        widget.groupId,
-                                                        GroupMessage(
-                                                          id: "${DateTime.now().microsecondsSinceEpoch}",
-                                                          senderId: cid,
-                                                          text: encryptedMessageString,
-                                                          contentType: "text",
-                                                          timestamp: DateTime.now(),
-                                                          senderName: currentuser.name!,
-                                                          senderPhoneNo:
-                                                              currentuser.phoneNo,
-                                                          senderPhotoUrl:
-                                                              currentuser.photoUrl!,
-                                                        ));
-                                                validTokens = [];
-                                                for (int i = 0;
-                                                    i < tokens.length;
-                                                    i++) {
-                                                  if (tokens[i] != null) {
-                                                    validTokens.add(tokens[i]!);
-                                                  }
-                                                }
-                                                //print(validTokens);
-                                                if(validTokens.isNotEmpty) {
-                                                  SendNotificationService()
-                                                    .sendFCMGroupMessage(validTokens, {
-                                                  'title':
-                                                      "${widget.groupName} (${curUser!.name})",
-                                                  'body': temp
-                                                }, {});
-                                                }
-                                                debugPrint(' valid tokens $validTokens');
-                                                // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
-                                                // List<dynamic> participants = docSnap.get('participantIds');
-                                                // .getDocumentField(
-                                                //     "groups/${widget.groupId}", 'participantIds');
-
-                                                for (var x in participants) {
-                                                  debugPrint("group window update user group 4");
-                                                  RemoteServices().updateUserGroup(
-                                                      x,
-                                                      {
-                                                        'lastMessage':
-                                                            encryptedMessageString,
-                                                        'lastMessageType': "text",
-                                                        'lastMessageTime':
-                                                            DateTime.now()
-                                                                .toIso8601String(),
-                                                        'senderId':cid
-                                                      },
-                                                      widget.groupId);
-                                                }
-                                              } else if (isEditing) {
-                                                debugPrint("group window update group message");
-                                                GroupsRemoteServices()
-                                                    .updateGroupMessage(
-                                                        widget.groupId,
-                                                        {
-                                                          'text':
-                                                              encryptedMessageString,
-                                                          'edited': true
-                                                        },
-                                                        editingId);
-                                              }
-                                              setState(() {
-                                                debugPrint('$isSending');
-                                                isSending = false;
-                                              });
-                                            },
-                                            icon: const Icon(Icons.send_rounded,
-                                                color: Colors.blue),
-                                          )),
-                                  ],
-                                ),
-                              );
-                            }
-                          ),
-                        ],
-                      ),
-                    );
+                                  );
+                                }
+                              ),
+                ],
+                                
+                                      ),);
           }
-        ),
-        ));
+                            ),
+                          )
+                      );
   }
-}
+  }

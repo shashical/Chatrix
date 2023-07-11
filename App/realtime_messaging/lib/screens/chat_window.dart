@@ -20,6 +20,7 @@ import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/Widgets/progress-indicator.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
+import 'package:realtime_messaging/screens/imagepage.dart';
 import 'package:realtime_messaging/screens/otherUser_profile_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:math'as math;
@@ -210,7 +211,8 @@ class _DocBubleState extends State<DocBuble> {
                                  uploaded = true;
                                });
                              }, icon: const Icon(Icons.upload))
-                             : (!uploaded) ? progressIndicator(_uploadTask,null)
+                             : (!uploaded) ?
+                         Center(child: progressIndicator(_uploadTask,null))
                              : const SizedBox(width: 0,) :
                          (!downloading && !downloaded)?IconButton(
                              onPressed: () async {
@@ -293,13 +295,14 @@ class _ImageBubbleState extends State<ImageBubble> {
   DownloadTask? _downloadTask;
   late Color dbg;
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     uploaded = widget.uploaded;
     downloaded=widget.downloaded;
-     dbg=widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? Color.fromARGB(255, 72, 69, 69) : Color.fromARGB(255, 30, 75, 31);
+     dbg=widget.isSelected?Colors.lightBlue.withOpacity(0.5): !widget.isUser ? const Color.fromARGB(255, 72, 69, 69) : const Color.fromARGB(255, 30, 75, 31);
     bg = widget.isSelected ? Colors.lightBlue.withOpacity(0.5) : !widget.isUser
         ? Colors.white
         : Colors.greenAccent.shade100;
@@ -370,9 +373,9 @@ class _ImageBubbleState extends State<ImageBubble> {
                 final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
                 return Container(
                   constraints:
-                  BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7,
-                      maxHeight: MediaQuery.of(context).size.height*0.4
-                  ),
+                    BoxConstraints( maxWidth: MediaQuery.of(context).size.width * 0.71,
+                        maxHeight: MediaQuery.of(context).size.height*0.4
+                    ),
                   padding: const EdgeInsets.all(2),
                   margin: const EdgeInsets.all(3.0),
                   decoration: BoxDecoration(
@@ -387,42 +390,58 @@ class _ImageBubbleState extends State<ImageBubble> {
                   color:themeProvider.isDarkMode? dbg:bg,
         ),
                   child: Stack(
-                      children: [ Container(
-                          constraints:
-                          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7,
-                                  maxHeight: MediaQuery.of(context).size.height*0.4
-                          ),
+                      children: [
+                        InkWell(
+                         onTap: (){
+                           if(!widget.isSelected){
+                             if(widget.isUser){
+                               Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageScreen(path: widget.senderUrl)));
+                             }
+                             else{
+                               if(downloaded){
+                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageScreen(path:widget.receiverUrl)));
+                               }
+                             }
+                           }
+                         },
+                          child: Container(
 
-                        alignment: Alignment.bottomRight,
-                        decoration: BoxDecoration(
-                          image:(widget.isUser)? DecorationImage(
-                            image: FileImage(File(widget.senderUrl)),
-                            fit: BoxFit.cover
-                          ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)),fit: BoxFit.cover)
-                              :const DecorationImage(image: AssetImage('assets/blurimg.png')),
+                            decoration: BoxDecoration(
+                              image:(widget.isUser)? DecorationImage(
+                                  image: FileImage(File(widget.senderUrl)),
+                                  fit: BoxFit.cover
+                              ):(downloaded)?DecorationImage(image: FileImage(File(widget.receiverUrl)),fit: BoxFit.cover)
+                                  :const DecorationImage(image:AssetImage('assets/blurimg.png'),fit: BoxFit.cover),
 
-                          borderRadius: radius,
+                              borderRadius: radius,
 
+                            ),),
                         ),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 55.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                widget.time,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              (widget.isUser) ? Icon(
-                                icon,
-                                size: 16,
-                              ) : const SizedBox(width: 0,)
-                            ],
-                          ),
-                        ),),
+
+
+                         Positioned(
+                           bottom:0,
+                           right:0,
+                           child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 55.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  widget.time,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                (widget.isUser) ? Icon(
+                                  icon,
+                                  size: 16,
+                                ) : const SizedBox(width: 0,)
+                              ],
+                            ),
+                        ),
+                         ),
                         Center(child:
                         Container(
                           height: 50,
@@ -885,16 +904,23 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                             otheruser.blockedBy!.remove(cid);
                             youBlocked=false;
                             hintText='Type here ';
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(const SnackBar(content: Text('unblocked')));
                           }
                           else{
                             youBlocked=true;
                             hintText='You have blocked ';
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(const SnackBar(content: Text('blocked')));
                        if(otheruser.blockedBy!=null){ otheruser.blockedBy!.add(cid);}
                        else{
                         otheruser.blockedBy=[cid];
                         }}
                        RemoteServices().updateUser(widget.otherUserId, {'blockedBy':otheruser.blockedBy});
                          setState(() {
+
 
                          });
                         });
@@ -1367,7 +1393,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                               margin: const EdgeInsets.all(8.0),
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               decoration: BoxDecoration(
-                                color: (themeProvider.isDarkMode?Color.fromARGB(255, 72, 69, 69):Colors.white),
+                                color: (themeProvider.isDarkMode?const Color.fromARGB(255, 72, 69, 69):Colors.white),
                                 borderRadius: BorderRadius.circular(24.0),
                               ),
                               child: Row(

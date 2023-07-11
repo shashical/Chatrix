@@ -23,11 +23,12 @@ class HomePage extends StatefulWidget  {
 
 Users? curUser;
 String? current;
+bool isLoaded=false;
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
-  bool isLoaded=false;
+
 
   final List<Widget> _pages = [
     ChatsPage(),
@@ -58,6 +59,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     curUser=await RemoteServices().getSingleUser(cid);
     setState(() {
       isLoaded=true;
+
     });
   }
   @override
@@ -172,15 +174,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
         ),
       ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        children: _pages,
-      ),
+      body: StreamBuilder(
+          stream:RemoteServices().getUserStream(cid),
+          builder: (context,snapshot){
+            if(snapshot.hasData){
+              curUser=snapshot.data;
+              debugPrint('printing again ${curUser!.id} ');
+              return PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                children: _pages,
+              );
+            }
+
+            return const CircularProgressIndicator();
+          }),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
