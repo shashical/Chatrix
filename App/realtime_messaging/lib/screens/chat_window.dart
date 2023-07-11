@@ -199,7 +199,7 @@ class _DocBubleState extends State<DocBuble> {
 
                                String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                                encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
-                               encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                               encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey,padding: null));
                                encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
                                String encryptedDocUrlString = encryptedDocUrl.base64;
 
@@ -464,7 +464,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                                     }
                                 String symmKeyString = (await const FlutterSecureStorage().read(key: widget.chatId))!;
                                 encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString);
-                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey,padding: null));
                                 encrypt.Encrypted encryptedDocUrl = encrypter.encrypt(docUrl,iv: iv);
                                 String encryptedDocUrlString = encryptedDocUrl.base64;
                                 ChatsRemoteServices().updateChatMessage(widget.chatId, {
@@ -509,13 +509,14 @@ class _ImageBubbleState extends State<ImageBubble> {
 class MyBubble extends StatelessWidget {
   const MyBubble(
       {super.key, required this.message,
+      required this.edited,
       required this.time,
       required this.delivered,
       required this.isUser,
       required this.read, required this.isSelected});
 
   final String message, time;
-  final bool isUser, delivered, read,isSelected;
+  final bool isUser, delivered, read, isSelected, edited;
 
   @override
   Widget build(BuildContext context) {
@@ -581,6 +582,8 @@ class MyBubble extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 1,),
+                  (edited?Text("Edited",style: TextStyle(fontSize: 13),):SizedBox(height: 0,)),
                 ],
               ),
             );
@@ -803,7 +806,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                     (trueCount==1 &&chatmessages[isSelected.indexOf(true)].contentType=='text' )?IconButton(onPressed: () async {
                      String?  symmKeyString = await const FlutterSecureStorage().read(key: chatid!);
                       encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                      encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey,padding: null));
                       encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(chatmessages[isSelected.indexOf(true)].text);
                       final message = encrypter.decrypt(encryptedMessage,iv: iv);
                       await Clipboard.setData(ClipboardData(text: message));
@@ -1187,6 +1190,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
 
                                                   child:(chatmessage.contentType=='text')?MyBubble(
                                                     message: message,
+                                                    edited: chatmessage.edited,
                                                     time:
                                                     ("${chatmessage.timestamp.hour}:${chatmessage.timestamp.minute~/10}${chatmessage.timestamp.minute%10}"),
                                                     delivered: chatmessage.delivered,
@@ -1739,7 +1743,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                               RemoteServices().updateUserChat(
                                               cid,
                                               {
-                                              'lastMessage': 'image',
+                                              'lastMessage': 'Image',
                                               'lastMessageType': "image",
                                               'lastMessageTime': DateTime.now().toIso8601String(),
                                                 'isSender':true,
@@ -1750,7 +1754,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     RemoteServices().updateUserChat(
                                                     widget.otherUserId,
                                                     {
-                                                      'lastMessage': 'image',
+                                                      'lastMessage': 'Image',
                                                       'lastMessageType': "image",
                                                       'lastMessageTime': DateTime.now().toIso8601String(),
                                                       'issender':false,
@@ -1905,7 +1909,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 RemoteServices().updateUserChat(
                                                     cid,
                                                     {
-                                                      'lastMessage': 'image',
+                                                      'lastMessage': 'Image',
                                                       'lastMessageType': "image",
                                                       'lastMessageTime': DateTime.now().toIso8601String(),
                                                       'isSender':true,
@@ -1916,7 +1920,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 RemoteServices().updateUserChat(
                                                     widget.otherUserId,
                                                     {
-                                                      'lastMessage': 'image',
+                                                      'lastMessage': 'Image',
                                                       'lastMessageType': "image",
                                                       'lastMessageTime': DateTime.now().toIso8601String(),
                                                       'isSender':false
@@ -2033,7 +2037,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                         encrypt.Key symmKey = encrypt.Key.fromBase64(
                                             symmKeyString);
                                         encrypt.Encrypter encrypter = encrypt.Encrypter(
-                                            encrypt.AES(symmKey,padding: null));
+                                            encrypt.AES(symmKey, padding: null));
                                         encrypt.Encrypted encryptedMessage = encrypter
                                             .encrypt(temp, iv: iv);
                                         String encryptedMessageString = encryptedMessage

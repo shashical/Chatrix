@@ -225,7 +225,7 @@ class _DocBubbleState extends State<DocBubble> {
                                     : BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
-                                                0.72),
+                                                0.73),
                             child: InkWell(
                               onTap: () {
                                 if (!widget.isSelected) {
@@ -511,210 +511,213 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
   bool isUploading = false;
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment:
-          (widget.isUser) ? MainAxisAlignment.end : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        (!widget.isUser)
-            ? SizedBox(
-                height: 25,
-                width: 25,
-                child: CircleAvatar(
-                  foregroundImage: NetworkImage(widget.photoUrl!),
-                ),
-              )
-            : SizedBox(),
-        Column(
-          crossAxisAlignment: align,
-          children: [
-            Builder(
-              builder: (context) {
-                final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
-                return Container(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.65,
-                      maxHeight: (widget.isUser)
-                          ? MediaQuery.of(context).size.height * .41
-                          : MediaQuery.of(context).size.height * .45),
-                  margin: const EdgeInsets.all(3.0),
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                          blurRadius: .5,
-                          spreadRadius: 1.0,
-                          color: Colors.black.withOpacity(.12))
-                    ],
-                    color: themeProvider.isDarkMode? dbg:bg,
-                    borderRadius: radius,
+    return Container(
+      color:(widget.isSelected)?Colors.blue.withOpacity(0.5):null,
+      child: Row(
+        mainAxisAlignment:
+            (widget.isUser) ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          (!widget.isUser)
+              ? SizedBox(
+                  height: 25,
+                  width: 25,
+                  child: CircleAvatar(
+                    foregroundImage: NetworkImage(widget.photoUrl!),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      (widget.isUser
-                          ? const SizedBox()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(((widget.isAcontact!) ? '' : '~') +
-                                    (widget.displayName!)),
-                                Text(((widget.isAcontact!)
-                                    ? ''
-                                    : (widget.phoneNo!))),
-                              ],
-                            )),
-                      Stack(children: [
-                        Container(
-                          constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.65,
-                              maxHeight: MediaQuery.of(context).size.height * 0.4),
-                          alignment: Alignment.bottomRight,
-                          decoration: BoxDecoration(
-                            image: (widget.isUser)
-                                ? DecorationImage(
-                                    image: FileImage(File(widget.senderUrl)),
-                                    fit: BoxFit.cover)
-                                : (downloaded[cid] ?? false)
-                                    ? DecorationImage(
-                                        image: FileImage(
-                                            File(widget.receiverUrls[cid]!)),
-                                        fit: BoxFit.cover)
-                                    : const DecorationImage(
-                                        image: AssetImage('assets/blurimg.png'),
-                                        fit: BoxFit.cover),
-                            borderRadius: radius,
-                          ),
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 55.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  widget.time,
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                (widget.isUser)
-                                    ? Icon(
-                                        icon,
-                                        size: 16,
-                                      )
-                                    : const SizedBox(
-                                        width: 0,
-                                      )
-                              ],
+                )
+              : SizedBox(),
+          Column(
+            crossAxisAlignment: align,
+            children: [
+              Builder(
+                builder: (context) {
+                  final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
+                  return Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+                        maxHeight: (widget.isUser)
+                            ? MediaQuery.of(context).size.height * .41
+                            : MediaQuery.of(context).size.height * .45),
+                    margin: const EdgeInsets.all(3.0),
+                    padding: const EdgeInsets.all(4.0),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            blurRadius: .5,
+                            spreadRadius: 1.0,
+                            color: Colors.black.withOpacity(.12))
+                      ],
+                      color: themeProvider.isDarkMode? dbg:bg,
+                      borderRadius: radius,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        (widget.isUser
+                            ? const SizedBox()
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(((widget.isAcontact!) ? '' : '~') +
+                                      (widget.displayName!)),
+                                  Text(((widget.isAcontact!)
+                                      ? ''
+                                      : (widget.phoneNo!))),
+                                ],
+                              )),
+                        Stack(children: [
+                          Container(
+                            constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context).size.width * 0.65,
+                                maxHeight: MediaQuery.of(context).size.height * 0.4),
+                            alignment: Alignment.bottomRight,
+                            decoration: BoxDecoration(
+                              image: (widget.isUser)
+                                  ? DecorationImage(
+                                      image: FileImage(File(widget.senderUrl)),
+                                      fit: BoxFit.cover)
+                                  : (downloaded[cid] ?? false)
+                                      ? DecorationImage(
+                                          image: FileImage(
+                                              File(widget.receiverUrls[cid]!)),
+                                          fit: BoxFit.cover)
+                                      : const DecorationImage(
+                                          image: AssetImage('assets/blurimg.png'),
+                                          fit: BoxFit.cover),
+                              borderRadius: radius,
                             ),
-                          ),
-                        ),
-                        Center(
-                            child: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: (widget.isUser)
-                                ? (uploaded)
-                                    ? null
-                                    : Colors.white.withOpacity(0.5)
-                                : (downloaded[cid] ?? false)
-                                    ? null
-                                    : Colors.white.withOpacity(0.5),
-                          ),
-                          child: (widget.isUser)
-                              ? (!isUploading && !uploaded)
-                                  ? IconButton(
-                                      onPressed: () async {
-                                        setState(() {
-                                          isUploading = true;
-                                        });
-                                        final docUrl = await uploadDocument(
-                                            File(widget.senderUrl));
-                                        validTokens = [];
-                                                for (int i = 0;
-                                                    i < tokens.length;
-                                                    i++) {
-                                                  if (tokens[i] != null) {
-                                                    validTokens.add(tokens[i]!);
-                                                  }
-                                                }
-                                                if(validTokens.isNotEmpty) {
-                                                  SendNotificationService()
-                                                    .sendFCMGroupMessage(
-                                                        validTokens, {
-                                                  'title':
-                                                      "${widget.groupName} (${curUser!.name})",
-                                                  'body': "Document"
-                                                }, {});
-                                                }
-
-                                        String symmKeyString =
-                                            (await const FlutterSecureStorage()
-                                                .read(key: widget.chatId))!;
-                                        encrypt.Key symmKey =
-                                            encrypt.Key.fromBase64(symmKeyString);
-                                        encrypt.Encrypter encrypter =
-                                            encrypt.Encrypter(encrypt.AES(symmKey));
-                                        encrypt.Encrypted encryptedDocUrl =
-                                            encrypter.encrypt(docUrl, iv: iv);
-                                        String encryptedDocUrlString =
-                                            encryptedDocUrl.base64;
-
-                                        GroupsRemoteServices().updateGroupMessage(
-                                            widget.chatId,
-                                            {
-                                              'isUploaded': true,
-                                              'text': encryptedDocUrlString
-                                            },
-                                            widget.id);
-                                        setState(() {
-                                          uploaded = true;
-                                        });
-                                      },
-                                      icon: const Icon(Icons.upload))
-                                  : (!uploaded)
-                                      ? progressIndicator(_uploadTask, null)
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 55.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    widget.time,
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  (widget.isUser)
+                                      ? Icon(
+                                          icon,
+                                          size: 16,
+                                        )
                                       : const SizedBox(
                                           width: 0,
                                         )
-                              : (!downloading && !(downloaded[cid] ?? false))
-                                  ? IconButton(
-                                      onPressed: () async {
-                                        setState(() {
-                                          downloading = true;
-                                        });
-                                        final receiveUrl =
-                                            await downloadImage(widget.message);
-                                        receiverUrls[cid] = receiveUrl;
-                                        setState(() {
-                                          downloaded[cid] = true;
-                                        });
-                                        GroupsRemoteServices().updateGroupMessage(
-                                            widget.chatId,
-                                            {
-                                              'receiverUrls': receiverUrls,
-                                              'downloaded': downloaded,
-                                            },
-                                            widget.id);
-                                      },
-                                      icon: const Icon(Icons.download))
-                                  : !(downloaded[cid] ?? false)
-                                      ? progressIndicator(null, _downloadTask)
-                                      : const SizedBox(
-                                          width: 0,
-                                        ),
-                        ))
-                      ]),
-                    ],
-                  ),
-                );
-              }
-            ),
-          ],
-        ),
-      ],
+                                ],
+                              ),
+                            ),
+                          ),
+                          Center(
+                              child: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: (widget.isUser)
+                                  ? (uploaded)
+                                      ? null
+                                      : Colors.white.withOpacity(0.5)
+                                  : (downloaded[cid] ?? false)
+                                      ? null
+                                      : Colors.white.withOpacity(0.5),
+                            ),
+                            child: (widget.isUser)
+                                ? (!isUploading && !uploaded)
+                                    ? IconButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            isUploading = true;
+                                          });
+                                          final docUrl = await uploadDocument(
+                                              File(widget.senderUrl));
+                                          validTokens = [];
+                                                  for (int i = 0;
+                                                      i < tokens.length;
+                                                      i++) {
+                                                    if (tokens[i] != null) {
+                                                      validTokens.add(tokens[i]!);
+                                                    }
+                                                  }
+                                                  if(validTokens.isNotEmpty) {
+                                                    SendNotificationService()
+                                                      .sendFCMGroupMessage(
+                                                          validTokens, {
+                                                    'title':
+                                                        "${widget.groupName} (${curUser!.name})",
+                                                    'body': "Document"
+                                                  }, {});
+                                                  }
+
+                                          String symmKeyString =
+                                              (await const FlutterSecureStorage()
+                                                  .read(key: widget.chatId))!;
+                                          encrypt.Key symmKey =
+                                              encrypt.Key.fromBase64(symmKeyString);
+                                          encrypt.Encrypter encrypter =
+                                              encrypt.Encrypter(encrypt.AES(symmKey));
+                                          encrypt.Encrypted encryptedDocUrl =
+                                              encrypter.encrypt(docUrl, iv: iv);
+                                          String encryptedDocUrlString =
+                                              encryptedDocUrl.base64;
+
+                                          GroupsRemoteServices().updateGroupMessage(
+                                              widget.chatId,
+                                              {
+                                                'isUploaded': true,
+                                                'text': encryptedDocUrlString
+                                              },
+                                              widget.id);
+                                          setState(() {
+                                            uploaded = true;
+                                          });
+                                        },
+                                        icon: const Icon(Icons.upload))
+                                    : (!uploaded)
+                                        ? progressIndicator(_uploadTask, null)
+                                        : const SizedBox(
+                                            width: 0,
+                                          )
+                                : (!downloading && !(downloaded[cid] ?? false))
+                                    ? IconButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            downloading = true;
+                                          });
+                                          final receiveUrl =
+                                              await downloadImage(widget.message);
+                                          receiverUrls[cid] = receiveUrl;
+                                          setState(() {
+                                            downloaded[cid] = true;
+                                          });
+                                          GroupsRemoteServices().updateGroupMessage(
+                                              widget.chatId,
+                                              {
+                                                'receiverUrls': receiverUrls,
+                                                'downloaded': downloaded,
+                                              },
+                                              widget.id);
+                                        },
+                                        icon: const Icon(Icons.download))
+                                    : !(downloaded[cid] ?? false)
+                                        ? progressIndicator(null, _downloadTask)
+                                        : const SizedBox(
+                                            width: 0,
+                                          ),
+                          ))
+                        ]),
+                      ],
+                    ),
+                  );
+                }
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -730,11 +733,12 @@ class MyBubble extends StatelessWidget {
     required this.displayName,
     required this.phoneNo,
     required this.isSelected,
+    required this.edited,
     this.photoUrl,
   });
 
   final String message, time;
-  final bool isUser, delivered, read, isSelected;
+  final bool isUser, delivered, read, isSelected, edited;
   final String? displayName, phoneNo, photoUrl;
   final bool? isAcontact;
 
@@ -744,7 +748,7 @@ class MyBubble extends StatelessWidget {
         ? Colors.lightBlue.withOpacity(.5)
         : !isUser
             ? Colors.white
-            : Color.fromARGB(255, 121, 238, 246);
+            : Colors.greenAccent.shade100;
     final dbg = isSelected
         ? Colors.lightBlue.withOpacity(0.5)
         : !isUser
@@ -834,10 +838,12 @@ class MyBubble extends StatelessWidget {
                                   : Icon(
                                       icon,
                                       size: 16,
-                                    ))
+                                    )),
                             ],
                           ),
                         ),
+                        const SizedBox(height: 1,),
+                  (edited?Text("Edited",style: TextStyle(fontSize: 13),):SizedBox(height: 0,)),
                       ],
                     ),
                   ),
@@ -1024,6 +1030,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                 false);
                                                         trueCount = 0;
                                                       });
+                                                      Navigator.of(context, rootNavigator: true).pop();
                                                     },
                                                     child: const Text(
                                                       'Delete for Everyone',
@@ -1201,7 +1208,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               }
                               final imageTemp = File(image.path);
                               backgroundImage=imageTemp.path;
-                              RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, widget.groupId);
+                              RemoteServices().updateUserGroup(cid, {'backgroundImage':backgroundImage}, widget.groupId);
 
                               setState(() {
 
@@ -1419,8 +1426,9 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         'text')
                                                     ? MyBubble(
                                                         message: message,
+                                                        edited: groupmessage.edited,
                                                         time:
-                                                            ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute}"),
+                                                            ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                         delivered: false,
                                                         isUser: (groupmessage
                                                                 .senderId ==
@@ -2291,4 +2299,4 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
         ),
         ));
   }
-}
+  }
