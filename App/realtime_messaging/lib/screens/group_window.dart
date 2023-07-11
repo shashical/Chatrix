@@ -1169,18 +1169,19 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                   onTap: () {
                                     WidgetsBinding.instance
                                         .addPostFrameCallback((timeStamp) {
-                                      for (int i = 0;
-                                          i < groupmessages.length;
-                                          i++) {
-                                        if (isSelected[i]) {
+                                      for (int i = groupmessages.length-1;
+                                          i >=0;
+                                          i--) {
+
                                           groupmessages[i].deletedForMe[cid] =
                                               true;
+
 
                           GroupsRemoteServices().updateGroupMessage(
                               widget.groupId,
                               {'deletedForMe': groupmessages[i].deletedForMe},
                               groupmessages[i].id);
-                        }
+
                       }
 
                     });
@@ -2273,7 +2274,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                         },
                                         icon: const Icon(Icons.send_rounded,
                                             color: Colors.blue),
-                                      )),
+                                      )
+                                ),
                               ],
                             ),
                           ),
