@@ -216,12 +216,12 @@ class _DocBubbleState extends State<DocBubble> {
                                     : BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
-                                                0.72)
+                                                0.73)
                                 : (downloaded[cid] ?? false)
                                     ? BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
-                                                0.62)
+                                                0.63)
                                     : BoxConstraints(
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
@@ -2261,6 +2261,10 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       'edited': true
                                                     },
                                                     editingId);
+                                            isEditing=false;
+                                            setState(() {
+
+                                            });
                                           }
                                           setState(() {
                                             debugPrint('$isSending');

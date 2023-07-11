@@ -83,11 +83,7 @@ class _SearchGroupState extends State<SearchGroup> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                     },
                   ),
-                  title: Text(widget.usergroup[index].name),
-                  subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                  trailing: Text((widget.usergroup[index].lastMessageTime == null
-                      ? ""
-                      : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
+                  title:  Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 28),),
                   onTap: () async {
                     RemoteServices().updateUser(cid, {'current':widget.usergroup[index].groupId});
                     final result=await Navigator.pushReplacement(context,
@@ -114,11 +110,8 @@ class _SearchGroupState extends State<SearchGroup> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                     },
                   ),
-                  title: Text(widget.usergroup[index].name),
-                  subtitle: Text(widget.usergroup[index].lastMessage ?? "", maxLines: 1, overflow: TextOverflow.ellipsis,),
-                  trailing: Text((widget.usergroup[index].lastMessageTime == null
-                      ? ""
-                      : "${widget.usergroup[index].lastMessageTime!.hour}:${widget.usergroup[index].lastMessageTime!.minute/10}${widget.usergroup[index].lastMessageTime!.minute%10}")),
+                  title: Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 28),),
+
 
                     onTap: () async {
                       RemoteServices().updateUser(cid, {'current':widget.usergroup[index].groupId});
