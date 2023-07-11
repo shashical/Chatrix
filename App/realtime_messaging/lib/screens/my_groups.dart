@@ -367,7 +367,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                         ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                             child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                         const SizedBox(width: 5,),
-                                                        (usergroup.senderId==cid)?const Icon(Icons.done):const SizedBox(width: 0,)
+                                                        (usergroup.senderId==cid)?const Icon(Icons.done,size: 20,):const SizedBox(width: 0,)
                                                       ],
                                                     ),
                                                   ),
@@ -586,7 +586,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                   ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                       child: Text(usergroup.lastMessage??'', maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                   const SizedBox(width: 5,),
-                                                  !(usergroup.senderId==cid)?const SizedBox(width: 0,):const Icon(Icons.done)
+                                                  !(usergroup.senderId==cid)?const SizedBox(width: 0,):const Icon(Icons.done,size: 20,)
                                                 ],
                                               ),
                                             ),
@@ -817,7 +817,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                                         ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                             child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                         const SizedBox(width: 5,),
-                                                        (usergroup.senderId==cid)?const Icon(Icons.done):const SizedBox()
+                                                        (usergroup.senderId==cid)?const Icon(Icons.done,size: 20,):const SizedBox()
                                                       ],
                                                     ),
                                                   ),

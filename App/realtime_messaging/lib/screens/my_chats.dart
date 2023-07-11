@@ -364,7 +364,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     if(userchat.lastMessageType=='text'){
                                                     symmKeyString = snapshot.data;
                                                     encrypt.Key symmKey = encrypt.Key.fromBase64(symmKeyString!);
-                                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey));
+                                                    encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(symmKey,padding: null));
 
                                                     encrypt.Encrypted encryptedMessage = encrypt.Encrypted.fromBase64(userchat.lastMessage!);
                                                     message = encrypter.decrypt(encryptedMessage,iv: iv);}
@@ -406,7 +406,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                                 ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                                     child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                                 const SizedBox(width: 5,),
-                                                                (count==0)?const Icon(Icons.done_all, size: 20,):const Icon(Icons.done)
+                                                                (count==0)?const Icon(Icons.done_all, size: 20,):const Icon(Icons.done,size: 20,)
                                                               ],
                                                             ),
                                                           ),
@@ -703,7 +703,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                       encrypt.Key symmKey = encrypt.Key
                                           .fromBase64(symmKeyString!);
                                       encrypt.Encrypter encrypter = encrypt
-                                          .Encrypter(encrypt.AES(symmKey));
+                                          .Encrypter(encrypt.AES(symmKey,padding: null));
 
                                       encrypt.Encrypted encryptedMessage = encrypt
                                           .Encrypted.fromBase64(
@@ -748,7 +748,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                     ConstrainedBox(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.57,),
                                                     child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                                     const SizedBox(width: 5,),
-                                                    (count==0)?const Icon(Icons.done_all,size: 20,):const Icon(Icons.done)
+                                                    (count==0)?const Icon(Icons.done_all,size: 20,):const Icon(Icons.done,size: 20,)
                                                   ],
                                                 ),
                                               ),
