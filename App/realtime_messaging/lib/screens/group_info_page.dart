@@ -673,20 +673,79 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   for(int i=0;i<aux.length;i++) {
     admins.add(ListTile(
       onTap: () async{
-        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${aux[i][4]}").get();
-            if(docsnap.exists){
-              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
-             final  result=await  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: aux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
-              },));
-             RemoteServices().updateUser(cid, {'current':result});
-             current=null;
-            }
-            else{
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: aux[i][4]);
-              },));
-            }
+        DocumentSnapshot docsnap = await FirebaseFirestore.instance
+            .collection('users').doc(cid).collection('userChats').doc('$cid${aux[i][4]}')
+            .get();
+        if (docsnap.exists) {
+          RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+          final result=await Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) {
+              return ChatWindow(
+                otherUserId: aux[i][4],
+                chatId: docsnap.get('chatId'),
+                backgroundImage: docsnap.get('backgroundImage'),
+                
+              );
+            },
+          ));
+          RemoteServices().updateUser(cid, {'current':result});
+          current=null;
+        } else {
+          docsnap = await FirebaseFirestore.instance
+              .collection('chats').doc('${aux[i][4]}$cid')
+              .get();
+          if (docsnap.exists) {
+            RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+            final nav=Navigator.of(context);
+            nav.popUntil(ModalRoute.withName('/'));
+            nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+            await nav.push( MaterialPageRoute(
+              builder: (context) {
+                return ChatWindow(
+                  otherUserId: aux[i][4],
+
+                  chatId: docsnap.get('id'),
+                  //backgroundImage: docsnap.get('backgroundImage'),
+                );
+              },
+            ));
+            RemoteServices().updateUser(cid, {'current':null});
+            current=null;
+          } else {
+            docsnap = await FirebaseFirestore.instance
+                .collection('chats').doc('$cid${aux[i][4]}')
+                .get();
+            if (docsnap.exists) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+              await nav.push( MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: aux[i][4],
+
+                    chatId: docsnap.get('id'),
+                    //backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+              RemoteServices().updateUser(cid, {'current':null});
+              current=null;
+            } else {
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+              await nav.push( MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(otherUserId:aux[i][4]);
+                },
+              ));}
+          }
+        }
       },
       leading: InkWell(
         child: CircleAvatar(
@@ -703,9 +762,9 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
       ),
       trailing: Container(
         color: Colors.deepOrange,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: const Text(' Admin ', style: TextStyle(color: Colors.white70),),
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(' Admin ', style: TextStyle(color: Colors.white70),),
         ),
       ),
       title: Text(aux[i][0]),
@@ -719,20 +778,83 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   for(int i=0;i<extrAux.length;i++) {
     admins.add(ListTile(
       onTap: () async{
-        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${extrAux[i][4]}").get();
-            if(docsnap.exists){
-              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
-            final result=await  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: extrAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
-              },));
-              RemoteServices().updateUser(cid, {'current':result});
+        DocumentSnapshot docsnap = await FirebaseFirestore.instance
+            .collection('users').doc(cid).collection('userChats').doc('$cid${extrAux[i][4]}')
+            .get();
+        if (docsnap.exists) {
+          RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+          final nav=Navigator.of(context);
+          nav.popUntil(ModalRoute.withName('/'));
+          nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+         await nav.push( MaterialPageRoute(
+            builder: (context) {
+              return ChatWindow(
+                otherUserId: extrAux[i][4],
+                chatId: docsnap.get('chatId'),
+                backgroundImage: docsnap.get('backgroundImage'),
+              );
+            },
+          ));
+          RemoteServices().updateUser(cid, {'current':null});
+          current=null;
+        } else {
+          docsnap = await FirebaseFirestore.instance
+              .collection('chats').doc('${epAux[i][4]}$cid')
+              .get();
+          if (docsnap.exists) {
+            RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+            final nav=Navigator.of(context);
+            nav.popUntil(ModalRoute.withName('/'));
+            nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+             await nav.push( MaterialPageRoute(
+              builder: (context) {
+                return ChatWindow(
+                  otherUserId: extrAux[i][4],
+
+                  chatId: docsnap.get('id'),
+                  //backgroundImage: docsnap.get('backgroundImage'),
+                );
+              },
+            ));
+            RemoteServices().updateUser(cid, {'current':null});
+            current=null;
+          } else {
+            docsnap = await FirebaseFirestore.instance
+                .collection('chats').doc('$cid${extrAux[i][4]}')
+                .get();
+            if (docsnap.exists) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+              RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+              await nav.push( MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: extrAux[i][4],
+
+                    chatId: docsnap.get('id'),
+                    //backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+              RemoteServices().updateUser(cid, {'current':null});
               current=null;
-            }
-            else{
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: extrAux[i][4]);
-              },));
-            }
+            } else {
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+               nav.push(  MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(otherUserId:extrAux[i][4]);
+                },
+              ));}
+          }
+        }
       },
       leading: InkWell(
         child: CircleAvatar(
@@ -764,20 +886,85 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   for(int i=0;i<pAux.length;i++) {
     admins.add(ListTile(
       onTap: () async{
-        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${pAux[i][4]}").get();
-            if(docsnap.exists){
-              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
-              final result=await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: pAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
-              },));
-              RemoteServices().updateUser(cid, {'current':result});
+        DocumentSnapshot docsnap = await FirebaseFirestore.instance
+            .collection('users').doc(cid).collection('userChats').doc('$cid${pAux[i][4]}')
+            .get();
+        if (docsnap.exists) {
+
+          final nav=Navigator.of(context);
+          nav.popUntil(ModalRoute.withName('/'));
+          nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+          RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+          //debugPrint('updated  ');
+
+          await nav.push(  MaterialPageRoute(
+            builder: (context) {
+              return ChatWindow(
+                otherUserId: pAux[i][4],
+                chatId: docsnap.get('chatId'),
+                backgroundImage: docsnap.get('backgroundImage'),
+              );
+            },
+          ));
+          RemoteServices().updateUser(cid, {'current':null});
+          current=null;
+        } else {
+          docsnap = await FirebaseFirestore.instance
+              .collection('chats').doc('${pAux[i][4]}$cid')
+              .get();
+          if (docsnap.exists) {
+            RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+            debugPrint('updated');
+            final nav=Navigator.of(context);
+            nav.popUntil(ModalRoute.withName('/'));
+            nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+            await nav.push(  MaterialPageRoute(
+              builder: (context) {
+                return ChatWindow(
+                  otherUserId: pAux[i][4],
+
+                  chatId: docsnap.get('id'),
+                  //backgroundImage: docsnap.get('backgroundImage'),
+                );
+              },
+            ));
+            RemoteServices().updateUser(cid, {'current':null});
+            current=null;
+          } else {
+            docsnap = await FirebaseFirestore.instance
+                .collection('chats').doc('$cid${pAux[i][4]}')
+                .get();
+            if (docsnap.exists) {
+              RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+              await nav.push(  MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: pAux[i][4],
+
+                    chatId: docsnap.get('id'),
+                    //backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+              RemoteServices().updateUser(cid, {'current':null});
               current=null;
-            }
-            else{
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: pAux[i][4]);
-              },));
-            }
+            } else {
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+              await nav.push(  MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(otherUserId:pAux[i][4]);
+                },
+              ));}
+          }
+        }
       },
       leading: InkWell(
         child: CircleAvatar(
@@ -804,20 +991,83 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
   for(int i=0;i<epAux.length;i++) {
     admins.add(ListTile(
       onTap: () async{
-        final DocumentSnapshot docsnap = await FirebaseFirestore.instance.doc("users/$cid/userChats/$cid${epAux[i][4]}").get();
-            if(docsnap.exists){
-              RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
-              final result =await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: epAux[i][4],chatId: docsnap.get('chatId'),backgroundImage: docsnap.get('backgroundImage'),);
-              },));
-              RemoteServices().updateUser(cid, {'current':result});
+        DocumentSnapshot docsnap = await FirebaseFirestore.instance
+            .collection('users').doc(cid).collection('userChats').doc('$cid${epAux[i][4]}')
+            .get();
+        if (docsnap.exists) {
+          RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+          final nav=Navigator.of(context);
+          nav.popUntil(ModalRoute.withName('/'));
+          nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+          await nav.push(  MaterialPageRoute(
+            builder: (context) {
+              return ChatWindow(
+                otherUserId: epAux[i][4],
+                chatId: docsnap.get('chatId'),
+                backgroundImage: docsnap.get('backgroundImage'),
+              );
+            },
+          ));
+          RemoteServices().updateUser(cid, {'current':null});
+          current=null;
+        } else {
+          docsnap = await FirebaseFirestore.instance
+              .collection('chats').doc('${epAux[i][4]}$cid')
+              .get();
+          if (docsnap.exists) {
+            RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+            final nav=Navigator.of(context);
+            nav.popUntil(ModalRoute.withName('/'));
+            nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+            await nav.push(  MaterialPageRoute(
+              builder: (context) {
+                return ChatWindow(
+                  otherUserId: epAux[i][4],
+
+                  chatId: docsnap.get('id'),
+                  //backgroundImage: docsnap.get('backgroundImage'),
+                );
+              },
+            ));
+            RemoteServices().updateUser(cid, {'current':null});
+            current=null;
+          } else {
+            docsnap = await FirebaseFirestore.instance
+                .collection('chats').doc('$cid${epAux[i][4]}')
+                .get();
+            if (docsnap.exists) {
+
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+              RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+
+              await nav.push(  MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(
+                    otherUserId: epAux[i][4],
+
+                    chatId: docsnap.get('id'),
+                    //backgroundImage: docsnap.get('backgroundImage'),
+                  );
+                },
+              ));
+              RemoteServices().updateUser(cid, {'current':null});
               current=null;
-            }
-            else{
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return ChatWindow(otherUserId: epAux[i][4]);
-              },));
-            }
+            } else {
+              final nav=Navigator.of(context);
+              nav.popUntil(ModalRoute.withName('/'));
+              nav.push(MaterialPageRoute(builder: (context)=>HomePage()));
+
+             nav.push(  MaterialPageRoute(
+                builder: (context) {
+                  return ChatWindow(otherUserId:epAux[i][4]);
+                },
+              ));}
+          }
+        }
       },
       leading: InkWell(
         child: CircleAvatar(

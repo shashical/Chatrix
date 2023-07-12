@@ -178,27 +178,47 @@ List<Widget> MergeAppUserAndSendInvite(
               current=null;
             } else {
               docsnap = await FirebaseFirestore.instance
-                  .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
+                  .collection('chats').doc('${users[index].id}$cid')
                   .get();
               if (docsnap.exists) {
-                RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+                RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
                 await Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
                     return ChatWindow(
                       otherUserId: users[index].id,
 
-                      chatId: docsnap.get('chatId'),
-                      backgroundImage: docsnap.get('backgroundImage'),
+                      chatId: docsnap.get('id'),
+                      //backgroundImage: docsnap.get('backgroundImage'),
                     );
                   },
                 ));
                 RemoteServices().updateUser(cid, {'current':null});
+                current=null;
               } else {
+                docsnap = await FirebaseFirestore.instance
+                    .collection('chats').doc('$cid${users[index].id}')
+                    .get();
+                if (docsnap.exists) {
+                  RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+                  await Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return ChatWindow(
+                        otherUserId: users[index].id,
+
+                        chatId: docsnap.get('id'),
+                        //backgroundImage: docsnap.get('backgroundImage'),
+                      );
+                    },
+                  ));
+                  RemoteServices().updateUser(cid, {'current':null});
+                  current=null;
+                } else {
+
                 Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
                     return ChatWindow(otherUserId: users[index].id);
                   },
-                ));
+                ));}
               }
             }
           },
@@ -315,27 +335,47 @@ List<Widget> SearchMerge(
               current=null;
             } else {
               docsnap = await FirebaseFirestore.instance
-                  .collection('users').doc(users[index].id).collection('userChats').doc('${users[index].id}$cid')
+                  .collection('chats').doc('${users[index].id}$cid')
                   .get();
               if (docsnap.exists) {
-                RemoteServices().updateUser(cid, {'current':docsnap.get('chatId')});
+                RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
                 await Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
                     return ChatWindow(
                       otherUserId: users[index].id,
 
-                      chatId: docsnap.get('chatId'),
-                      backgroundImage: docsnap.get('backgroundImage'),
+                      chatId: docsnap.get('id'),
+                      //backgroundImage: docsnap.get('backgroundImage'),
                     );
                   },
                 ));
                 RemoteServices().updateUser(cid, {'current':null});
+                current=null;
               } else {
-                Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) {
-                    return ChatWindow(otherUserId: users[index].id);
-                  },
-                ));
+                docsnap = await FirebaseFirestore.instance
+                    .collection('chats').doc('$cid${users[index].id}')
+                    .get();
+                if (docsnap.exists) {
+                  RemoteServices().updateUser(cid, {'current':docsnap.get('id')});
+                  await Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return ChatWindow(
+                        otherUserId: users[index].id,
+
+                        chatId: docsnap.get('id'),
+                        //backgroundImage: docsnap.get('backgroundImage'),
+                      );
+                    },
+                  ));
+                  RemoteServices().updateUser(cid, {'current':null});
+                  current=null;
+                } else {
+
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return ChatWindow(otherUserId: users[index].id);
+                    },
+                  ));}
               }
             }
           },

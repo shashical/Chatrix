@@ -211,7 +211,7 @@ class _GroupsPageState extends State<GroupsPage> {
                 PopupMenuButton(
                     itemBuilder: (context)=>[
                       PopupMenuItem(
-                        child: const Text('Select All'),
+                        child:  Text((trueCount!=usergroups.length)?'Select All':'Unselect All'),
                         onTap: (){
                           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                             if(trueCount!=usergroups.length) {
