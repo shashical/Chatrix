@@ -171,6 +171,7 @@ List<Widget> MergeAppUserAndSendInvite(
                     otherUserId: users[index].id,
                     chatId: docsnap.get('chatId'),
                     backgroundImage: docsnap.get('backgroundImage'),
+                    exists: true,
                   );
                 },
               ));
