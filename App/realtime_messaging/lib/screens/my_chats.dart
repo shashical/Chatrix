@@ -217,10 +217,12 @@ class _ChatsPageState extends State<ChatsPage> {
                   width:20,
                 ),
                 IconButton(onPressed: ()async{
+                  List<bool> hello=isSelected;
                   for(int i=userchats.length-1;i>=0;i--) {
                     String temp = userchats[i].id;
                     String chatid = userchats[i].chatId;
-                    if (isSelected[i]) {
+
+                    if (hello[i]) {
                       try {
                         RemoteServices().deleteSingleUserChat(cid, userchats[i].id)
                         // _usersremoteServices.updateUserChat(
@@ -475,7 +477,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                               RemoteServices().updateUser(cid,
                                                                   {'current':userchat.id});
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                                return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                                return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,exists: true,);
                                                               },));
                                                               debugPrint("my chats current update");
                                                             RemoteServices().updateUser(cid,{'current':result});
@@ -610,7 +612,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                                 {'current':userchat.id});
                                                             debugPrint('my chat is culprit  ');
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                              return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                              return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,exists: true,);
                                                             },));
                                                             debugPrint("my chats current update");
                                                             RemoteServices().updateUser(cid,{'current':result});
@@ -817,7 +819,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                   RemoteServices().updateUser(cid,
                                                       {'current':userchat.id});
                                                   final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                    return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                    return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,exists: true,);
                                                   },));
                                                   debugPrint("my chats current 3");
                                                   RemoteServices().updateUser(cid,{'current':result});
@@ -950,7 +952,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                         final otheruserid = userchat.id.substring(cid.length,userchat.id.length);
                                         RemoteServices().updateUser(cid, {'current':userchat.chatId});
                                         final result =await Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                          return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                          return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,exists: true,);
                                         },));
                                         RemoteServices().updateUser(cid, {'current':result});
                                         current=null;

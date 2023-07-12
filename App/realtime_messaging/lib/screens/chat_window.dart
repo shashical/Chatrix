@@ -1069,6 +1069,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                 if(myMessageLength!=chatmessages.length){
                                   myMessageLength=chatmessages.length;
                                   isSelected=List.filled(myMessageLength, false);
+                                  debugPrint(' curUserChat ${widget.exists}');
                                     if(curUserChatExists==true){
                                       RemoteServices().updateUserChat(cid,{'unreadMessageCount':0} , '$cid${otheruser.id}');
                                     }
@@ -2064,18 +2065,6 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                         }
                                         debugPrint("Chat window noti");
                                         if (!isEditing) {
-                                          await ChatsRemoteServices().setChatMessage(
-                                              chatid!,
-                                              ChatMessage(
-                                                  id: "${DateTime
-                                                      .now()
-                                                      .microsecondsSinceEpoch}",
-                                                  senderId: cid,
-                                                  text: encryptedMessageString,
-                                                  contentType: "text",
-                                                  timestamp: DateTime.now()));
-
-
                                           DocumentSnapshot docsnap = await FirebaseFirestore
                                               .instance
                                               .collection('users').doc(cid).collection(
@@ -2093,9 +2082,22 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     backgroundImage: "assets/backgroundimage.png",
                                                     lastMessageTime: DateTime.now())
                                             );
-                                            curUserChatExists=true;
-                                          }
-                                          debugPrint("Chat window Update user chats");
+                                            curUserChatExists=true;}
+                                          await ChatsRemoteServices().setChatMessage(
+                                              chatid!,
+                                              ChatMessage(
+                                                  id: "${DateTime
+                                                      .now()
+                                                      .microsecondsSinceEpoch}",
+                                                  senderId: cid,
+                                                  text: encryptedMessageString,
+                                                  contentType: "text",
+                                                  timestamp: DateTime.now()));
+
+
+
+                                          
+                                          //debugPrint("Chat window Update user chats");
 
                                           RemoteServices().updateUserChat(
                                               cid,
