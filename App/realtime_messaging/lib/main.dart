@@ -25,7 +25,7 @@ bool darkmode=false;
 Future<void> backgroundHandler(RemoteMessage message)async{
   debugPrint("This message is from background");
   LocalNotificationService.showNotificationOnForeground(message);
-  debugPrint(message.notification!.title);
+debugPrint(message.notification!.title);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 }
 
 List<String> savedNumber = [];

@@ -664,7 +664,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                                           validTokens, {
                                                     'title':
                                                         "${widget.groupName} (${curUser!.name})",
-                                                    'body': "Document"
+                                                    'body': "Image"
                                                   }, {});
                                                   }
 
@@ -1876,7 +1876,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       if(!isStatedSet) {
                                                         if (gp.muted) {
                                                           tokens[index] = null;
-                                                          debugPrint('workig');
+                                                          debugPrint('working');
                                                         }
                                                       }
                                                       else{
@@ -2147,7 +2147,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
-                                                          'lastMessage': 'image',
+                                                          'lastMessage': 'Image',
                                                           'lastMessageType': "image",
                                                           'lastMessageTime':
                                                               DateTime.now()
@@ -2220,7 +2220,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
-                                                          'lastMessage': 'image',
+                                                          'lastMessage': 'Image',
                                                           'lastMessageType': "image",
                                                           'lastMessageTime':
                                                               DateTime.now()
