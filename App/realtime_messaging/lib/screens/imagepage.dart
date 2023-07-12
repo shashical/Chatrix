@@ -13,10 +13,13 @@ class _ImageScreenState extends State<ImageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black45,
       body: Stack(
+
         children: [
 
           Container(
+            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
             decoration:
             BoxDecoration(
               image: DecorationImage(
@@ -25,9 +28,9 @@ class _ImageScreenState extends State<ImageScreen> {
               )
             ),
           ),
-          const Positioned(top: 10,
+          const Positioned(top: 30,
               left: 5,
-              child: BackButton()),
+              child: BackButton( color: Colors.white70,)),
 
         ],
       ),

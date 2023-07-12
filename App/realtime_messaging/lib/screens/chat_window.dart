@@ -1679,7 +1679,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
 
                                                 otherUserChat=UserChat(
                                                   id: "${widget.otherUserId}$cid",
-                                                  chatId: "$cid${widget.otherUserId}",
+                                                  chatId: chatid!,
                                                   recipientPhoto: currentuser.photoUrl!,
                                                   pinned: false,
                                                   recipientPhoneNo: currentuser.phoneNo,

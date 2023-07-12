@@ -17,6 +17,7 @@ import 'package:realtime_messaging/Services/users_remote_services.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/group_info_page.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
+import 'package:realtime_messaging/screens/imagepage.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'package:realtime_messaging/theme_provider.dart';
 import 'dart:math' as math;
@@ -162,8 +163,8 @@ class _DocBubbleState extends State<DocBubble> {
         children: [
           (!widget.isUser)
               ? SizedBox(
-                  height: 25,
-                  width: 25,
+                  height: 30,
+                  width: 30,
                   child: CircleAvatar(
                     foregroundImage: NetworkImage(widget.photoUrl),
                   ),
@@ -520,13 +521,13 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
         children: [
           (!widget.isUser)
               ? SizedBox(
-                  height: 25,
-                  width: 25,
+                  height: 30,
+                  width: 30,
                   child: CircleAvatar(
                     foregroundImage: NetworkImage(widget.photoUrl!),
                   ),
                 )
-              : SizedBox(),
+              : const SizedBox(),
           Column(
             crossAxisAlignment: align,
             children: [
@@ -538,9 +539,10 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                         maxWidth: MediaQuery.of(context).size.width * 0.7,
                         maxHeight: (widget.isUser)
                             ? MediaQuery.of(context).size.height * .41
-                            : MediaQuery.of(context).size.height * .45),
-                    margin: const EdgeInsets.all(3.0),
-                    padding: const EdgeInsets.all(4.0),
+                            : MediaQuery.of(context).size.height * .425),
+
+
+
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
@@ -555,7 +557,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         (widget.isUser
-                            ? const SizedBox()
+                            ? const SizedBox(height: 2,)
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -566,48 +568,62 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                       : (widget.phoneNo!))),
                                 ],
                               )),
-                        Stack(children: [
-                          Container(
-                            constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width * 0.65,
-                                maxHeight: MediaQuery.of(context).size.height * 0.4),
-                            alignment: Alignment.bottomRight,
-                            decoration: BoxDecoration(
-                              image: (widget.isUser)
-                                  ? DecorationImage(
-                                      image: FileImage(File(widget.senderUrl)),
-                                      fit: BoxFit.cover)
-                                  : (downloaded[cid] ?? false)
-                                      ? DecorationImage(
-                                          image: FileImage(
-                                              File(widget.receiverUrls[cid]!)),
-                                          fit: BoxFit.cover)
-                                      : const DecorationImage(
-                                          image: AssetImage('assets/blurimg.png'),
-                                          fit: BoxFit.cover),
-                              borderRadius: radius,
-                            ),
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 55.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    widget.time,
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  (widget.isUser)
-                                      ? Icon(
-                                          icon,
-                                          size: 16,
-                                        )
-                                      : const SizedBox(
-                                          width: 0,
-                                        )
-                                ],
+                        Stack(
+                          alignment: AlignmentDirectional.center,
+                            children: [
+                          InkWell(
+                            onTap:(){
+                              if(!widget.isSelected) {
+                                if(widget.isUser) {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageScreen(path: widget.senderUrl)));
+                                }
+                                else if(downloaded[cid]??false){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageScreen(path: widget.receiverUrls[cid]!)));
+                                }
+                              }
+                            },
+                            child: Container(
+                              constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width * 0.65,
+                                  maxHeight: MediaQuery.of(context).size.height * 0.4),
+                              alignment: Alignment.bottomRight,
+                              decoration: BoxDecoration(
+                                image: (widget.isUser)
+                                    ? DecorationImage(
+                                        image: FileImage(File(widget.senderUrl)),
+                                        fit: BoxFit.cover)
+                                    : (downloaded[cid] ?? false)
+                                        ? DecorationImage(
+                                            image: FileImage(
+                                                File(widget.receiverUrls[cid]!)),
+                                            fit: BoxFit.cover)
+                                        : const DecorationImage(
+                                            image: AssetImage('assets/blurimg.png'),
+                                            fit: BoxFit.cover),
+                                borderRadius: radius,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 55.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      widget.time,
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    (widget.isUser)
+                                        ? Icon(
+                                            icon,
+                                            size: 16,
+                                          )
+                                        : const SizedBox(
+                                            width: 0,
+                                          )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -623,7 +639,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                       : Colors.white.withOpacity(0.5)
                                   : (downloaded[cid] ?? false)
                                       ? null
-                                      : Colors.white.withOpacity(0.5),
+                                      : Colors.white.withOpacity(0.9),
                             ),
                             child: (widget.isUser)
                                 ? (!isUploading && !uploaded)
@@ -753,7 +769,7 @@ class MyBubble extends StatelessWidget {
         ? Colors.lightBlue.withOpacity(0.5)
         : !isUser
         ?  const Color.fromARGB(255, 72, 69, 69)
-        : Color.fromARGB(255, 30, 75, 31);
+        : const Color.fromARGB(255, 30, 75, 31);
 
     final align = !isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final icon = read ? Icons.done_all : Icons.done;
@@ -775,8 +791,8 @@ class MyBubble extends StatelessWidget {
       children: [
         (!isUser)
             ? SizedBox(
-                height: 25,
-                width: 25,
+                height: 30,
+                width: 30,
                 child: CircleAvatar(
                   foregroundImage: NetworkImage(photoUrl!),
                 ),
@@ -843,7 +859,7 @@ class MyBubble extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 1,),
-                  (edited?Text("Edited",style: TextStyle(fontSize: 13),):SizedBox(height: 0,)),
+                  (edited?const Text("Edited",style: TextStyle(fontSize: 13),):SizedBox(height: 0,)),
                       ],
                     ),
                   ),
@@ -893,6 +909,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   List<dynamic> participants = [];
   bool isLoaded = false;
   List<bool> isUpdated = [];
+  bool isStatedSet=false;
   @override
   void initState() {
     // TODO: implement initState
@@ -906,11 +923,15 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      debugPrint("group window resume");
-      RemoteServices().updateUser(cid, {'current': current});
+      //Print("group window resume");
+      if(cid!='') {
+        RemoteServices().updateUser(cid, {'current': current});
+      }
     } else {
-      debugPrint("group window exit");
-      RemoteServices().updateUser(cid, {'current': null});
+      //Print("group window exit");
+      if(cid!='') {
+        RemoteServices().updateUser(cid, {'current': null});
+      }
     }
   }
 
@@ -958,6 +979,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
         onWillPop: () async {
           if (trueCount != 0) {
             setState(() {
+              isStatedSet=true;
               trueCount = 0;
 
               isSelected = List.filled(groupmessages.length, false);
@@ -974,6 +996,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                 ? IconButton(
                     onPressed: () {
                       setState(() {
+                        isStatedSet=true;
                         isSelected = List.filled(groupmessages.length, false);
                         trueCount = 0;
                         otherUserChatSelected = [];
@@ -1024,6 +1047,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         }
                                                       }
                                                       setState(() {
+                                                        isStatedSet=true;
                                                         isSelected =
                                                             List.filled(
                                                                 myMessageLength,
@@ -1068,6 +1092,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 }
 
                                                 setState(() {
+                                                  isStatedSet=true;
                                                   isSelected = List.filled(
                                                       myMessageLength, false);
                                                   trueCount = 0;
@@ -1130,6 +1155,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                 await Clipboard.setData(
                                     ClipboardData(text: message));
                                 setState(() {
+                                  isStatedSet=true;
                                   isSelected =
                                       List.filled(groupmessages.length, false);
                                   trueCount = 0;
@@ -1211,7 +1237,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               RemoteServices().updateUserGroup(cid, {'backgroundImage':backgroundImage}, widget.groupId);
 
                               setState(() {
-
+                                isStatedSet=true;
                               });
                               Navigator.of(context, rootNavigator: true).pop();
                             },
@@ -1243,7 +1269,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                               RemoteServices().updateUserChat(cid, {'backgroundImage':backgroundImage}, widget.groupId);
 
                               setState(() {
-
+                                isStatedSet=true;
                               });
                               Navigator.of(context, rootNavigator: true).pop();
                             },
@@ -1303,10 +1329,10 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                           groupmessages = snapshot.data!.reversed.toList();
                           if(myMessageLength!=groupmessages.length){
                             myMessageLength=groupmessages.length;
-                            debugPrint("group window umc 0");
+                            //Print("messege length ${myMessageLength}");
                             RemoteServices().updateUserGroup(cid, {'unreadMessageCount':0}, widget.groupId);
                             totalWritesFromThisPage++;
-                            debugPrint('printing from cidupdateunreadcount $totalWritesFromThisPage ');
+                            //Print('printing from cidupdateunreadcount $totalWritesFromThisPage ');
                             isSelected=List.filled(myMessageLength, false);
                             trueCount=0;
                             otherUserChatSelected=[];
@@ -1323,7 +1349,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                           while(fgIndex<groupmessages.length && !(groupmessages[fgIndex].readBy[cid]??false)){
                             if(groupmessages[fgIndex].senderId!=cid){
                               groupmessages[fgIndex].readBy[cid]=true;
-                              debugPrint("group window read by 1");
+                              //Print("group window read by 1");
                               GroupsRemoteServices().updateGroupMessage(widget.groupId, {'readBy':groupmessages[fgIndex].readBy}, groupmessages[fgIndex].id);
                             }
                             fgIndex++;
@@ -1337,13 +1363,13 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                             }
                             else{
                               groupmessages[bgIndex].readBy[cid]=true;
-                              debugPrint("group window read by 2");
+                              //Print("group window read by 2");
                               GroupsRemoteServices().updateGroupMessage(
                                   widget.groupId,
                                   {'readBy':groupmessages[bgIndex].readBy},
                                   groupmessages[bgIndex].id);
                               totalWritesFromThisPage++;
-                                  debugPrint('printing from readupdate $totalWritesFromThisPage ');
+                                  //Print('printing from readupdate $totalWritesFromThisPage ');
 
                             }
                             bgIndex--;
@@ -1457,6 +1483,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         ? (groupmessage.isUploaded)
                                                             ? ImgBubble(
                                                               groupName: widget.groupName,
+                                                                phoneNo: groupmessage.senderPhoneNo,
                                                                 message: message,
                                                                 time:
                                                                     ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
@@ -1508,6 +1535,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                   groupName: widget.groupName,
                                                                     message:
                                                                         message,
+                                                                    phoneNo: groupmessage.senderPhoneNo,
                                                                     time:
                                                                         ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                     isAcontact: savedNumber.contains(
@@ -1546,6 +1574,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                 groupName: widget
                                                                     .groupName,
                                                                 message: message,
+                                                                phoneNo: groupmessage.senderPhoneNo,
                                                                 time:
                                                                     ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                 photoUrl: groupmessage
@@ -1604,6 +1633,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                         message,
                                                                     groupName: widget
                                                                         .groupName,
+                                                                    phoneNo: groupmessage.senderPhoneNo,
                                                                     photoUrl:
                                                                         groupmessage
                                                                             .senderPhotoUrl,
@@ -1661,6 +1691,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 onTap: () {
                                                   if (trueCount != 0) {
                                                     setState(() {
+                                                      isStatedSet=true;
                                                       if (isSelected[index]) {
                                                         isSelected[index] = false;
                                                         trueCount--;
@@ -1695,6 +1726,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                           ),
                                                           onPressed: () {
                                                             setState(() {
+                                                              isStatedSet=true;
                                                               isEditing = true;
                                                               messageController
                                                                   .text = message;
@@ -1718,6 +1750,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 },
                                                 onLongPress: () {
                                                   setState(() {
+                                                    isStatedSet=true;
                                                     if (isSelected[index]) {
                                                       isSelected[index] = false;
                                                       trueCount--;
@@ -1763,68 +1796,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                         height: 5,
                                         child: ListView.builder(
                                             physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: participants.length,
-                                            itemBuilder: (context, index) {
-                                              // debugPrint('index $index');
-                                              if (participants[index] != cid) {
-                                                //debugPrint('$isUpdated');
-                                                // if(dummy!=0) {
-                                                //debugPrint('working here also !!!!');
-                                                return StreamBuilder<UserGroup>(
-                                                  stream: RemoteServices()
-                                                      .getUserGroupStream(
-                                                          participants[index],
-                                                          widget.groupId),
-                                                  builder: (BuildContext context,
-                                                      AsyncSnapshot<dynamic>
-                                                          snapshot) {
-                                                            debugPrint("group window get user stream");
-                                                    if (snapshot.hasData) {
-                                                      final UserGroup gp =
-                                                          snapshot.data;
-                                                      if (gp.muted) {
-                                                        tokens[index] = null;
-                                                      }
-                                                      int count =
-                                                          gp.unreadMessageCount ??
-                                                              0;
-                                                      if (!isUpdated[index] &&
-                                                          dummy != 0) {
-                                                        // debugPrint(
-                                                        //     'checking $count +$dummy=${dummy + count}');
-                                                        debugPrint("group window count + dummy");
-                                                        RemoteServices()
-                                                            .updateUserGroup(
-                                                                participants[index],
-                                                                {
-                                                                  'unreadMessageCount':
-                                                                      count + dummy
-                                                                },
-                                                                widget.groupId);
-                                                        isUpdated[index] = true;
-                                                        totalWritesFromThisPage++;
-                                                        debugPrint('printing from all-participants unreadability $totalWritesFromThisPage from group window ');
-
-                                                      }
-                                                    }
-                                                    return const SizedBox(
-                                                      height: 0,
-                                                    );
-                                                  },
-                                                );
-                                              } else {
-                                                //debugPrint('${participants.length} rajeev ');
-                                                print(tokens);
-                                                tokens[index] = null;
-                                                return const SizedBox();
-                                              }
-                                            }),
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                        child: ListView.builder(
-                                            physics:
                                             const NeverScrollableScrollPhysics(),
                                             itemCount: participants.length,
                                             itemBuilder: (context, index) {
@@ -1844,11 +1815,18 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                     if (snapshot.hasData) {
                                                       final Users gp =
                                                           snapshot.data;
-                                                      if (gp.token!=null) {
-                                                        tokens[index] = gp.token;
+                                                      if(!isStatedSet) {
+                                                        if (gp.token != null) {
+                                                          tokens[index] =
+                                                              gp.token;
+                                                        }
+                                                        if (gp.current ==
+                                                            widget.groupId) {
+                                                          tokens[index] = null;
+                                                        }
                                                       }
-                                                      if(gp.current==widget.groupId){
-                                                        tokens[index]=null;
+                                                      else{
+                                                        isStatedSet=false;
                                                       }
 
 
@@ -1864,6 +1842,104 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 print(tokens);
                                                 tokens[index] = null;
                                                 return const SizedBox();
+                                              }
+                                            }),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                        child: ListView.builder(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemCount: participants.length,
+                                            itemBuilder: (context, index) {
+                                              // debugPrint('index $index');
+                                              if (participants[index] != cid) {
+                                                //debugPrint('$isUpdated');
+                                                // if(dummy!=0) {
+                                                //debugPrint('working here also !!!!');
+                                                return StreamBuilder<UserGroup>(
+                                                  stream: RemoteServices()
+                                                      .getUserGroupStream(
+                                                          participants[index],
+                                                          widget.groupId),
+                                                  builder: (BuildContext context,
+                                                      AsyncSnapshot<dynamic>
+                                                          snapshot) {
+                                                            //Print("group window get user stream");
+                                                    if (snapshot.hasData) {
+
+                                                      final UserGroup gp =
+                                                          snapshot.data;
+                                                      if(!isStatedSet) {
+                                                        if (gp.muted) {
+                                                          tokens[index] = null;
+                                                          debugPrint('workig');
+                                                        }
+                                                      }
+                                                      else{
+                                                        isStatedSet=false;
+                                                      }
+                                                      int count =
+                                                          gp.unreadMessageCount ??
+                                                              0;
+                                                      if (!isUpdated[index] &&
+                                                          dummy != 0) {
+                                                        // debugPrint(
+                                                        //     'checking $count +$dummy=${dummy + count}');
+                                                        //Print("group window count + dummy");
+                                                         RemoteServices()
+                                                            .updateUserGroup(
+                                                                participants[index],
+                                                                {
+                                                                  'unreadMessageCount':
+                                                                      count + dummy
+                                                                },
+                                                                widget.groupId);
+                                                        isUpdated[index] = true;
+                                                        totalWritesFromThisPage++;
+                                                        //Print('printing from all-participants unreadability $totalWritesFromThisPage from group window ');
+
+                                                      }
+                                                    }
+                                                    return const SizedBox(
+                                                      height: 0,
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                //debugPrint('${participants.length} rajeev ');
+                                                print(tokens);
+                                                tokens[index] = null;
+
+                                                return StreamBuilder<UserGroup>(
+                                                  stream: RemoteServices()
+                                                      .getUserGroupStream(
+                                                      participants[index],
+                                                      widget.groupId),
+                                                  builder: (BuildContext context,
+                                                      AsyncSnapshot<dynamic>
+                                                      snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      if (!isUpdated[index] &&
+                                                          dummy != 0) {
+                                                        // debugPrint(
+                                                        //     'checking $count +$dummy=${dummy + count}');
+                                                        RemoteServices()
+                                                            .updateUserGroup(
+                                                            participants[index],
+                                                            {
+                                                              'unreadMessageCount':
+                                                              0
+                                                            },
+                                                            widget.groupId);
+                                                        isUpdated[index] = true;
+                                                      }
+                                                    }
+                                                    return const SizedBox(
+                                                      height: 0,
+                                                    );
+                                                  },
+                                                );
                                               }
                                             }),
                                       ),
@@ -1903,8 +1979,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                           maxLines: null,
                                           controller: messageController,
                                           onChanged: (e) {
-                                            debugPrint("group window sus set state");
-                                            setState(() {});
+                                           // debugPrint("group window sus set state");
+                                            setState(() { isStatedSet=true;});
                                             // if(messageController.text.isEmpty||messageController.text.length==1||messageController.text.length==2){
                                             //   setState(() {
                                             //      // debugPrint('${messageController.text.length}');
@@ -1939,7 +2015,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   for (int i = 0;
                                                       i < files.files.length;
                                                       i++) {
-                                                        debugPrint("set group message");
+                                                     //   debugPrint("set group message");
                                                     await GroupsRemoteServices()
                                                         .setGroupMessage(
                                                             widget.groupId,
@@ -1971,7 +2047,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   // .getDocumentField(
                                                   //     "groups/${widget.groupId}", 'participantIds');
                                                   for (var x in participants) {
-                                                    debugPrint("group window update user group");
+                                                  //  debugPrint("group window update user group");
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
@@ -2031,7 +2107,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       (await RemoteServices()
                                                           .getSingleUser(cid))!;
                                                   for (int i = 0; i < 1; i++) {
-                                                    debugPrint("group window set group message 2");
+                                                //    debugPrint("group window set group message 2");
                                                     await GroupsRemoteServices()
                                                         .setGroupMessage(
                                                             widget.groupId,
@@ -2063,7 +2139,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   // .getDocumentField(
                                                   //     "groups/${widget.groupId}", 'participantIds');
                                                   for (var x in participants) {
-                                                    debugPrint("group window update user group 2");
+                                                   // debugPrint("group window update user group 2");
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
@@ -2104,7 +2180,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       (await RemoteServices()
                                                           .getSingleUser(cid))!;
                                                   for (int i = 0; i < 1; i++) {
-                                                    debugPrint("group window set group message 3");
+                                                 //   debugPrint("group window set group message 3");
                                                     await GroupsRemoteServices()
                                                         .setGroupMessage(
                                                             widget.groupId,
@@ -2136,7 +2212,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   // .getDocumentField(
                                                   //     "groups/${widget.groupId}", 'participantIds');
                                                   for (var x in participants) {
-                                                    debugPrint("group window update user group 3");
+                                                  //  debugPrint("group window update user group 3");
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
@@ -2186,6 +2262,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                             iconSize: 24,
                                             onPressed: () async {
                                               setState(() {
+                                                isStatedSet=true;
                                                 isSending = true;
                                               });
                                               String temp = messageController.text;
@@ -2208,7 +2285,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                               String encryptedMessageString =
                                                   encryptedMessage.base64;
                                               if (!isEditing) {
-                                                debugPrint("group window set group message 4");
+                                             //   debugPrint("group window set group message 4");
                                                 await GroupsRemoteServices()
                                                     .setGroupMessage(
                                                         widget.groupId,
@@ -2225,14 +2302,18 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                               currentuser.photoUrl!,
                                                         ));
                                                 validTokens = [];
+                                                debugPrint(' tokens $tokens');
+
                                                 for (int i = 0;
                                                     i < tokens.length;
                                                     i++) {
-                                                  if (tokens[i] != null) {
+
+                                                  if (tokens[i] != 'null' && tokens[i]!=null) {
+                                                    debugPrint('valid $validTokens');
                                                     validTokens.add(tokens[i]!);
                                                   }
                                                 }
-                                                //print(validTokens);
+                                                debugPrint( 'valid $validTokens');
                                                 if(validTokens.isNotEmpty) {
                                                   SendNotificationService()
                                                     .sendFCMGroupMessage(validTokens, {
@@ -2242,13 +2323,14 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 }, {});
                                                 }
                                                 debugPrint(' valid tokens $validTokens');
+
                                                 // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
                                                 // List<dynamic> participants = docSnap.get('participantIds');
                                                 // .getDocumentField(
                                                 //     "groups/${widget.groupId}", 'participantIds');
 
                                                 for (var x in participants) {
-                                                  debugPrint("group window update user group 4");
+                                                  //Print("group window update user group 4");
                                                   RemoteServices().updateUserGroup(
                                                       x,
                                                       {
@@ -2263,7 +2345,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                       widget.groupId);
                                                 }
                                               } else if (isEditing) {
-                                                debugPrint("group window update group message");
+                                                //Print("group window update group message");
                                                 GroupsRemoteServices()
                                                     .updateGroupMessage(
                                                         widget.groupId,
@@ -2275,11 +2357,12 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         editingId);
                                                 isEditing=false;
                                                 setState(() {
-
+                                                    isStatedSet=true;
                                                 });
                                               }
                                               setState(() {
-                                                debugPrint('$isSending');
+                                                //Print('$isSending');
+                                                isStatedSet=true;
                                                 isSending = false;
                                               });
                                             },

@@ -47,11 +47,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       debugPrint("app life cycle resume");
-      RemoteServices().updateUser(cid, {'isOnline':true});
+      if(cid!='') {
+        RemoteServices().updateUser(cid, {'isOnline':true});
+      }
     }
     else {
       debugPrint("app life cycle exit");
-      RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
+      if(cid!='') {
+        RemoteServices().updateUser(cid,{'isOnline':false, 'lastOnline':DateTime.now().toIso8601String()});
+      }
 
     }
   }
@@ -129,12 +133,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   },
 )
             ,),
-            PopupMenuDivider(),
+            const PopupMenuDivider(),
             PopupMenuItem(
             onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) async{
 
-                RemoteServices().updateUser(cid,
+               await RemoteServices().updateUser(cid,
                 {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
 
                 );
