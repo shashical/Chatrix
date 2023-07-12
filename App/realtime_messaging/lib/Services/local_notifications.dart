@@ -8,7 +8,7 @@ class LocalNotificationService {
   static void initialize() {
     final InitializationSettings initializationSettings =
         InitializationSettings(
-            android: AndroidInitializationSettings("@mipmap/launcher_icon"));
+            android: AndroidInitializationSettings("@mipmap/ic_launcher"));
     _notificationPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (details) {
