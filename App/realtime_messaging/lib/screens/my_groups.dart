@@ -126,7 +126,7 @@ class _GroupsPageState extends State<GroupsPage> {
                     }
 
                   },
-                  icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded,semanticLabel: 'unmute',):const Icon(Icons.volume_mute_rounded,semanticLabel: 'mute',),
+                  icon:(unMutedSelected.isEmpty)? const Icon(Icons.volume_up_rounded,semanticLabel: 'unmute',):const Icon(CupertinoIcons.volume_off,size:20),
                 ),
                 const SizedBox(
                   width:20,
@@ -203,8 +203,8 @@ class _GroupsPageState extends State<GroupsPage> {
                       }
                     },
                     icon:(unPinnedSelected.isEmpty)? Transform.rotate(angle: math.pi/7,
-                    child: const Icon((CupertinoIcons.pin_slash_fill),semanticLabel: 'Unpin',)):Transform.rotate(angle: math.pi/7,
-                    child: const Icon(CupertinoIcons.pin_fill,semanticLabel: 'Pin',))),
+                    child: const Icon((CupertinoIcons.pin_slash_fill),semanticLabel: 'Unpin',size: 20,)):Transform.rotate(angle: math.pi/7,
+                    child: const Icon(CupertinoIcons.pin_fill,semanticLabel: 'Pin',size: 20,))),
                 const SizedBox(
                   width:20,
                 ),
@@ -259,11 +259,11 @@ class _GroupsPageState extends State<GroupsPage> {
                     }
 
                     usergroups.sort((a, b) {
-                      if(a.lastMessageTime == null || b.lastMessageTime == null){
-                        return (a.lastMessageTime == null?-1:1);
-                      }
                       if (a.pinned != b.pinned) {
                         return a.pinned ? -1 : 1;
+                      }
+                      if(a.lastMessageTime == null || b.lastMessageTime == null){
+                        return (a.lastMessageTime == null?-1:1);
                       }
                       if (a.pinned) {
                         return b.lastMessageTime!.compareTo(a.lastMessageTime!);

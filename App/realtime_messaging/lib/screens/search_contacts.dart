@@ -308,6 +308,7 @@ List<Widget> SearchMerge(
                     otherUserId: users[index].id,
                     chatId: docsnap.get('chatId'),
                     backgroundImage: docsnap.get('backgroundImage'),
+                    exists: true,
                   );
                 },
               ));
@@ -373,7 +374,7 @@ List<Widget> SearchMerge(
             openMessagingApp(searchedNumber[i]);
           },
           child: const Text(
-            'invite',
+            'Invite',
             style: TextStyle(color: Colors.purple, fontSize: 20),
           ),
         ),

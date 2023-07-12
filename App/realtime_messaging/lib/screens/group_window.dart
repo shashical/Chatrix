@@ -1103,8 +1103,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                       const SizedBox(
                         width: 18,
                       ),
-                      IconButton(
-                          onPressed: () {}, icon: const Icon(Icons.star)),
                       const SizedBox(
                         width: 18,
                       ),
@@ -1457,6 +1455,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                             ? ImgBubble(
                                                               groupName: widget.groupName,
                                                                 message: message,
+                                                                phoneNo: groupmessage.senderPhoneNo,
                                                                 time:
                                                                     ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                 isAcontact: savedNumber
@@ -1505,6 +1504,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                         .senderId)
                                                                 ? ImgBubble(
                                                                   groupName: widget.groupName,
+                                                                  phoneNo: groupmessage.senderPhoneNo,
                                                                     message:
                                                                         message,
                                                                     time:
@@ -1778,7 +1778,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                   builder: (BuildContext context,
                                                       AsyncSnapshot<dynamic>
                                                           snapshot) {
-                                                            debugPrint("group window get user stream");
+                                                            debugPrint("group window get user group stream");
                                                     if (snapshot.hasData) {
                                                       final UserGroup gp =
                                                           snapshot.data;
@@ -1814,7 +1814,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 );
                                               } else {
                                                 //debugPrint('${participants.length} rajeev ');
-                                                print(tokens);
                                                 tokens[index] = null;
                                                 return const SizedBox();
                                               }
@@ -1860,7 +1859,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 );
                                               } else {
                                                 //debugPrint('${participants.length} rajeev ');
-                                                print(tokens);
+                                                // print(tokens);
                                                 tokens[index] = null;
                                                 return const SizedBox();
                                               }
@@ -2231,7 +2230,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         validTokens.add(tokens[i]!);
                                                       }
                                                     }
-                                                    //print(validTokens);
+                                                    // print(tokens);
                                                     if(validTokens.isNotEmpty) {
                                                       SendNotificationService()
                                                         .sendFCMGroupMessage(validTokens, {
@@ -2239,8 +2238,9 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                           "${widget.groupName} (${curUser!.name})",
                                                       'body': temp
                                                     }, {});
+                                                    print(validTokens);
                                                     }
-                                                    debugPrint(' valid tokens $validTokens');
+                                                    // print("hiiiiiiiiiiiiiiiiiii");//debugPrint(' valid tokens $validTokens');
                                                     // DocumentSnapshot docSnap = await RemoteServices().reference.collection('groups').doc('${widget.groupId}').get();
                                                     // List<dynamic> participants = docSnap.get('participantIds');
                                                     // .getDocumentField(
