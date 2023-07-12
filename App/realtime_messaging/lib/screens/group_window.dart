@@ -1128,8 +1128,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                       const SizedBox(
                         width: 18,
                       ),
-                      IconButton(
-                          onPressed: () {}, icon: const Icon(Icons.star)),
                       const SizedBox(
                         width: 18,
                       ),
@@ -1485,6 +1483,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                               groupName: widget.groupName,
                                                                 phoneNo: groupmessage.senderPhoneNo,
                                                                 message: message,
+                                                                phoneNo: groupmessage.senderPhoneNo,
                                                                 time:
                                                                     ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                 isAcontact: savedNumber
@@ -1533,6 +1532,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                         .senderId)
                                                                 ? ImgBubble(
                                                                   groupName: widget.groupName,
+                                                                  phoneNo: groupmessage.senderPhoneNo,
                                                                     message:
                                                                         message,
                                                                     phoneNo: groupmessage.senderPhoneNo,
@@ -1908,7 +1908,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                 );
                                               } else {
                                                 //debugPrint('${participants.length} rajeev ');
-                                                print(tokens);
                                                 tokens[index] = null;
 
                                                 return StreamBuilder<UserGroup>(

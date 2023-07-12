@@ -83,7 +83,7 @@ class _SearchGroupState extends State<SearchGroup> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                     },
                   ),
-                  title:  Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 28),),
+                  title:  Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 20),),
                   onTap: () async {
                     RemoteServices().updateUser(cid, {'current':widget.usergroup[index].groupId});
                     final result=await Navigator.pushReplacement(context,
@@ -110,7 +110,7 @@ class _SearchGroupState extends State<SearchGroup> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GroupInfoPage(groupId: widget.usergroup[index].groupId,userGroupId: widget.usergroup[index].id,)));
                     },
                   ),
-                  title: Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 28),),
+                  title: Text(widget.usergroup[index].name,style: const TextStyle(fontSize: 20),),
 
 
                     onTap: () async {
