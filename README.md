@@ -28,6 +28,8 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 # Screenshots
 # Installation
 To get started with Chatrix, follow these steps:
+
+1. Ensure that you have Flutter and Dart SDK installed on your machine. For installation instructions, refer to the official [Flutter documentation](https://docs.flutter.dev/get-started/install).
 1. Clone the repository:
    
     ```bash
