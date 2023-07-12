@@ -535,6 +535,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                 builder: (context) {
                   final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
                   return Container(
+                    margin: EdgeInsets.all(3),
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.7,
                         maxHeight: (widget.isUser)
@@ -609,7 +610,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                   children: [
                                     Text(
                                       widget.time,
-                                      style: const TextStyle(fontSize: 13),
+                                      style: const TextStyle(fontSize: 13,color: Colors.white),
                                     ),
                                     const SizedBox(
                                       width: 5,
@@ -618,6 +619,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                         ? Icon(
                                             icon,
                                             size: 16,
+                                            color: Colors.white,
                                           )
                                         : const SizedBox(
                                             width: 0,
