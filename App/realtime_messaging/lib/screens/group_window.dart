@@ -535,6 +535,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                 builder: (context) {
                   final themeProvider=Provider.of<ThemeProvider>(context,listen: false);
                   return Container(
+                    margin: EdgeInsets.all(3),
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.7,
                         maxHeight: (widget.isUser)
@@ -664,7 +665,7 @@ class _ImgBubbleState extends State<ImgBubble> with WidgetsBindingObserver {
                                                           validTokens, {
                                                     'title':
                                                         "${widget.groupName} (${curUser!.name})",
-                                                    'body': "Document"
+                                                    'body': "Image"
                                                   }, {});
                                                   }
 
@@ -2147,8 +2148,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                     RemoteServices().updateUserGroup(
                                                         x,
                                                         {
-                                                          'lastMessage': 'image',
-                                                          'lastMessageType': "image",
+                                                          'lastMessage': 'Image',
+                                                          'lastMessageType': "Image",
                                                           'lastMessageTime':
                                                               DateTime.now()
                                                                   .toIso8601String(),
