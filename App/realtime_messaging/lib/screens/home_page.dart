@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       value: themeProvider.isDarkMode,
       onChanged: (value)  async {
         themeProvider.toggleTheme();
-          await const FlutterSecureStorage().write(key: 'theme_preference',value: value.toString());
+        await const FlutterSecureStorage().write(key: 'theme_preference',value: value.toString());
       },
     );
   },
@@ -135,22 +135,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ,),
             const PopupMenuDivider(),
             PopupMenuItem(
-            onTap: (){
-              WidgetsBinding.instance.addPostFrameCallback((_) async{
-               await RemoteServices().updateUser(cid,
-                {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
 
-                );
-                cid='';
-             await FirebaseAuth.instance.signOut();
-             Navigator.pushAndRemoveUntil(context,
-                 MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
-              });
-              },
-              child: const ListTile(
-                  leading: Icon(Icons.logout,color: Colors.black,),
-                  title: Text('Log Out'),
-                ),)
+              child: Consumer<ThemeProvider>(
+                builder: (context,themeProvider,_){
+                return  ListTile(
+                  onTap: () async {
+                    if(themeProvider.isDarkMode){
+                      themeProvider.toggleTheme();
+                      await const FlutterSecureStorage().write(key: 'theme_preference',value: false.toString());
+                    }
+
+                      await RemoteServices().updateUser(cid,
+                        {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
+
+                      );
+                      cid='';
+
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.pushAndRemoveUntil(context,
+                          MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
+                  },
+                    leading: Icon(Icons.logout,color: Colors.black,),
+                    title: Text('Log Out'),
+                  );}
+              ))
 
           ],
           )
