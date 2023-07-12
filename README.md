@@ -7,7 +7,7 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 +  Search functionality
 + Light/Dark theme toggle
 + Real-time messaging
-+ Messages are **end-to-end Encrypted**
++ Messages are **End-To-End Encrypted (E2EE)**
 + Chats can be one-to-one or in a group
 + Chats and groups can also be pinned and muted
 + Change wallpaper option
