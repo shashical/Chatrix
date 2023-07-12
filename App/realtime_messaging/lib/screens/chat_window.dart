@@ -429,7 +429,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                               children: [
                                 Text(
                                   widget.time,
-                                  style: const TextStyle(fontSize: 13),
+                                  style: const TextStyle(fontSize: 13,color: Colors.white),
                                 ),
                                 const SizedBox(
                                   width: 5,
@@ -437,6 +437,7 @@ class _ImageBubbleState extends State<ImageBubble> {
                                 (widget.isUser) ? Icon(
                                   icon,
                                   size: 16,
+                                  color: Colors.white,
                                 ) : const SizedBox(width: 0,)
                               ],
                             ),
