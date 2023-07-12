@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:restart_app/restart_app.dart';
 
 import '../main.dart';
 
 class ContactServices{
   List<Contact> contacts = [];
   Set<String> helper = {};
-  void getContactPermission(BuildContext context) async {
+  Future<void> getContactPermission(BuildContext context) async {
     if (await Permission.contacts.isGranted) {
       fetchContact();
 
@@ -18,20 +17,23 @@ class ContactServices{
         fetchContact();
 
       }
-      else{
-        showDialog(context: context, builder: (context)=> AlertDialog(
-          title: Text('Permission Required !',
+      else  {
+
+
+        await showDialog(context: context, builder: (context)=> AlertDialog(
+          title:  Text('Permission Required !',
           style: TextStyle(
             color: Colors.red,
             fontSize: 20,
           ),),
-          content: Text('Please restart your app  and provide permission to continue'),
+          content: const Text('Please allow permission to continue'),
           actions: [
             ElevatedButton(
-                onPressed: (){
-             Restart.restartApp();
+                onPressed: () async {
+                  await openAppSettings();
+             Navigator.of(context,rootNavigator:true).pop();
             },
-                child: Text('Ok restart')
+                child: const Text('Open Settings')
             )
           ],
         ));

@@ -14,25 +14,30 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    savedUsers=[];
-    savedNumber=[];
-    ContactServices().getContactPermission(context);
-
-    Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-             builder: (context) => StreamBuilder(
-                stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (context, snapshot) {
-                  debugPrint('${snapshot.hasData}');
-                  return (snapshot.hasData)? HomePage():const WelcomePage();
-                })
-
-      ));
-    });
-
+    savedUsers = [];
+    savedNumber = [];
+    getPermissionAndFutureDelay();
   }
+   void  getPermissionAndFutureDelay() async {
+      await ContactServices().getContactPermission(context);
+
+      Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => StreamBuilder(
+                    stream: FirebaseAuth.instance.authStateChanges(),
+                    builder: (context, snapshot) {
+                      debugPrint('${snapshot.hasData}');
+                      return (snapshot.hasData)? HomePage():const WelcomePage();
+                    })
+
+            ));
+      });
+
+    }
+
+
 
   @override
   Widget build(BuildContext context) {
