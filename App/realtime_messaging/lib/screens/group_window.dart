@@ -907,6 +907,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
   bool isEditing = false;
   String editingId = '';
   List<dynamic> participants = [];
+  List<String?> currents=[];
   bool isLoaded = false;
   List<bool> isUpdated = [];
   bool isStatedSet=false;
@@ -944,6 +945,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
     participants = docSnap.get('participantIds');
 
     tokens=List.filled(participants.length, null);
+    currents=List.filled(participants.length, null);
     isUpdated=List.filled(participants.length, true);
     // for (int i = 0; i < participants.length; i++) {
     //   DocumentSnapshot docsnap = await FirebaseFirestore.instance
@@ -1821,7 +1823,10 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         if (gp.current ==
                                                             widget.groupId) {
                                                           tokens[index] = null;
+
                                                         }
+                                                        currents[index]=gp.current;
+
                                                       }
                                                       else{
                                                         isStatedSet=false;
@@ -1885,7 +1890,8 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                         // debugPrint(
                                                         //     'checking $count +$dummy=${dummy + count}');
                                                         //Print("group window count + dummy");
-                                                         RemoteServices()
+                                                        if(currents[index]!=widget.groupId) {
+                                                          RemoteServices()
                                                             .updateUserGroup(
                                                                 participants[index],
                                                                 {
@@ -1893,6 +1899,7 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                       count + dummy
                                                                 },
                                                                 widget.groupId);
+                                                        }
                                                         isUpdated[index] = true;
                                                         totalWritesFromThisPage++;
                                                         //Print('printing from all-participants unreadability $totalWritesFromThisPage from group window ');

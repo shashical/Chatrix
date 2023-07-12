@@ -684,7 +684,7 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
                 otherUserId: aux[i][4],
                 chatId: docsnap.get('chatId'),
                 backgroundImage: docsnap.get('backgroundImage'),
-                
+                exists: true,
               );
             },
           ));
@@ -793,6 +793,7 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
                 otherUserId: extrAux[i][4],
                 chatId: docsnap.get('chatId'),
                 backgroundImage: docsnap.get('backgroundImage'),
+                exists: true,
               );
             },
           ));
@@ -903,6 +904,7 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
                 otherUserId: pAux[i][4],
                 chatId: docsnap.get('chatId'),
                 backgroundImage: docsnap.get('backgroundImage'),
+                exists: true,
               );
             },
           ));
@@ -1006,6 +1008,7 @@ List<Widget> showableWidget(BuildContext context,List<List<String>>aux,List<List
                 otherUserId: epAux[i][4],
                 chatId: docsnap.get('chatId'),
                 backgroundImage: docsnap.get('backgroundImage'),
+                exists: true,
               );
             },
           ));
