@@ -1483,7 +1483,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                               groupName: widget.groupName,
                                                                 phoneNo: groupmessage.senderPhoneNo,
                                                                 message: message,
-                                                                phoneNo: groupmessage.senderPhoneNo,
                                                                 time:
                                                                     ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                 isAcontact: savedNumber
@@ -1535,7 +1534,6 @@ class _GroupWindowState extends State<GroupWindow> with WidgetsBindingObserver {
                                                                   phoneNo: groupmessage.senderPhoneNo,
                                                                     message:
                                                                         message,
-                                                                    phoneNo: groupmessage.senderPhoneNo,
                                                                     time:
                                                                         ("${groupmessage.timestamp.hour}:${groupmessage.timestamp.minute ~/ 10}${groupmessage.timestamp.minute % 10}"),
                                                                     isAcontact: savedNumber.contains(

@@ -475,7 +475,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                                               RemoteServices().updateUser(cid,
                                                                   {'current':userchat.id});
                                                             final result=await  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                                return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,);
+                                                                return ChatWindow(otherUserId: otheruserid, chatId: userchat.chatId, backgroundImage: userchat.backgroundImage!,exists: true,);
                                                               },));
                                                               debugPrint("my chats current update");
                                                             RemoteServices().updateUser(cid,{'current':result});
