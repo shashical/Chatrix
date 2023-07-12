@@ -28,7 +28,7 @@ bool isLoaded=false;
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
-
+  ThemeProvider? themeProvider;
 
   final List<Widget> _pages = [
     ChatsPage(),
@@ -78,8 +78,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Chatrix",
-          style: TextStyle(fontFamily: "Caveat", fontSize: 40),
+              "Chatrix",
+              style: TextStyle(fontFamily: "Caveat", fontSize: 40),
         ),
         automaticallyImplyLeading: false,
         actions: [
@@ -137,13 +137,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             PopupMenuItem(
             onTap: (){
               WidgetsBinding.instance.addPostFrameCallback((_) async{
-
                await RemoteServices().updateUser(cid,
                 {'token': null,'isOnline':false,'lastOnline':DateTime.now().toIso8601String()},
 
                 );
                 cid='';
-
              await FirebaseAuth.instance.signOut();
              Navigator.pushAndRemoveUntil(context,
                  MaterialPageRoute(builder: (context)=>const WelcomePage()), ModalRoute.withName('/'));
