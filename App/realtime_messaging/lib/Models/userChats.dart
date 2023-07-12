@@ -27,7 +27,7 @@ class UserChat {
     this.backgroundImage,
     required this.pinned,
     required this.recipientPhoneNo,
-    this.unreadMessageCount=1,
+    this.unreadMessageCount,
     this.lastMessage='',
     this.lastMessageType='',
     this.lastMessageTime,

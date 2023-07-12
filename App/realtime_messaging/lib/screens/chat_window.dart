@@ -1462,6 +1462,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             UserChat(
                                                 id: "$cid${widget.otherUserId}",
                                                 chatId: "$cid${widget.otherUserId}",
+                                                unreadMessageCount: 0,
                                                 recipientPhoto: otheruser.photoUrl!,
                                                 pinned: false,
                                                 recipientPhoneNo: otheruser.phoneNo,
@@ -1482,6 +1483,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             UserChat(
                                                 id: "${widget.otherUserId}$cid",
                                                 chatId: "$cid${widget.otherUserId}",
+                                                unreadMessageCount: 1,
                                                 recipientPhoto: currentuser.photoUrl!,
                                                 pinned: false,
                                                 recipientPhoneNo: currentuser.phoneNo,
@@ -1509,6 +1511,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     UserChat(
                                                       id: "$cid${otheruser.id}",
                                                       chatId: chatid!,
+                                                      unreadMessageCount: 0,
                                                       recipientPhoto: otheruser.photoUrl!,
                                                       pinned: false,
                                                       recipientPhoneNo:otheruser.phoneNo,
@@ -1521,6 +1524,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 otherUserChat=UserChat(
                                                     id: "${otheruser.id}$cid",
                                                     chatId: chatid!,
+                                                    unreadMessageCount: 1,
                                                     recipientPhoto: currentuser.photoUrl!,
                                                     pinned: false,
                                                     recipientPhoneNo: currentuser.phoneNo,
@@ -1638,6 +1642,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             cid,
                                             UserChat(
                                                 id: "$cid${widget.otherUserId}",
+                                                unreadMessageCount: 0,
                                                 chatId: "$cid${widget.otherUserId}",
                                                 recipientPhoto: otheruser.photoUrl!,
                                                 pinned: false,
@@ -1658,6 +1663,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                           id: "${widget.otherUserId}$cid",
                                           chatId: "$cid${widget.otherUserId}",
                                           recipientPhoto: currentuser.photoUrl!,
+                                          unreadMessageCount: 1,
                                           pinned: false,
                                           recipientPhoneNo: currentuser.phoneNo,
                                           backgroundImage: "assets/backgroundimage.png",
@@ -1678,6 +1684,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     UserChat(
                                                       id: "$cid${otheruser.id}",
                                                       chatId: chatid!,
+                                                      unreadMessageCount: 0,
                                                       recipientPhoto: otheruser.photoUrl!,
                                                       pinned: false,
                                                       recipientPhoneNo:otheruser.phoneNo,
@@ -1691,6 +1698,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 otherUserChat=UserChat(
                                                   id: "${widget.otherUserId}$cid",
                                                   chatId: chatid!,
+                                                  unreadMessageCount: 1,
                                                   recipientPhoto: currentuser.photoUrl!,
                                                   pinned: false,
                                                   recipientPhoneNo: currentuser.phoneNo,
@@ -1807,6 +1815,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             UserChat(
                                                 id: "$cid${widget.otherUserId}",
                                                 chatId: "$cid${widget.otherUserId}",
+                                                unreadMessageCount: 0,
                                                 recipientPhoto: otheruser.photoUrl!,
                                                 pinned: false,
                                                 recipientPhoneNo: otheruser.phoneNo,
@@ -1826,6 +1835,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                   otherUserChat=UserChat(
                                                     id: "${widget.otherUserId}$cid",
                                                     chatId: "$cid${widget.otherUserId}",
+                                                    unreadMessageCount: 1,
                                                     recipientPhoto: currentuser.photoUrl!,
                                                     pinned: false,
                                                     recipientPhoneNo: currentuser.phoneNo,
@@ -1846,6 +1856,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                     cid,
                                                     UserChat(
                                                       id: "$cid${otheruser.id}",
+                                                      unreadMessageCount: 0,
                                                       chatId: chatid!,
                                                       recipientPhoto: otheruser.photoUrl!,
                                                       pinned: false,
@@ -1858,6 +1869,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 (await RemoteServices().getSingleUser(cid))!;
                                                 otherUserChat=UserChat(
                                                   id: "${widget.otherUserId}$cid",
+                                                  unreadMessageCount: 1,
                                                   chatId: chatid!,
                                                   recipientPhoto: currentuser.photoUrl!,
                                                   pinned: false,
@@ -1999,6 +2011,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 cid,
                                                 UserChat(
                                                   id: "$cid${widget.otherUserId}",
+                                                  unreadMessageCount: 0,
                                                   chatId: "$cid${widget.otherUserId}",
                                                   recipientPhoto: otheruser.photoUrl!,
                                                   pinned: false,
@@ -2027,6 +2040,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             otherUserChat=UserChat(
                                               id: "${widget.otherUserId}$cid",
                                               chatId: "$cid${widget.otherUserId}",
+                                              unreadMessageCount: 1,
                                               recipientPhoto: currentuser.photoUrl!,
                                               pinned: false,
                                               recipientPhoneNo: currentuser.phoneNo,
@@ -2075,6 +2089,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                             await RemoteServices().setUserChat(cid,
                                                 UserChat(
                                                     id: "$cid${widget.otherUserId}",
+                                                    unreadMessageCount: 0,
                                                     chatId: chatid!,
                                                     recipientPhoto: otheruser.photoUrl!,
                                                     pinned: false,
@@ -2122,6 +2137,7 @@ class _ChatWindowState extends State<ChatWindow> with WidgetsBindingObserver{
                                                 .getSingleUser(cid))!;
                                             otherUserChat=UserChat(
                                               id: "${widget.otherUserId}$cid",
+                                              unreadMessageCount: 1,
                                               chatId: chatid!,
                                               recipientPhoto: currentuser.photoUrl!,
                                               pinned: false,
