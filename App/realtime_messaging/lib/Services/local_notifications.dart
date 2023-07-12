@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService {
@@ -12,7 +13,7 @@ class LocalNotificationService {
     _notificationPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (details) {
-        print(details.payload);
+        debugPrint(details.payload);
       },
     );
   }

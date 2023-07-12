@@ -1,11 +1,9 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realtime_messaging/main.dart';
 import 'package:realtime_messaging/screens/group_window.dart';
-import 'package:realtime_messaging/screens/home_page.dart';
 import 'package:realtime_messaging/screens/new_group_page.dart';
 import 'package:realtime_messaging/screens/user_info.dart';
 import 'dart:io';

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,21 +5,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_messaging/Services/local_notifications.dart';
-import 'package:realtime_messaging/screens/chat_window.dart';
-import 'package:realtime_messaging/screens/current_user_profile_page.dart';
-import 'package:realtime_messaging/screens/group_window.dart';
 import 'package:realtime_messaging/screens/home_page.dart';
-import 'package:realtime_messaging/screens/login_page.dart';
-import 'package:realtime_messaging/screens/search_contacts.dart';
-import 'package:realtime_messaging/screens/verify_otp_page.dart';
 import 'package:realtime_messaging/theme_provider.dart';
-import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
-import 'screens/my_chats.dart';
 import 'screens/splash.dart';
-import 'screens/user_info.dart';
+
 bool darkmode=false;
 Future<void> backgroundHandler(RemoteMessage message)async{
   debugPrint("This message is from background");
