@@ -49,6 +49,8 @@ To get started with Chatrix, follow these steps:
    ```bash
    flutter run
 # Download Apk file
+
+https://drive.google.com/file/d/17Nve1M5f5DNKvbSWR5JLuxdWbcEwUPfz/view?usp=sharing
 # Environment Variables
 Firebase Cloud Messaging (FCM) server key 
 ```bash
