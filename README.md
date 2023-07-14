@@ -26,6 +26,9 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 
 **DataBase:** Cloud Firestore
 # Screenshots
+
+![Img1 (1)](https://github.com/shashical/realtime_messaging/assets/106883186/9b341a2f-6943-476f-8a1a-c1122ca0ccf5)
+
 # Installation
 To get started with Chatrix, follow these steps:
 
