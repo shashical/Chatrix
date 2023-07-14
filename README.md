@@ -26,12 +26,8 @@ Messages are end-to-end encrypted, that is, not even the developers or the owner
 
 **DataBase:** Cloud Firestore
 # Screenshots
-<div>
-<!-- ![Img1 (1)](https://github.com/shashical/realtime_messaging/assets/106883186/9b341a2f-6943-476f-8a1a-c1122ca0ccf5)
-![Img2 (1)](https://github.com/shashical/realtime_messaging/assets/106883186/14465e30-3a1c-48fa-8b9e-e2cfb0407990) -->
- <img src="[image1.png](https://github.com/shashical/realtime_messaging/assets/106883186/9b341a2f-6943-476f-8a1a-c1122ca0ccf5)" alt="Image 1">
- <img src="[image2.png](https://github.com/shashical/realtime_messaging/assets/106883186/14465e30-3a1c-48fa-8b9e-e2cfb0407990)" alt="Image 2">
-</div>
+
+![Image1](https://github.com/shashical/realtime_messaging/assets/106883186/9b341a2f-6943-476f-8a1a-c1122ca0ccf5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Image2](https://github.com/shashical/realtime_messaging/assets/106883186/14465e30-3a1c-48fa-8b9e-e2cfb0407990)
 # Installation
 To get started with Chatrix, follow these steps:
 
@@ -92,7 +88,7 @@ Tapping on the profile image within each chat will direct you to the profile pag
  
  Additional features:
  
-**Attach Icon:** Located beside the text field, the attach icon allows you to send various types of files. You can choose to send media such as documents or images. Images can be from gallery or camera.
+**Attach Icon:** Located beside the text field, the attach icon allows you to send various types of files. You can choose to send files such as documents or images. Images can be from gallery or camera.
 
 **Pop-up Menu:** There is a pop-up menu button present on the top right of the screen. This menu provides options such as clearing the chat history, blocking or unblocking the other user, and changing the wallpaper for this particular chat window.
 
